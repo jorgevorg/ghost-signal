@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import * as THREE from "three";
-import ReactDOM from "react-dom/client";
+import React, { useState, useEffect, useRef } from "react";
 
 const MONO="'Share Tech Mono',monospace",ORB="'Orbitron',sans-serif",RAJ="'Rajdhani',sans-serif",BG="#0a0a14";
 const B1="#5a5a7a",B2="#35354f",B3="#6a6a8a";
