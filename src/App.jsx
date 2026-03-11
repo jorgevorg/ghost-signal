@@ -882,312 +882,107 @@ function HexMap(props){
     ),
     React.createElement("div",{style:{position:"absolute",bottom:10,left:12,display:"flex",flexDirection:"column",gap:4,background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"8px 12px"}},
       React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:2,marginBottom:2}},"LEGEND"),
-      [["#FF2060","▲ SHIP POSITION"],["#BBAA44","■ MIDDLE RING"],["#CC6622","■ INNER RING"],["#CCCCCC","■ OUTER RING"],[BARRIER_C,"⬡ BARRIER TILE"],[BASE_C,"⬡ FACTION BASE"],["#6a7a8a","░ UNCHARTED"]].map(function(pair){return React.createElement("div",{key:pair[1],style:{display:"flex",alignItems:"center",gap:6}},React.createElement("div",{style:{width:8,height:8,borderRadius:2,background:pair[0]}}),React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb"}},pair[1]));}))
+      [["#FF2060","▲ SHIP POSITION"],["#BBAA44","■ MIDDLE RING"],["#CC6622","■ INNER RING"],["#CCCCCC","■ OUTER RING"],["#884400","■ BARRIER"],["#3a6a3a","■ FACTION BASE"],["#6a7a8a","░ UNCHARTED"]].map(function(pair){return React.createElement("div",{key:pair[1],style:{display:"flex",alignItems:"center",gap:5}},React.createElement("div",{style:{width:9,height:9,background:pair[0],borderRadius:1}}),React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aabb"}},pair[1]));})
     )
   );
 }
-// ── APP ─────────────────────────────────────────────────────────────────────
+
 function App(){
-  var gsS=useState(function(){
-    try{var r=localStorage.getItem("gs_state");if(r)return merge(JSON.parse(r));}catch(e){}
-    return merge(null);
-  }),setGs=gsS[1];var gs=gsS[0];
-  var tabS=useState("crew"),setTab=tabS[1];var tab=tabS[0];
-  // FIX 1: localStorage (sync) for main state persistence
-  useEffect(function(){
-    try{localStorage.setItem("gs_state",JSON.stringify(gs));}catch(e){}
-  },[gs]);
-  var upChar=function(charKey,key,val){
-    setGs(function(prev){
-      var n=Object.assign({},prev);
-      var c=Object.assign({},n[charKey]);
-      if(key.startsWith("weapons.")){
-        var parts=key.split(".");var wi=parseInt(parts[1]),wk=parts[2];
-        c.weapons=c.weapons.map(function(w,i){return i===wi?Object.assign({},w,{[wk]:val}):w;});
-      }else if(key.startsWith("inventory.")){
-        var idx=parseInt(key.split(".")[1]);var inv=c.inventory.slice();inv[idx]=val;c.inventory=inv;
-      }else if(key.startsWith("memory.")){
-        var idx=parseInt(key.split(".")[1]);var mem=c.memory.slice();mem[idx]=val;c.memory=mem;
-      }else if(key.startsWith("cybertech.")){
-        var idx=parseInt(key.split(".")[1]);var ct=c.cybertech.slice();ct[idx]=val;c.cybertech=ct;
-      }else if(key.startsWith("fav.")){
-        var k=key.slice(4);c.fav=Object.assign({},c.fav,{[k]:val});
-      }else{c[key]=val;}
-      n[charKey]=c;return n;
-    });
-  };
-  var upShip=function(key,val){
-    setGs(function(prev){
-      var n=Object.assign({},prev);var s=Object.assign({},n.ship);
-      if(key.startsWith("modules.")){
-        var idx=parseInt(key.split(".")[1]);var mods=s.modules.slice();mods[idx]=val;s.modules=mods;
-      }else if(key.startsWith("cargo.")){
-        var idx=parseInt(key.split(".")[1]);var cargo=s.cargo.slice();cargo[idx]=val;s.cargo=cargo;
-      }else{s[key]=val;}
-      n.ship=s;return n;
-    });
-  };
-  var upCrew=function(index,key,val){
-    setGs(function(prev){
-      var n=Object.assign({},prev);var crew=n.crew.slice();
-      var c=Object.assign({},crew[index]||mkCrew());c[key]=val;crew[index]=c;n.crew=crew;return n;
-    });
-  };
-  var upHexMap=function(m){setGs(function(p){return Object.assign({},p,{hexMap:m});});};
-  var upCampaignMap=function(cm){setGs(function(p){return Object.assign({},p,{campaignMap:cm});});};
-  var upSession=function(v){setGs(function(p){return Object.assign({},p,{session:v});});};
-  var addLog=function(){
-    var t=window.prompt("Log title:");
-    if(!t)return;
-    setGs(function(prev){
-      var n=Object.assign({},prev);
-      n.logs=n.logs.concat([{id:Date.now(),session:prev.session,title:t,content:"",ts:new Date().toISOString()}]);
-      return n;
-    });
-  };
-  var upLog=function(id,content){
-    setGs(function(prev){
-      var n=Object.assign({},prev);
-      n.logs=n.logs.map(function(l){return l.id===id?Object.assign({},l,{content:content}):l;});
-      return n;
-    });
-  };
-  var TABS=["CREW","SHIP","MAP","COMMS","LOGS"];
-  var tabBtn=function(t){
-    var a=tab===t.toLowerCase();
-    return React.createElement("button",{key:t,onClick:function(){setTab(t.toLowerCase());},style:{padding:"8px 18px",background:"transparent",border:"none",borderBottom:"2px solid "+(a?"#FF2060":"transparent"),color:a?"#FF2060":"#aaa",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);
-  };
-  return React.createElement("div",{style:{minHeight:"100vh",background:BG,color:"#dde",position:"relative"}},
+  var gsS=useState(function(){try{var r=localStorage.getItem("gs_state");if(r)return merge(JSON.parse(r));}catch(e){}return INIT;}),setGs=gsS[1];var gs=gsS[0];
+  var tabS=useState("map"),setTab=tabS[1];var tab=tabS[0];
+  var savedS=useState(false),setSaved=savedS[1];
+  useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}catch(e){}setSaved(true);setTimeout(function(){setSaved(false);},1200);},[gs]);
+  var upC=function(who,key,val){setGs(function(p){var char=Object.assign({},p[who]);var keys=key.split(".");if(keys.length===1){char[key]=val;}else if(keys.length>=2&&keys[0]==="fav"){char.fav=Object.assign({},char.fav);char.fav[keys[1]]=val;}else if(keys.length===3){var arr=char[keys[0]].slice();if(keys[2])arr[parseInt(keys[1])]=Object.assign({},arr[parseInt(keys[1])],{[keys[2]]:val});else arr[parseInt(keys[1])]=val;char[keys[0]]=arr;}return Object.assign({},p,{[who]:char});});};
+  var upS=function(key,val){setGs(function(p){var ship=Object.assign({},p.ship);var keys=key.split(".");if(keys.length===1){ship[key]=val;}else{var arr=ship[keys[0]].slice();arr[parseInt(keys[1])]=val;ship[keys[0]]=arr;}return Object.assign({},p,{ship:ship});});};
+  var upCrew=function(idx,key,val){setGs(function(p){var crew=p.crew.slice();crew[idx]=Object.assign({},crew[idx]);crew[idx][key]=val;return Object.assign({},p,{crew:crew});});};
+  var upHex=function(newMap){setGs(function(p){return Object.assign({},p,{hexMap:newMap});});};
+  var addLog=function(log){setGs(function(p){return Object.assign({},p,{logs:p.logs.concat([Object.assign({id:Date.now()},log)])});});};
+  var upSession=function(n){setGs(function(p){return Object.assign({},p,{session:n});});};
+  var upCampaign=function(cm){setGs(function(p){return Object.assign({},p,{campaignMap:cm});});};
+  var TABS=["MAP","CREW","SHIP","LOGS","COMMS"];
+  var TAB_C={MAP:"#cc88ff",CREW:"#FFD166",SHIP:"#00FFD0",LOGS:"#FF6EC7",COMMS:"#88BBFF"};
+  return React.createElement("div",{style:{minHeight:"100vh",background:BG,color:"#ddd",position:"relative",zIndex:1}},
     React.createElement("style",null,css),
     React.createElement(Starfield,null),
-    React.createElement("div",{style:{position:"relative",zIndex:1,maxWidth:1400,margin:"0 auto",padding:"0 20px 40px"}},
-      React.createElement("div",{style:{padding:"20px 0 8px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
-        React.createElement("div",{style:{fontFamily:ORB,fontSize:18,color:"#FF2060",letterSpacing:4,textShadow:"0 0 20px #FF206066"}},"ASTROPRISMA"),
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#556",letterSpacing:2}},"SESSION "+String(gs.session).padStart(2,"0"))
-      ),
-      React.createElement("div",{style:{padding:"6px 0 10px",borderBottom:"1px solid "+B2,marginBottom:0}},
-        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#778",letterSpacing:2}},"CAMPAIGN MAP:"),
-          CAMPAIGN_MAPS.map(function(cm){
-            var sel=gs.campaignMap&&gs.campaignMap.id===cm.id;
-            var cc=parseInt(cm.id)<7?"#aaaaff":"#cc88ff";
-            return React.createElement("button",{key:cm.id,onClick:function(){upCampaignMap(sel?null:cm);},style:{padding:"3px 9px",background:sel?cc+"22":"transparent",border:"1px solid "+(sel?cc:B1),color:sel?cc:"#778",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},cm.id+" "+cm.name);
-          })
+    React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 60px"}},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"18px 0 10px",borderBottom:"1px solid "+B2,marginBottom:18}},
+        React.createElement("div",{style:{display:"flex",alignItems:"baseline",gap:12}},
+          React.createElement("span",{style:{fontFamily:ORB,fontSize:18,color:"#FF2060",letterSpacing:4,fontWeight:900}},"GHOST SIGNAL"),
+          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#FF2060",opacity:.6,letterSpacing:2}},"v2.4")
         ),
-        gs.campaignMap&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:12,color:"#aaa",marginTop:3,paddingLeft:2}},gs.campaignMap.desc)
-      ),
-      React.createElement("div",{style:{display:"flex",borderBottom:"1px solid "+B2,marginBottom:20,alignItems:"center"}},
-        TABS.map(tabBtn),
-        React.createElement("div",{style:{flex:1}}),
-        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,padding:"0 4px"}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#778",letterSpacing:1}},"SESSION"),
-          React.createElement(Spin,{v:gs.session,min:0,max:99,onChange:upSession})
+        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12}},
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+            React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:1}},"SESSION"),
+            React.createElement("input",{type:"number",value:gs.session,onChange:function(e){upSession(+e.target.value||0);},style:{width:44,background:"transparent",border:"1px solid "+B1,borderRadius:3,color:"#eee",fontFamily:MONO,fontSize:13,textAlign:"center",padding:"3px",outline:"none"}})
+          ),
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+            React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa"}},"MAP"),
+            React.createElement("select",{value:gs.campaignMap?gs.campaignMap.id:"",onChange:function(e){var found=e.target.value?CAMPAIGN_MAPS.find(function(m){return m.id===e.target.value;}):null;upCampaign(found||null);},style:{background:"#0a0a14",border:"1px solid "+B1,color:"#eee",fontFamily:MONO,fontSize:10,padding:"3px 6px",borderRadius:3,outline:"none"}},
+              React.createElement("option",{value:""},"— NONE —"),
+              CAMPAIGN_MAPS.map(function(m){return React.createElement("option",{key:m.id,value:m.id},"#"+m.id+" "+m.name+" (Lv"+m.level+")");})
+            )
+          ),
+          savedS[0]&&React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#00FFD0",letterSpacing:2}},"SAVED ✓")
         )
       ),
+      React.createElement("div",{style:{display:"flex",gap:0,marginBottom:22,borderBottom:"1px solid "+B2}},
+        TABS.map(function(t){var a=tab===t.toLowerCase();var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t.toLowerCase());},style:{padding:"9px 20px",background:a?tc+"18":"transparent",border:"none",borderBottom:"2px solid "+(a?tc:"transparent"),color:a?tc:"#778",fontFamily:MONO,fontSize:11,letterSpacing:2,cursor:"pointer"}},t);})
+      ),
+      tab==="map"&&React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name}),
       tab==="crew"&&React.createElement("div",null,
-        React.createElement("div",{style:{display:"flex",gap:20,flexWrap:"wrap",marginBottom:20}},
-          React.createElement(CharCard,{name:gs.cole.name,data:gs.cole,accent:"#FFD166",onChange:function(k,v){upChar("cole",k,v);},onNameChange:function(v){upChar("cole","name",v);}}),
-          React.createElement(CharCard,{name:gs.vela.name,data:gs.vela,accent:"#FF2060",onChange:function(k,v){upChar("vela",k,v);},onNameChange:function(v){upChar("vela","name",v);}})
+        React.createElement("div",{style:{display:"flex",gap:18,flexWrap:"wrap",marginBottom:28}},
+          React.createElement(CharCard,{name:gs.cole.name,data:gs.cole,accent:"#FFD166",onChange:function(k,v){upC("cole",k,v);},onNameChange:function(n){upC("cole","name",n);}}),
+          React.createElement(CharCard,{name:gs.vela.name,data:gs.vela,accent:"#FF2060",onChange:function(k,v){upC("vela",k,v);},onNameChange:function(n){upC("vela","name",n);}})
         ),
-        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}},
-          gs.crew.map(function(c,i){return React.createElement(CrewCard,{key:i,index:i,data:c||mkCrew(),onChange:upCrew});})
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:14}},"NPC CREW"),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},(gs.crew||[]).map(function(c,i){return React.createElement(CrewCard,{key:i,index:i,data:c,onChange:upCrew});}))
+      ),
+      tab==="ship"&&React.createElement("div",{style:{background:BG,border:"1px solid #00FFD055",borderRadius:8,padding:24,maxWidth:640}},
+        React.createElement("div",{style:{fontFamily:ORB,fontSize:16,color:"#00FFD0",letterSpacing:3,marginBottom:20}},gs.ship.name),
+        [["HULL","hull"],["FUEL","fuel"]].map(function(pair){return React.createElement("div",{key:pair[1],style:{marginBottom:16}},
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:13,color:"#bbb",letterSpacing:2,marginBottom:7}},pair[0]),
+          React.createElement(Bar,{v:gs.ship[pair[1]],m:gs.ship[pair[1]+"Max"],c:"#00FFD0"}),
+          React.createElement("div",{style:{display:"flex",gap:5,marginTop:7}},[-10,-5,-1,1,5,10].map(function(d){return React.createElement("button",{key:d,onClick:function(){upS(pair[1],Math.max(0,Math.min(gs.ship[pair[1]+"Max"],gs.ship[pair[1]]+d)));},style:{flex:1,padding:"5px 0",background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:11}},d>0?"+"+d:d);}))
+        );}),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:8}},
+          React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:12,color:"#bbb",letterSpacing:1,marginBottom:6}},"SCRAPS"),React.createElement(Spin,{v:gs.ship.scraps||0,onChange:function(v){upS("scraps",v);}}))
+        ),
+        React.createElement("div",{style:{marginTop:18}},
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"CONTROL"),
+          React.createElement("input",{value:gs.ship.control,onChange:function(e){upS("control",e.target.value);},style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#eee",fontFamily:RAJ,fontSize:14,padding:"7px 10px",outline:"none",boxSizing:"border-box",marginBottom:10}}),
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"ENGINES"),
+          React.createElement("input",{value:gs.ship.engines,onChange:function(e){upS("engines",e.target.value);},style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#eee",fontFamily:RAJ,fontSize:14,padding:"7px 10px",outline:"none",boxSizing:"border-box",marginBottom:14}})
+        ),
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"MODULES"),
+          (gs.ship.modules||[]).map(function(m,i){return React.createElement("input",{key:i,value:m,onChange:function(e){upS("modules."+i,e.target.value);},placeholder:"Module slot "+(i+1),style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#cc88ff",fontFamily:RAJ,fontSize:14,padding:"7px 10px",outline:"none",boxSizing:"border-box",marginBottom:6}});})
+        ),
+        React.createElement("div",{style:{marginTop:14}},
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"CARGO"),
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}},(gs.ship.cargo||[]).map(function(c,i){return React.createElement("input",{key:i,value:c,onChange:function(e){upS("cargo."+i,e.target.value);},placeholder:"Cargo "+(i+1),style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:14,padding:"7px 10px",outline:"none",boxSizing:"border-box"}});}))
         )
       ),
-      tab==="ship"&&React.createElement("div",{style:{maxWidth:700}},
-        React.createElement("div",{style:{background:BG,border:"1px solid #FF206055",borderRadius:8,padding:22}},
-          React.createElement("div",{style:{fontFamily:ORB,fontSize:15,fontWeight:700,color:"#FF2060",letterSpacing:3,marginBottom:18}},gs.ship.name),
-          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:16}},
-            ["hull","fuel"].map(function(stat){
-              var label=stat.toUpperCase(),color=stat==="hull"?"#FF2060":"#00FFD0",max=gs.ship[stat+"Max"];
-              return React.createElement("div",{key:stat},
-                React.createElement("div",{style:{fontFamily:MONO,fontSize:13,color:"#bbb",letterSpacing:2,marginBottom:7}},label),
-                React.createElement(Bar,{v:gs.ship[stat],m:max,c:color}),
-                React.createElement("div",{style:{display:"flex",gap:5,marginTop:7}},[-5,-1,1,5].map(function(d){return React.createElement("button",{key:d,onClick:function(){upShip(stat,Math.max(0,Math.min(max,gs.ship[stat]+d)));},style:{flex:1,padding:"5px 0",background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:12}},d>0?"+"+d:d);}))
-              );
-            })
-          ),
-          React.createElement("div",{style:{marginBottom:14}},
-            React.createElement("div",{style:{fontFamily:MONO,fontSize:12,color:"#bbb",letterSpacing:1,marginBottom:6}},"SCRAPS"),
-            React.createElement(Spin,{v:gs.ship.scraps||0,onChange:function(v){upShip("scraps",v);}})
-          ),
-          React.createElement("div",{style:{marginBottom:12}},
-            React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#778",letterSpacing:2,marginBottom:4}},"CONTROL"),
-            React.createElement("input",{value:gs.ship.control||"",onChange:function(e){upShip("control",e.target.value);},style:Object.assign({},tS("#cc88ff",false),{marginBottom:8})})
-          ),
-          React.createElement("div",{style:{marginBottom:12}},
-            React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#778",letterSpacing:2,marginBottom:4}},"ENGINES"),
-            React.createElement("input",{value:gs.ship.engines||"",onChange:function(e){upShip("engines",e.target.value);},style:Object.assign({},tS("#00FFD0",false),{marginBottom:8})})
-          ),
-          React.createElement("div",{style:{marginBottom:12}},
-            React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#778",letterSpacing:2,marginBottom:6}},"MODULES"),
-            React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6}},
-              (gs.ship.modules||[]).map(function(m,i){return React.createElement("input",{key:i,value:m||"",onChange:function(e){upShip("modules."+i,e.target.value);},placeholder:"Module slot "+(i+1),style:tS("#FFD166",false)});})
-            )
-          ),
-          React.createElement("div",null,
-            React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#778",letterSpacing:2,marginBottom:6}},"CARGO HOLD"),
-            React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}},
-              (gs.ship.cargo||[]).map(function(c,i){return React.createElement("input",{key:i,value:c||"",onChange:function(e){upShip("cargo."+i,e.target.value);},placeholder:"Cargo "+(i+1),style:tS("#aaa",false)});})
-            )
-          )
-        )
-      ),
-      tab==="map"&&React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHexMap,shipName:gs.ship.name}),
-      tab==="comms"&&React.createElement(CommsTab,{gameState:gs}),
-      tab==="logs"&&React.createElement("div",{style:{maxWidth:800}},
-        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}},
-          React.createElement("span",{style:{fontFamily:ORB,fontSize:13,color:"#FF2060",letterSpacing:3}},"MISSION LOGS"),
-          React.createElement("button",{onClick:addLog,style:{padding:"7px 16px",background:"#FF206018",border:"1px solid #FF206055",color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:10,letterSpacing:2}},"+ NEW ENTRY")
+      tab==="logs"&&React.createElement("div",null,
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
+          React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2}},"MISSION LOGS"),
+          React.createElement("button",{onClick:function(){addLog({session:gs.session,title:"",content:"",date:new Date().toISOString().slice(0,10)});},style:{padding:"7px 18px",background:"#FF6EC718",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:10,letterSpacing:2}},"+  NEW ENTRY")
         ),
         gs.logs.length===0
-          ?React.createElement("div",{style:{fontFamily:MONO,fontSize:12,color:"#445",padding:"30px 0",textAlign:"center"}},"// NO LOG ENTRIES YET")
-          :gs.logs.slice().reverse().map(function(log){return React.createElement("div",{key:log.id,style:{background:"#06060f",border:"1px solid "+B3,borderRadius:8,padding:16,marginBottom:12}},
-            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
-              React.createElement("div",null,
-                React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#556",letterSpacing:2,marginRight:10}},"S"+log.session),
-                React.createElement("span",{style:{fontFamily:ORB,fontSize:12,color:"#ccc",letterSpacing:2}},log.title||"(untitled)")
-              ),
-              React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#445"}},log.ts?new Date(log.ts).toLocaleDateString():"")
+          ?React.createElement("div",{style:{fontFamily:MONO,fontSize:12,color:"#445",textAlign:"center",padding:"40px 0"}},"// NO LOG ENTRIES YET")
+          :React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:14}},gs.logs.slice().reverse().map(function(log,i){var ri=gs.logs.length-1-i;return React.createElement("div",{key:log.id,style:{background:"#06060f",border:"1px solid "+B3,borderRadius:8,padding:16}},
+            React.createElement("div",{style:{display:"flex",gap:10,marginBottom:10,alignItems:"center"}},
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#FF6EC7",letterSpacing:2}},"S"+log.session),
+              React.createElement("input",{value:log.title||"",onChange:function(e){setGs(function(p){var logs=p.logs.slice();logs[ri]=Object.assign({},logs[ri],{title:e.target.value});return Object.assign({},p,{logs:logs});});},placeholder:"Log title",style:{flex:1,background:"transparent",border:"none",borderBottom:"1px solid "+B1,color:"#eee",fontFamily:ORB,fontSize:13,letterSpacing:2,outline:"none",padding:"2px 4px"}}),
+              React.createElement("button",{onClick:function(){setGs(function(p){return Object.assign({},p,{logs:p.logs.filter(function(_,j){return j!==ri;})});});},style:{background:"transparent",border:"none",color:"#555",cursor:"pointer",fontSize:16,padding:"2px 6px"}},"✕")
             ),
-            React.createElement("textarea",{value:log.content||"",onChange:function(e){upLog(log.id,e.target.value);},placeholder:"Log entry...",rows:4,style:{width:"100%",background:"transparent",border:"1px solid "+B2,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:14,padding:"9px 12px",outline:"none",resize:"vertical",boxSizing:"border-box",lineHeight:1.7}})
-          );})
-      )
+            React.createElement("textarea",{value:log.content||"",onChange:function(e){setGs(function(p){var logs=p.logs.slice();logs[ri]=Object.assign({},logs[ri],{content:e.target.value});return Object.assign({},p,{logs:logs});});},placeholder:"Log entry...",rows:4,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#ccc",fontFamily:RAJ,fontSize:14,padding:"9px 12px",outline:"none",resize:"vertical",boxSizing:"border-box",lineHeight:1.7}})
+          );}))
+      ),
+      tab==="comms"&&React.createElement(CommsTab,{gameState:gs})
     ),
     React.createElement(DiceRoller,{gameState:gs})
   );
 }
+
 const root=ReactDOM.createRoot(document.getElementById("root"));
 root.render(React.createElement(App,null));
-
-// ── APP ─────────────────────────────────────────────────────────────────────
-
-function App(){
-  var gsS=useState(function(){
-    try{var r=localStorage.getItem("gs_state");if(r)return merge(JSON.parse(r));}catch(e){}
-    return merge(null);
-  }),setGs=gsS[1];var gs=gsS[0];
-  var tabS=useState("crew"),setTab=tabS[1];var tab=tabS[0];
-
-  // FIX 1: localStorage (sync) for main state persistence
-  useEffect(function(){
-    try{localStorage.setItem("gs_state",JSON.stringify(gs));}catch(e){}
-  },[gs]);
-
-  var upChar=function(charKey,key,val){
-    setGs(function(prev){
-      var n=Object.assign({},prev);
-      var c=Object.assign({},n[charKey]);
-      if(key.startsWith("weapons.")){
-        var parts=key.split(".");var wi=parseInt(parts[1]),wk=parts[2];
-        c.weapons=c.weapons.map(function(w,i){return i===wi?Object.assign({},w,{[wk]:val}):w;});
-      }else if(key.startsWith("inventory.")){
-        var idx=parseInt(key.split(".")[1]);var inv=c.inventory.slice();inv[idx]=val;c.inventory=inv;
-      }else if(key.startsWith("memory.")){
-        var idx=parseInt(key.split(".")[1]);var mem=c.memory.slice();mem[idx]=val;c.memory=mem;
-      }else if(key.startsWith("cybertech.")){
-        var idx=parseInt(key.split(".")[1]);var ct=c.cybertech.slice();ct[idx]=val;c.cybertech=ct;
-      }else if(key.startsWith("fav.")){
-        var k=key.slice(4);c.fav=Object.assign({},c.fav,{[k]:val});
-      }else{c[key]=val;}
-      n[charKey]=c;return n;
-    });
-  };
-
-  var upShip=function(key,val){
-    setGs(function(prev){
-      var n=Object.assign({},prev);var s=Object.assign({},n.ship);
-      if(key.startsWith("modules.")){
-        var idx=parseInt(key.split(".")[1]);var mods=s.modules.slice();mods[idx]=val;s.modules=mods;
-      }else if(key.startsWith("cargo.")){
-        var idx=parseInt(key.split(".")[1]);var cargo=s.cargo.slice();cargo[idx]=val;s.cargo=cargo;
-      }else{s[key]=val;}
-      n.ship=s;return n;
-    });
-  };
-
-  var upCrew=function(index,key,val){
-    setGs(function(prev){
-      var n=Object.assign({},prev);var crew=n.crew.slice();
-      var c=Object.assign({},crew[index]||mkCrew());c[key]=val;crew[index]=c;n.crew=crew;return n;
-    });
-  };
-
-  var upHexMap=function(m){setGs(function(p){return Object.assign({},p,{hexMap:m});});};
-  var upCampaignMap=function(cm){setGs(function(p){return Object.assign({},p,{campaignMap:cm});});};
-  var upSession=function(v){setGs(function(p){return Object.assign({},p,{session:v});});};
-  var addLog=function(){
-    var t=window.prompt("Log title:");
-    if(!t)return;
-    setGs(function(prev){
-      var n=Object.assign({},prev);
-      n.logs=n.logs.concat([{id:Date.now(),session:prev.session,title:t,content:"",ts:new Date().toISOString()}]);
-      return n;
-    });
-  };
-  var upLog=function(id,content){
-    setGs(function(prev){
-      var n=Object.assign({},prev);
-      n.logs=n.logs.map(function(l){return l.id===id?Object.assign({},l,{content:content}):l;});
-      return n;
-    });
-  };
-
-  var TABS=["CREW","SHIP","MAP","COMMS","LOGS"];
-  var tabBtn=function(t){
-    var a=tab===t.toLowerCase();
-    return React.createElement("button",{key:t,onClick:function(){setTab(t.toLowerCase());},style:{padding:"8px 18px",background:"transparent",border:"none",borderBottom:"2px solid "+(a?"#FF2060":"transparent"),color:a?"#FF2060":"#aaa",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);
-  };
-
-  return React.createElement("div",{style:{minHeight:"100vh",background:BG,color:"#dde",position:"relative"}},
-    React.createElement("style",null,css),
-    React.createElement(Starfield,null),
-    React.createElement("div",{style:{position:"relative",zIndex:1,maxWidth:1400,margin:"0 auto",padding:"0 20px 40px"}},
-      React.createElement("div",{style:{padding:"20px 0 8px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
-        React.createElement("div",{style:{fontFamily:ORB,fontSize:18,color:"#FF2060",letterSpacing:4,textShadow:"0 0 20px #FF206066"}},"ASTROPRISMA"),
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#556",letterSpacing:2}},"SESSION "+String(gs.session).padStart(2,"0"))
-      ),
-      React.createElement("div",{style:{padding:"6px 0 10px",borderBottom:"1px solid "+B2,marginBottom:0}},
-        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#778",letterSpacing:2}},"CAMPAIGN MAP:"),
-          CAMPAIGN_MAPS.map(function(cm){
-            var sel=gs.campaignMap&&gs.campaignMap.id===cm.id;
-            var cc=parseInt(cm.id)<7?"#aaaaff":"#cc88ff";
-            return React.createElement("button",{key:cm.id,onClick:function(){upCampaignMap(sel?null:cm);},style:{padding:"3px 9px",background:sel?cc+"22":"transparent",border:"1px solid "+(sel?cc:B1),color:sel?cc:"#778",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},cm.id+" "+cm.name);
-          })
-        ),
-        gs.campaignMap&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:12,color:"#aaa",marginTop:3,paddingLeft:2}},gs.campaignMap.desc)
-      ),
-      React.createElement("div",{style:{display:"flex",borderBottom:"1px solid "+B2,marginBottom:20,alignItems:"center"}},
-        TABS.map(tabBtn),
-        React.createElement("div",{style:{flex:1}}),
-        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,padding:"0 4px"}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#778",letterSpacing:1}},"SESSION"),
-          React.createElement(Spin,{v:gs.session,min:0,max:99,onChange:upSession})
-        )
-      ),
-      tab==="crew"&&React.createElement("div",null,
-        React.createElement("div",{style:{display:"flex",gap:20,flexWrap:"wrap",marginBottom:20}},
-          React.createElement(CharCard,{name:gs.cole.name,data:gs.cole,accent:"#FFD166",onChange:function(k,v){upChar("cole",k,v);},onNameChange:function(v){upChar("cole","name",v);}}),
-          React.createElement(CharCard,{name:gs.vela.name,data:gs.vela,accent:"#FF2060",onChange:function(k,v){upChar("vela",k,v);},onNameChange:function(v){upChar("vela","name",v);}})
-        ),
-        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}},
-          gs.crew.map(function(c,i){return React.createElement(CrewCard,{key:i,index:i,data:c||mkCrew(),onChange:upCrew});})
-        )
-      ),
-      tab==="ship"&&React.createElement("div",{style:{maxWidth:700}},
-        React.createElement("div",{style:{background:BG,border:"1px solid #FF206055",borderRadius:8,padding:22}},
-          React.createElement("div",{style:{fontFamily:ORB,fontSize:15,fontWeight:700,color:"#FF2060",letterSpacing:3,marginBottom:18}},gs.ship.name),
-          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:16}},
-            ["hull","fuel"].map(function(stat){
-              var label=stat.toUpperCase(),color=stat==="hull"?"#FF2060":"#00FFD0",max=gs.ship[stat+"Max"];
-              return React.createElement("div",{key:stat},
-                React.createElement("div",{style:{fontFamily:MONO,fontSize:13,color:"#bbb",letterSpacing:2,marginBottom:7}},label),
-                React.createElement(Bar,{v:gs.ship[stat],m:max,c:color}),
-                React.createElement("div",{style:{display:"flex",gap:5,marginTop:7}},[-5,-1,1,5].map(function(d){return React.createElement("button",{key:d,onClick:function(){upShip(stat,Math.max(0,Math.min(max,gs.ship[stat]+d)));},style:{flex:1,padding:"5px 0",background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:12}},d>0?"+"+d:d);}))
-              );
-            })
-          ),
-          React.createElement("div",{style:{marginBottom:14}},
-            React.createElement("div",{style:{fontFamily:MONO,fontSize:12,color:"#bbb",letterSpacing:1,marginBottom:6}},"SCRAPS"),
-            React.createElement(Spin,{v:gs.ship.scraps||0,onChange:function(v){upShip("scraps",v);}})
-          ),
