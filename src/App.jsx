@@ -5,7 +5,7 @@ import * as THREE from "three";
 const MONO="'Share Tech Mono',monospace",ORB="'Orbitron',sans-serif",RAJ="'Rajdhani',sans-serif",BG="#0a0a14";
 const B1="#5a5a7a",B2="#35354f",B3="#6a6a8a";
 const css=`@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap');
-html,body{background:#080810!important;margin:0;padding:0}
+html,body{background:#080810!important;margin:0;padding:0;zoom:1.25}
 @keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
@@ -18,8 +18,7 @@ html,body{background:#080810!important;margin:0;padding:0}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0d0d1a}::-webkit-scrollbar-thumb{background:#FF206044;border-radius:2px}
 @keyframes scanmove{0%{background-position:0 0}100%{background-position:0 4px}}
-.gs-scan{pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,220,180,.016) 2px,rgba(0,220,180,.016) 4px);z-index:997;animation:scanmove .12s linear infinite}
-.gs-vig{pointer-events:none;position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,8,.65) 100%);z-index:996}`;
+.gs-scan{pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,220,180,.016) 2px,rgba(0,220,180,.016) 4px);z-index:997;animation:scanmove .12s linear infinite}`;
 
 const CAMPAIGN_MAPS=[
  {id:"01",name:"VIVARIUM",level:2,desc:"Four derelict O'Neill cylinders house rare flora and fauna. After decades without human supervision, their current status is unclear."},
@@ -935,7 +934,6 @@ function App(){
  return React.createElement("div",{style:{minHeight:"100vh",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
   React.createElement(Starfield,null),
-  React.createElement("div",{className:"gs-vig"}),
   React.createElement("div",{className:"gs-scan"}),
   React.createElement("div",{className:"gs-vig"}),
   React.createElement("div",{className:"gs-scan"}),
