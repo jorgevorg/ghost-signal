@@ -1022,3 +1022,81 @@ function App(){
   // MABEL Mini — globally visible on all tabs
   React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
   React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 60px"}},
+    React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #222230",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
+     TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);})
+    ),
+    React.createElement("div",{style:{paddingTop:20}},
+     tab==="MAP"&&React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name,campaignMap:gs.campaignMap}),
+     tab==="CREW"&&React.createElement("div",null,
+      React.createElement("div",{style:{display:"flex",gap:16,flexWrap:"wrap",marginBottom:24}},
+       React.createElement(CharCard,{name:gs.cole.name,data:gs.cole,accent:"#FFD166",onChange:function(k,v){upC("cole",k,v);},onNameChange:function(n){setGs(function(p){return Object.assign({},p,{cole:Object.assign({},p.cole,{name:n})});});}}),
+       React.createElement(CharCard,{name:gs.vela.name,data:gs.vela,accent:"#FF2060",onChange:function(k,v){upC("vela",k,v);},onNameChange:function(n){setGs(function(p){return Object.assign({},p,{vela:Object.assign({},p.vela,{name:n})});});}})
+      ),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:12}},
+       gs.crew.map(function(c,i){return React.createElement(CrewCard,{key:i,index:i,data:c,onChange:upCrew});})
+      )
+     ),
+     tab==="SHIP"&&React.createElement("div",{style:{maxWidth:600}},
+      React.createElement("div",{style:{background:BG,border:"1px solid #00FFD055",borderRadius:8,padding:22}},
+       React.createElement("div",{style:{fontFamily:ORB,fontSize:15,fontWeight:700,color:"#00FFD0",letterSpacing:3,marginBottom:18}},gs.ship.name||"THE INDESTRUCTIBLE II"),
+       [["HULL","hull"],["FUEL","fuel"]].map(function(pr){return React.createElement("div",{key:pr[1],style:{marginBottom:16}},
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:13,color:"#bbb",letterSpacing:2,marginBottom:7}},pr[0]),
+        React.createElement(Bar,{v:gs.ship[pr[1]],m:gs.ship[pr[1]+"Max"],c:"#00FFD0"}),
+        React.createElement("div",{style:{display:"flex",gap:5,marginTop:7}},[-5,-1,1,5].map(function(d){return React.createElement("button",{key:d,onClick:function(){upS(pr[1],Math.max(0,Math.min(gs.ship[pr[1]+"Max"],gs.ship[pr[1]]+d)));},style:{flex:1,padding:"5px 0",background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:12}},d>0?"+"+d:d);}))
+       );}),
+       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:8}},
+        [["SCRAPS","scraps"],["SERUM","serum"]].map(function(pr){return React.createElement("div",{key:pr[1]},React.createElement("div",{style:{fontFamily:MONO,fontSize:12,color:"#bbb",letterSpacing:1,marginBottom:6}},pr[0]),React.createElement(Spin,{v:gs.ship[pr[1]]||0,onChange:function(v){upS(pr[1],v);}}));})
+       ),
+       React.createElement("div",{style:{marginTop:18}},
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"MODULES"),
+        (gs.ship.modules||[]).map(function(m,i){return React.createElement("input",{key:i,value:m||"",onChange:function(e){upS("modules."+i,e.target.value);},placeholder:"Module slot "+(i+1),style:Object.assign({},tS("#cc88ff",false),{marginBottom:6,display:"block"})});})
+       ),
+       React.createElement("div",{style:{marginTop:18}},
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"CARGO"),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}},
+         (gs.ship.cargo||Array(6).fill("")).map(function(v,i){return React.createElement("input",{key:i,value:v||"",onChange:function(e){upS("cargo."+i,e.target.value);},placeholder:"Cargo "+(i+1),style:tS("#aaa",false)});})
+        )
+       )
+      )
+     ),
+     tab==="LOGS"&&React.createElement("div",{style:{maxWidth:680}},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}},
+       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:14}},
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2}},"SESSION"),
+        React.createElement(Spin,{v:gs.session||0,min:0,onChange:upSession})
+       ),
+       React.createElement("button",{onClick:function(){addLog({type:"note",text:"",session:gs.session,ts:new Date().toISOString()});},style:{padding:"6px 16px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"+NEW ENTRY")
+      ),
+      React.createElement("div",{style:{marginBottom:18}},
+       React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2,marginBottom:8}},"CAMPAIGN MAP"),
+       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:6}},
+        [{id:null,name:"— NONE —",level:0,desc:""}].concat(CAMPAIGN_MAPS).map(function(cm){
+         var a=gs.campaignMap&&gs.campaignMap.id===cm.id;
+         return React.createElement("div",{key:cm.id||"none",onClick:function(){upCampaign(cm.id?cm:null);},style:{padding:"8px 10px",background:a?"#cc88ff14":"#0d0d1e",border:"1px solid "+(a?"#cc88ff55":"#222230"),borderRadius:4,cursor:"pointer"}},
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:a?"#cc88ff":"#778",letterSpacing:1}},(cm.id?"#"+cm.id+" ":"")+cm.name),
+          cm.desc&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#556",marginTop:3,lineHeight:1.4}},cm.desc.slice(0,60)+(cm.desc.length>60?"...":""))
+         );
+        })
+       )
+      ),
+      gs.logs.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#334",textAlign:"center",padding:"32px 0"}},"// NO LOG ENTRIES"):
+      gs.logs.slice().reverse().map(function(log){
+       return React.createElement("div",{key:log.id,style:{background:"#06060f",border:"1px solid "+B2,borderRadius:6,padding:"12px 14px",marginBottom:8}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
+         React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#FF6EC7",letterSpacing:2}},"SESSION "+log.session),
+         React.createElement("button",{onClick:function(){setGs(function(p){return Object.assign({},p,{logs:p.logs.filter(function(l){return l.id!==log.id;})});});},style:{background:"transparent",border:"none",color:"#444",cursor:"pointer",fontFamily:MONO,fontSize:11}},"✕")
+        ),
+        React.createElement("textarea",{value:log.text||"",onChange:function(e){setGs(function(p){return Object.assign({},p,{logs:p.logs.map(function(l){return l.id===log.id?Object.assign({},l,{text:e.target.value}):l;})});});},placeholder:"Log entry...",rows:3,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:14,padding:"8px 10px",outline:"none",resize:"vertical",boxSizing:"border-box",lineHeight:1.7}})
+       );
+      })
+     ),
+     tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel})
+    )
+   )
+  ),
+  React.createElement(DiceRoller,{gameState:gs})
+ );
+}
+
+var root=ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(App,null));
