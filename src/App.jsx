@@ -1092,11 +1092,10 @@ function App(){
      ),
      tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel})
     )
-   )
-  ),
-  React.createElement(DiceRoller,{gameState:gs})
- );
-}
+   ),
+   React.createElement(DiceRoller,{gameState:gs})
+  );
+ }
 
 var root=ReactDOM.createRoot(document.getElementById("root"));
 root.render(React.createElement(App,null));
