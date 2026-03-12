@@ -16,7 +16,10 @@ html,body{background:#080810!important;margin:0;padding:0}
 @keyframes shipPulse{0%,100%{filter:drop-shadow(0 0 4px currentColor)}50%{filter:drop-shadow(0 0 12px currentColor)}}
 @keyframes cutMarch{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-24}}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0d0d1a}::-webkit-scrollbar-thumb{background:#FF206044;border-radius:2px}`;
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0d0d1a}::-webkit-scrollbar-thumb{background:#FF206044;border-radius:2px}
+@keyframes scanmove{0%{background-position:0 0}100%{background-position:0 4px}}
+.gs-scan{pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,220,180,.016) 2px,rgba(0,220,180,.016) 4px);z-index:997;animation:scanmove .12s linear infinite}
+.gs-vig{pointer-events:none;position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,8,.65) 100%);z-index:996}`;
 
 const CAMPAIGN_MAPS=[
  {id:"01",name:"VIVARIUM",level:2,desc:"Four derelict O'Neill cylinders house rare flora and fauna. After decades without human supervision, their current status is unclear."},
@@ -719,242 +722,155 @@ function ContextMenu(props){
 
 // ── HEX MAP (Batch 1) ──────────────────────────────────────────────────────
 function HexMap(props){
- var hexMap=props.hexMap,onUpdate=props.onUpdate,shipName=props.shipName||"THE INDESTRUCTIBLE II",campaignMap=props.campaignMap;
- var selectedS=useState(null),setSelected=selectedS[1];var selected=selectedS[0];
- var selectedSetS=useState(new Set()),setSelectedSet=selectedSetS[1];var selectedSet=selectedSetS[0];
- var editS=useState(null),setEdit=editS[1];var edit=editS[0];
- var contextS=useState(null),setContext=contextS[1];var context=contextS[0];
- var clipboardS=useState(null),setClipboard=clipboardS[1];var clipboard=clipboardS[0];
- var toastS=useState(null),setToast=toastS[1];var toast=toastS[0];
- var toastRef=useRef(null);
- var showToast=function(msg,color){if(toastRef.current)clearTimeout(toastRef.current);setToast({msg:msg,color:color||"#00FFD0"});toastRef.current=setTimeout(function(){setToast(null);},1800);};
-
- var doCopy=useCallback(function(hexId,mode){
-  var h=hexMap[hexId]||{};
-  var tile=mode!=="token"?(h.type?{type:h.type,name:h.name||"",notes:h.notes||"",faction:h.faction||""}:null):null;
-  var token=mode!=="tile"?(h.ship?{ship:h.ship}:null):null;
-  if(!tile&&!token)return;
-  var m=tile&&token?"both":tile?"tile":"token";
-  setClipboard({mode:m,tile:tile,token:token});
-  showToast("COPIED ("+m.toUpperCase()+")","#FFD166");
- },[hexMap]);
-
- var doCut=useCallback(function(hexId,mode){
-  var h=hexMap[hexId]||{};
-  var tile=mode!=="token"?(h.type?{type:h.type,name:h.name||"",notes:h.notes||"",faction:h.faction||""}:null):null;
-  var token=mode!=="tile"?(h.ship?{ship:h.ship}:null):null;
-  if(!tile&&!token)return;
-  var m=tile&&token?"both":tile?"tile":"token";
-  setClipboard({mode:m,tile:tile,token:token,cut:true});
-  var newMap=Object.assign({},hexMap);
-  var srcHex=Object.assign({},newMap[hexId]||{});
-  if(mode!=="token"&&tile){delete srcHex.type;delete srcHex.name;delete srcHex.notes;delete srcHex.faction;}
-  if(mode!=="tile"&&token){delete srcHex.ship;}
-  if(!srcHex.type&&!srcHex.ship&&!srcHex.name&&!srcHex.notes)delete newMap[hexId];else newMap[hexId]=srcHex;
-  onUpdate(newMap);
-  showToast("CUT ("+m.toUpperCase()+")","#FF9944");
- },[hexMap,onUpdate]);
-
- var doPaste=useCallback(function(hexId){
-  if(!clipboard)return;
-  var newMap=Object.assign({},hexMap);
-  var dest=Object.assign({},newMap[hexId]||{});
-  if(clipboard.tile&&clipboard.mode!=="token")Object.assign(dest,clipboard.tile);
-  if(clipboard.token&&clipboard.mode!=="tile")dest.ship=clipboard.token.ship;
-  newMap[hexId]=dest;
-  onUpdate(newMap);
-  showToast("PASTED","#00FFD0");
- },[hexMap,onUpdate,clipboard]);
-
- var doClear=useCallback(function(hexId,mode){
-  var newMap=Object.assign({},hexMap);
-  var h=Object.assign({},newMap[hexId]||{});
-  if(mode==="tile"||mode==="all"){delete h.type;delete h.name;delete h.notes;delete h.faction;}
-  if(mode==="token"||mode==="all"){delete h.ship;}
-  if(!h.type&&!h.ship&&!h.name&&!h.notes)delete newMap[hexId];else newMap[hexId]=h;
-  onUpdate(newMap);
-  showToast("CLEARED","#FF2060");
- },[hexMap,onUpdate]);
-
- // Keyboard shortcuts
- useEffect(function(){
-  var onKey=function(e){
-   if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
-   var isMac=navigator.platform.toUpperCase().includes("MAC");
-   var ctrl=isMac?e.metaKey:e.ctrlKey;
-   if(!ctrl||selected==null)return;
-   var mode=e.shiftKey?"tile":e.altKey?"token":"both";
-   if(e.key==="c"||e.key==="C"){e.preventDefault();doCopy(selected,mode);}
-   else if(e.key==="x"||e.key==="X"){e.preventDefault();doCut(selected,mode);}
-   else if(e.key==="v"||e.key==="V"){e.preventDefault();doPaste(selected);}
+  var hexMap=props.hexMap,onUpdate=props.onUpdate,shipName=props.shipName||"THE INDESTRUCTIBLE II";
+  var edS=useState(null),setEd=edS[1];var ed=edS[0];
+  var ctxS=useState(null),setCtx=ctxS[1];var ctx=ctxS[0];
+  var hovS=useState(null),setHov=hovS[1];var hov=hovS[0];
+  var hovPosS=useState({x:0,y:0}),setHovPos=hovPosS[1];var hovPos=hovPosS[0];
+  var formS=useState({name:"",type:"",notes:"",ship:false}),setForm=formS[1];var form=formS[0];
+  var showIdsS=useState(false),setShowIds=showIdsS[1];var showIds=showIdsS[0];
+  var confirmClearS=useState(false),setConfirmClear=confirmClearS[1];var confirmClear=confirmClearS[0];
+  var cbS=useState(null),setCb=cbS[1];var cb=cbS[0];
+  var selS=useState([]),setSel=selS[1];var sel=selS[0];
+  var toastS=useState([]),setToast=toastS[1];var toast=toastS[0];
+  var grpRef=useRef(null),dragRef=useRef(null),offRef=useRef({x:0,y:0}),movedRef=useRef(false);
+  var svgRef=useRef(null),mapRef=useRef(null);
+  var addToast=function(msg,color){var id=Date.now();setToast(function(p){return p.concat([{id:id,msg:msg,color:color||"#00FFD0"}]);});setTimeout(function(){setToast(function(p){return p.filter(function(t){return t.id!==id;});});},2200);};
+  useEffect(function(){
+    var handler=function(e){
+      if(!e.target||e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+      if((e.ctrlKey||e.metaKey)&&e.key==="c"){
+        if(sel.length>0){var d=hexMap[sel[0]]||{};var mode=e.shiftKey?"tile":e.altKey?"token":"both";var clip={mode:mode,tile:(mode==="token")?null:(d.type||null),token:(mode==="tile")?false:(d.ship||false)};setCb(clip);addToast("Copied ("+mode+")","#00FFD0");}e.preventDefault();
+      }
+      if((e.ctrlKey||e.metaKey)&&e.key==="x"){
+        if(sel.length>0){var d2=hexMap[sel[0]]||{};var mode2=e.shiftKey?"tile":e.altKey?"token":"both";var clip2={mode:mode2,tile:(mode2==="token")?null:(d2.type||null),token:(mode2==="tile")?false:(d2.ship||false)};setCb(clip2);var m2=Object.assign({},hexMap);sel.forEach(function(id){var h=Object.assign({},m2[id]||{});if(mode2==="tile"||mode2==="both")delete h.type;if(mode2==="token"||mode2==="both")h.ship=false;m2[id]=h;});onUpdate(m2);addToast("Cut ("+mode2+")","#FFD166");}e.preventDefault();
+      }
+      if((e.ctrlKey||e.metaKey)&&e.key==="v"){
+        if(cb&&sel.length>0){var m3=Object.assign({},hexMap);sel.forEach(function(id){var h3=Object.assign({},m3[id]||{});if(cb.mode==="tile"||cb.mode==="both"){if(cb.tile)h3.type=cb.tile;}if(cb.mode==="token"||cb.mode==="both"){h3.ship=cb.token;}m3[id]=h3;});onUpdate(m3);addToast("Pasted to "+sel.length+" hex"+(sel.length>1?"es":""),"#cc88ff");}e.preventDefault();
+      }
+    };
+    window.addEventListener("keydown",handler);
+    return function(){window.removeEventListener("keydown",handler);};
+  },[cb,sel,hexMap]);
+  var onMD=function(e){dragRef.current={sx:e.clientX-offRef.current.x,sy:e.clientY-offRef.current.y};movedRef.current=false;};
+  var onMM=function(e){if(!dragRef.current)return;var nx=e.clientX-dragRef.current.sx,ny=e.clientY-dragRef.current.sy;if(Math.abs(nx-offRef.current.x)>3||Math.abs(ny-offRef.current.y)>3)movedRef.current=true;offRef.current={x:nx,y:ny};if(grpRef.current)grpRef.current.setAttribute("transform","translate("+nx+","+ny+")");};
+  var onMU=function(){dragRef.current=null;};
+  var openHex=function(hex,e){
+    e.stopPropagation();if(hex.isStar||movedRef.current)return;
+    if(e.shiftKey){setSel(function(p){return p.includes(hex.id)?p.filter(function(x){return x!==hex.id;}):[].concat(p,[hex.id]);});return;}
+    setSel([]);setCtx(null);
+    var d=hexMap[hex.id]||{};
+    setForm({name:d.name||"HEX-"+String(hex.id).padStart(3,"0"),type:d.type||"",notes:d.notes||"",ship:d.ship||false});
+    setEd(hex.id);setConfirmClear(false);
   };
-  window.addEventListener("keydown",onKey);
-  return function(){window.removeEventListener("keydown",onKey);};
- },[selected,doCopy,doCut,doPaste]);
-
- var handleCtxAction=function(action){
-  if(!context)return;
-  var parts=action.split(":");var verb=parts[0],mode=parts[1];
-  if(verb==="copy")doCopy(context.hexId,mode);
-  else if(verb==="cut")doCut(context.hexId,mode);
-  else if(verb==="paste")doPaste(context.hexId);
-  else if(verb==="clear")doClear(context.hexId,mode);
- };
-
- var hexes=HEXES;
- var xs=hexes.map(function(h){return h.x;});var ys=hexes.map(function(h){return h.y;});
- var minX=Math.min.apply(null,xs)-HS,maxX=Math.max.apply(null,xs)+HS;
- var minY=Math.min.apply(null,ys)-HS,maxY=Math.max.apply(null,ys)+HS;
- var vw=maxX-minX,vh=maxY-minY,pad=12;
- var svgW=Math.min(typeof window!=="undefined"?window.innerWidth-32:800,820);
- var svgH=svgW*(vh+pad*2)/(vw+pad*2);
- var editData=edit!=null?(hexMap[edit]||{}):null;
-
- return React.createElement("div",{style:{position:"relative"}},
-  // Preset loader
-  React.createElement("div",{style:{marginBottom:14,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}},
-   React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2}},"PRESET:"),
-   React.createElement("button",{
-    onClick:function(){
-     if(!campaignMap||!MAP_PRESETS[campaignMap.id])return;
-     var ok=Object.keys(hexMap).length===0||window.confirm("Load preset? This replaces current hex data.");
-     if(ok){onUpdate(MAP_PRESETS[campaignMap.id]);showToast("LOADED: "+campaignMap.name,"#cc88ff");}
-    },
-    disabled:!campaignMap||!MAP_PRESETS[campaignMap.id],
-    style:{padding:"5px 14px",background:"#cc88ff18",border:"1px solid #cc88ff55",color:(!campaignMap||!MAP_PRESETS[campaignMap.id])?"#555":"#cc88ff",borderRadius:3,cursor:(!campaignMap||!MAP_PRESETS[campaignMap.id])?"not-allowed":"pointer",fontFamily:MONO,fontSize:10,letterSpacing:1}
-   },"LOAD PRESET"),
-   campaignMap&&React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#888"}},"#"+campaignMap.id+" "+campaignMap.name)
-  ),
-  React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#556",marginBottom:8,letterSpacing:1}},"click=select  ·  shift+click=multi  ·  dbl-click=edit  ·  right-click=menu  ·  ctrl+c/x/v=clipboard"),
-  React.createElement("div",{style:{overflowX:"auto"}},
-   React.createElement("svg",{width:svgW,height:svgH,viewBox:[(minX-pad),(minY-pad),(vw+pad*2),(vh+pad*2)].join(" "),style:{display:"block",margin:"0 auto"}},
-    hexes.map(function(hex){
-     var hd=hexMap[hex.id]||{};
-     var isSel=selected===hex.id;var isMulti=selectedSet.has(hex.id);
-     var strokeColor=isSel?"#ffffff":isMulti?"#FFD166":"#444455";
-     var strokeW=isSel?2.5:isMulti?2:1;
-     return React.createElement("g",{key:hex.id,
-      onClick:function(e){
-       if(e.shiftKey){var ns=new Set(selectedSet);if(ns.has(hex.id))ns.delete(hex.id);else ns.add(hex.id);setSelectedSet(ns);}
-       else{setSelected(hex.id===selected?null:hex.id);setSelectedSet(new Set());}
-       setEdit(null);
-      },
-      onDoubleClick:function(e){e.stopPropagation();if(!hex.isStar)setEdit(hex.id);},
-      onContextMenu:function(e){e.preventDefault();setContext({x:e.clientX,y:e.clientY,hexId:hex.id,hexData:hd});},
-      style:{cursor:"pointer"}
-     },
-     React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hex.isStar?"#1a0800":(hd.type?IC[hd.type]+"14":"#0d0d1e"),stroke:strokeColor,strokeWidth:strokeW}),
-     isSel&&React.createElement("polygon",{points:hPts(hex.x,hex.y,HS*.95),fill:"none",stroke:"#ffffff",strokeWidth:1.5,opacity:.4}),
-     hex.isStar&&React.createElement("g",null,
-      React.createElement("circle",{cx:hex.x,cy:hex.y,r:22,fill:"#FF8C00",filter:"drop-shadow(0 0 16px #FF8C00)"}),
-      React.createElement("circle",{cx:hex.x,cy:hex.y,r:15,fill:"#FFD166"}),
-      React.createElement("circle",{cx:hex.x,cy:hex.y,r:8,fill:"#ffffff",opacity:.9})
-     ),
-     !hex.isStar&&hd.type&&React.createElement(HexIcon,{t:hd.type,x:hex.x,y:hex.y,hexId:hex.id}),
-     !hex.isStar&&hd.ship&&React.createElement("g",{transform:"translate(0,-10)"},React.createElement(HexIcon,{t:hd.ship,x:hex.x,y:hex.y,hexId:hex.id})),
-     React.createElement("text",{x:hex.x,y:hex.y+(hd.type?17:10),textAnchor:"middle",fontSize:8,fontFamily:MONO,fill:"#33334a",opacity:.8},hex.isStar?"★":String(hex.id).padStart(2,"0")),
-     hd.name&&React.createElement("text",{x:hex.x,y:hex.y-22,textAnchor:"middle",fontSize:7,fontFamily:MONO,fill:"#aaa",opacity:.9},hd.name.slice(0,14))
-     );
-    })
-   )
-  ),
-  // Edit panel
-  edit!=null&&editData!=null&&React.createElement("div",{style:{marginTop:16,background:"#0d0d1e",border:"1px solid "+B3,borderRadius:8,padding:18,maxWidth:520}},
-   React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#cc88ff",letterSpacing:2,marginBottom:14,display:"flex",justifyContent:"space-between"}},
-    "HEX "+String(edit).padStart(2,"0")+" EDITOR",
-    React.createElement("button",{onClick:function(){setEdit(null);},style:{background:"transparent",border:"none",color:"#666",cursor:"pointer",fontFamily:MONO,fontSize:14}},"✕")
-   ),
-   React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}},
-    React.createElement("div",null,
-     React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",marginBottom:5,letterSpacing:1}},"TILE TYPE"),
-     React.createElement(HexTypeSelect,{value:editData.type||"",onChange:function(v){var nm=Object.assign({},hexMap);nm[edit]=Object.assign({},editData,{type:v||undefined});if(!v)delete nm[edit].type;onUpdate(nm);},shipName:shipName})
+  var openCtx=function(hex,e){
+    e.preventDefault();e.stopPropagation();if(hex.isStar||movedRef.current)return;
+    var mr=mapRef.current.getBoundingClientRect();
+    var px=Math.max(8,Math.min(mr.width-226,e.clientX-mr.left+12));
+    var py=Math.max(8,Math.min(mr.height-340,e.clientY-mr.top-8));
+    setCtx({hexId:hex.id,popX:px,popY:py});setEd(null);
+  };
+  var save=function(){var m=Object.assign({},hexMap);m[ed]=form;onUpdate(m);setEd(null);};
+  var clear=function(){if(!confirmClear){setConfirmClear(true);return;}var m=Object.assign({},hexMap);delete m[ed];onUpdate(m);setEd(null);setConfirmClear(false);};
+  var copyHex=function(hexId,mode){var d=hexMap[hexId]||{};setCb({mode:mode,tile:(mode==="token")?null:(d.type||null),token:(mode==="tile")?false:(d.ship||false)});addToast("Copied ("+mode+")","#00FFD0");setCtx(null);};
+  var cutHex=function(hexId,mode){var d=hexMap[hexId]||{};setCb({mode:mode,tile:(mode==="token")?null:(d.type||null),token:(mode==="tile")?false:(d.ship||false)});var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(mode==="tile"||mode==="both")delete h.type;if(mode==="token"||mode==="both")h.ship=false;m[hexId]=h;onUpdate(m);addToast("Cut ("+mode+")","#FFD166");setCtx(null);};
+  var pasteHex=function(hexId){if(!cb)return;var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(cb.mode==="tile"||cb.mode==="both"){if(cb.tile)h.type=cb.tile;}if(cb.mode==="token"||cb.mode==="both"){h.ship=cb.token;}m[hexId]=h;onUpdate(m);addToast("Pasted","#cc88ff");setCtx(null);};
+  var clearHex=function(hexId,mode){var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(mode==="tile"||mode==="both")delete h.type;if(mode==="token"||mode==="both")h.ship=false;if(!h.type&&!h.ship&&!h.name&&!h.notes)delete m[hexId];else m[hexId]=h;onUpdate(m);addToast("Cleared ("+mode+")","#FF2060");setCtx(null);};
+  var ringColor=function(ring){return ring===1?"#CC662211":ring===2?"#BBAA4411":ring===3?"#CCCCCC11":"#111828";};
+  var ringStroke=function(ring){return ring===1?"#CC6622aa":ring===2?"#BBAA44aa":ring===3?"#CCCCCCaa":"#3d4d6a";};
+  var ctxData=ctx?(hexMap[ctx.hexId]||{}):null;
+  var ctxAccent=ctxData&&ctxData.type&&IC[ctxData.type]?IC[ctxData.type]:ctxData&&SHIP_COLORS[ctxData.type]?SHIP_COLORS[ctxData.type]:"#00FFD0";
+  var hovData=hov!==null?(hexMap[hov]||null):null;
+  var hovAccent=hovData&&hovData.type&&IC[hovData.type]?IC[hovData.type]:hovData&&SHIP_COLORS[hovData.type]?SHIP_COLORS[hovData.type]:"#99aabb";
+  return React.createElement("div",{ref:mapRef,style:{position:"relative",borderRadius:12,border:"1px solid "+B3,overflow:"hidden",background:"transparent",height:"calc(100vh - 260px)"},onClick:function(){setCtx(null);}},
+    React.createElement("div",{style:{position:"absolute",top:10,left:12,zIndex:30,display:"flex",gap:8}},
+      React.createElement("button",{onClick:function(){setShowIds(!showIds);},style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:showIds?"#7744cc33":"transparent",border:"1px solid "+(showIds?"#9966cc":B3),color:showIds?"#cc88ff":"#aaa",borderRadius:4,cursor:"pointer",letterSpacing:2}},showIds?"HIDE IDs":"SHOW IDs"),
+      sel.length>0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:"#cc88ff22",border:"1px solid #cc88ff55",color:"#cc88ff",borderRadius:4,letterSpacing:1}},sel.length+" SELECTED")
     ),
-    React.createElement("div",null,
-     React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",marginBottom:5,letterSpacing:1}},"SHIP TOKEN"),
-     React.createElement("select",{value:editData.ship||"",onChange:function(e){var nm=Object.assign({},hexMap);nm[edit]=Object.assign({},editData);if(e.target.value)nm[edit].ship=e.target.value;else delete nm[edit].ship;onUpdate(nm);},style:{width:"100%",background:"#0a0a14",border:"1px solid "+B1,color:"#eee",fontFamily:MONO,fontSize:10,padding:"7px 10px",borderRadius:4,outline:"none"}},
-      React.createElement("option",{value:""},"— NO SHIP —"),
-      ["seance","twinrotor","snowstorm","epsilon","voyager","orionmoth","eclipsewarden"].map(function(s){return React.createElement("option",{key:s,value:s},TYPE_LABELS[s]||s);})
-     )
+    React.createElement("svg",{ref:svgRef,width:"100%",height:"100%",viewBox:"-310 -275 620 550",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
+      React.createElement("defs",null,React.createElement("pattern",{id:"hatch",width:"7",height:"7",patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"},React.createElement("line",{x1:"0",y1:"0",x2:"0",y2:"7",stroke:"#1e2a3a",strokeWidth:"1.3"}))),
+      React.createElement("g",{ref:grpRef},
+        HEXES.map(function(hex){
+          if(hex.isStar)return React.createElement("g",{key:"star"},React.createElement("circle",{cx:hex.x,cy:hex.y,r:50,fill:"#FF2060",opacity:.07}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:36,fill:"#FF2060",opacity:.15}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:24,fill:"#FF4070",opacity:.7}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:16,fill:"#FF2060"}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:9,fill:"#ff9090"}));
+          var d=hexMap[hex.id]||{},isShip=!!d.ship,isSel=ed===hex.id||(ctx&&ctx.hexId===hex.id)||sel.includes(hex.id);
+          var isBarrier=d.type==="barrier",isBase=d.type==="base";
+          var hasD=!!(d.notes&&d.notes.trim()||d.type);
+          var hexFill=isBarrier?BARRIER_C+"18":isBase?BASE_C+"22":isShip?"#FF206022":hasD?ringColor(hex.ring):"url(#hatch)";
+          var hexStroke=isSel?"#cc88ff":isBarrier?BARRIER_C:isBase?BASE_C:isShip?"#FF2060":hasD?ringStroke(hex.ring):"#3d4d6a";
+          var strokeW=isBarrier||isBase?2.5:isSel||isShip?2:1.5;
+          return React.createElement("g",{key:hex.id,
+            onClick:function(e){openHex(hex,e);},
+            onContextMenu:function(e){openCtx(hex,e);},
+            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){var mr=mapRef.current.getBoundingClientRect();setHovPos({x:e.clientX-mr.left,y:e.clientY-mr.top});setHov(hex.id);}},
+            onMouseLeave:function(){setHov(null);},
+            style:{cursor:"pointer"}},
+            React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hexFill,stroke:hexStroke,strokeWidth:strokeW}),
+            d.type&&React.createElement(HexIcon,{t:d.type,x:hex.x,y:hex.y,hexId:hex.id}),
+            isShip&&!isBarrier&&!isBase&&React.createElement("text",{x:hex.x,y:hex.y-HS*.5,textAnchor:"middle",fontSize:11,fontFamily:"monospace",fill:"#FF2060",opacity:.9},"⍙"),
+            showIds&&React.createElement("text",{x:hex.x,y:hex.y+HS*.55,textAnchor:"middle",fill:"#99aabb",fontSize:8,fontFamily:MONO,opacity:.9},String(hex.id).padStart(3,"0"))
+          );
+        })
+      )
+    ),
+    hov!==null&&hovData&&React.createElement("div",{style:{position:"absolute",left:Math.min(hovPos.x+14,((mapRef.current&&mapRef.current.offsetWidth)||600)-234),top:Math.min(hovPos.y+10,((mapRef.current&&mapRef.current.offsetHeight)||400)-190),width:224,background:"rgba(4,4,18,0.97)",border:"1px solid "+hovAccent+"55",borderRadius:8,padding:"10px 13px",zIndex:50,pointerEvents:"none",boxShadow:"0 0 20px "+hovAccent+"18"}},
+      React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:3,marginBottom:3}},"HEX-"+String(hov).padStart(3,"0")),
+      hovData.name&&React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:hovAccent,letterSpacing:2,marginBottom:5}},hovData.name),
+      hovData.type&&React.createElement("div",{style:{display:"inline-flex",alignItems:"center",background:hovAccent+"18",border:"1px solid "+hovAccent+"44",borderRadius:3,padding:"3px 8px",marginBottom:6}},React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:hovAccent,letterSpacing:1}},TYPE_LABELS[hovData.type]||hovData.type.toUpperCase())),
+      hovData.type&&HEX_FLAVOR[hovData.type]&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:12,color:"#777",lineHeight:1.6,fontStyle:"italic",marginBottom:hovData.notes?6:0}},HEX_FLAVOR[hovData.type]),
+      hovData.notes&&hovData.notes.trim()&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:12,color:"#bbb",lineHeight:1.6,borderTop:"1px solid "+B2,paddingTop:6,marginTop:2}},hovData.notes),
+      hovData.ship&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#FF2060",marginTop:6,letterSpacing:1}},"▲ "+shipName)
+    ),
+    ctx&&React.createElement("div",{onClick:function(e){e.stopPropagation();},style:{position:"absolute",left:ctx.popX,top:ctx.popY,width:218,background:"rgba(6,6,20,0.97)",border:"1px solid "+ctxAccent+"55",borderRadius:10,padding:"10px 0",zIndex:60,boxShadow:"0 0 24px "+ctxAccent+"18"}},
+      React.createElement("div",{style:{padding:"0 14px 8px",borderBottom:"1px solid "+B2,marginBottom:4}},
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:3,marginBottom:2}},"HEX-"+String(ctx.hexId).padStart(3,"0")),
+        React.createElement("div",{style:{fontFamily:ORB,fontSize:11,color:ctxAccent,letterSpacing:1}},(ctxData&&ctxData.name)||"UNCHARTED"),
+        ctxData&&ctxData.type&&React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:ctxAccent,opacity:.6,marginTop:1}},TYPE_LABELS[ctxData.type]||ctxData.type.toUpperCase())
+      ),
+      React.createElement("div",{onClick:function(){var d=hexMap[ctx.hexId]||{};setForm({name:d.name||"HEX-"+String(ctx.hexId).padStart(3,"0"),type:d.type||"",notes:d.notes||"",ship:d.ship||false});setEd(ctx.hexId);setCtx(null);setConfirmClear(false);},style:{padding:"7px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#cc88ff",letterSpacing:2}},"✎  EDIT HEX"),
+      React.createElement("div",{style:{height:1,background:B2,margin:"3px 0"}}),
+      [["COPY TILE","tile","#00FFD0"],["COPY TOKEN","token","#00FFD0"],["COPY BOTH","both","#00FFD0"]].map(function(r){return React.createElement("div",{key:r[0],onClick:function(){copyHex(ctx.hexId,r[1]);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:r[2],letterSpacing:1}},r[0]);}),
+      React.createElement("div",{style:{height:1,background:B2,margin:"3px 0"}}),
+      [["CUT TILE","tile","#FFD166"],["CUT TOKEN","token","#FFD166"],["CUT BOTH","both","#FFD166"]].map(function(r){return React.createElement("div",{key:r[0],onClick:function(){cutHex(ctx.hexId,r[1]);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:r[2],letterSpacing:1}},r[0]);}),
+      cb&&React.createElement("div",{onClick:function(){pasteHex(ctx.hexId);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#cc88ff",letterSpacing:1}},"PASTE"+(cb.tile?" ["+cb.tile.toUpperCase()+"]":"")),
+      React.createElement("div",{style:{height:1,background:B2,margin:"3px 0"}}),
+      [["CLEAR TILE","tile"],["CLEAR TOKEN","token"],["CLEAR BOTH","both"]].map(function(r){return React.createElement("div",{key:r[0],onClick:function(){clearHex(ctx.hexId,r[1]);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#FF2060",letterSpacing:1}},r[0]);}),
+      React.createElement("div",{onClick:function(){setCtx(null);},style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#445",letterSpacing:1}},"CANCEL")
+    ),
+    ed!==null&&React.createElement("div",{style:{position:"absolute",top:12,right:12,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,padding:16,zIndex:20}},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
+        React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:"#cc88ff",letterSpacing:2}},"SCAN REPORT"),
+        React.createElement("button",{onClick:function(){setEd(null);setConfirmClear(false);},style:{background:"transparent",border:"none",color:"#aaa",cursor:"pointer",fontSize:18,lineHeight:1,padding:0}},"✕")
+      ),
+      React.createElement("input",{value:form.name,onChange:function(e){setForm(function(p){return Object.assign({},p,{name:e.target.value});});},placeholder:"Hex designation",style:iS}),
+      React.createElement(HexTypeSelect,{value:form.type,onChange:function(v){setForm(function(p){return Object.assign({},p,{type:v});});},shipName:shipName}),
+      React.createElement("textarea",{value:form.notes,onChange:function(e){setForm(function(p){return Object.assign({},p,{notes:e.target.value});});},placeholder:"Sensor data / field notes...",rows:4,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:14,padding:"9px 12px",outline:"none",resize:"none",boxSizing:"border-box",lineHeight:1.7,marginBottom:8}}),
+      React.createElement("label",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:14,cursor:"pointer"}},
+        React.createElement("input",{type:"checkbox",checked:form.ship,onChange:function(e){setForm(function(p){return Object.assign({},p,{ship:e.target.checked});});},style:{accentColor:"#FF2060",width:14,height:14}}),
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:"#ccc"}},"SHIP IS HERE")
+      ),
+      React.createElement("div",{style:{display:"flex",gap:8}},
+        React.createElement("button",{onClick:clear,style:{flex:1,padding:"10px",background:confirmClear?"#FF206033":"#FF206018",border:"1px solid "+(confirmClear?"#FF2060":"#FF2060aa"),color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:12,letterSpacing:2}},confirmClear?"CONFIRM?":"CLEAR"),
+        React.createElement("button",{onClick:save,style:{flex:2,padding:"10px",background:"#7744cc18",border:"1px solid #9966cc",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:12,letterSpacing:2}},"TRANSMIT")
+      )
+    ),
+    React.createElement("div",{style:{position:"absolute",bottom:10,left:12,display:"flex",flexDirection:"column",gap:4,background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"8px 12px"}},
+      React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:2,marginBottom:2}},"LEGEND"),
+      [["#FF2060","▲ SHIP"],["#BBAA44","■ MID RING"],["#CC6622","■ INNER RING"],["#CCCCCC","■ OUTER RING"],["#FF8C00","■ BARRIER"],["#cc88ff","■ FACTION BASE"],["#6a7a8a","░ UNCHARTED"]].map(function(pair){return React.createElement("div",{key:pair[1],style:{display:"flex",alignItems:"center",gap:5}},React.createElement("div",{style:{width:9,height:9,background:pair[0],borderRadius:1}}),React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aabb"}},pair[1]));})
+    ),
+    toast.length>0&&React.createElement("div",{style:{position:"absolute",top:10,left:"50%",transform:"translateX(-50%)",zIndex:70,display:"flex",flexDirection:"column",gap:5,pointerEvents:"none",alignItems:"center"}},
+      toast.map(function(t){return React.createElement("div",{key:t.id,style:{background:"rgba(6,6,20,0.95)",border:"1px solid "+t.color+"55",borderRadius:6,padding:"6px 16px",fontFamily:MONO,fontSize:11,color:t.color,letterSpacing:2,animation:"in .2s ease"}},t.msg);})
+    ),
+    cb&&React.createElement("div",{style:{position:"absolute",bottom:10,right:12,background:"rgba(6,6,20,0.9)",border:"1px solid #cc88ff33",borderRadius:6,padding:"5px 12px",zIndex:30,fontFamily:MONO,fontSize:9,color:"#cc88ff88",letterSpacing:1}},
+      "CLIP: "+(cb.tile?cb.tile.toUpperCase():"—")+" | "+(cb.token?"SHIP":"—")
     )
-   ),
-   React.createElement("input",{value:editData.name||"",onChange:function(e){var nm=Object.assign({},hexMap);nm[edit]=Object.assign({},editData,{name:e.target.value});onUpdate(nm);},placeholder:"Hex name / designation...",style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#eee",fontFamily:MONO,fontSize:12,padding:"7px 10px",outline:"none",boxSizing:"border-box",marginBottom:8}}),
-   React.createElement("textarea",{value:editData.notes||"",onChange:function(e){var nm=Object.assign({},hexMap);nm[edit]=Object.assign({},editData,{notes:e.target.value});onUpdate(nm);},placeholder:"Field notes...",rows:3,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:13,padding:"8px 10px",outline:"none",resize:"vertical",boxSizing:"border-box",lineHeight:1.7,marginBottom:8}}),
-   React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
-    React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#778",letterSpacing:1,alignSelf:"center"}},"FACTION:"),
-    [{id:"",label:"NONE",c:"#555"}].concat(FACTIONS).map(function(f){var a=(editData.faction||"")===f.id;return React.createElement("button",{key:f.id,onClick:function(){var nm=Object.assign({},hexMap);nm[edit]=Object.assign({},editData,{faction:f.id||undefined});if(!f.id)delete nm[edit].faction;onUpdate(nm);},style:{padding:"3px 8px",background:a?f.c+"22":"transparent",border:"1px solid "+(a?f.c:B1),color:a?f.c:"#777",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9}},f.label);})
-   ),
-   React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
-    React.createElement("button",{onClick:function(){doCopy(edit,"both");},style:{padding:"5px 12px",background:"#FFD16618",border:"1px solid #FFD16655",color:"#FFD166",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9}},"⎘ COPY"),
-    React.createElement("button",{onClick:function(){doCut(edit,"both");setEdit(null);},style:{padding:"5px 12px",background:"#FF994418",border:"1px solid #FF994455",color:"#FF9944",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9}},"✂ CUT"),
-    clipboard&&React.createElement("button",{onClick:function(){doPaste(edit);},style:{padding:"5px 12px",background:"#00FFD018",border:"1px solid #00FFD055",color:"#00FFD0",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9}},"⎙ PASTE"),
-    React.createElement("button",{onClick:function(){doClear(edit,"all");setEdit(null);},style:{padding:"5px 12px",background:"#FF206018",border:"1px solid #FF206055",color:"#FF2060",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9}},"✕ CLEAR ALL")
-   )
-  ),
-  context&&React.createElement(ContextMenu,{x:context.x,y:context.y,hexData:context.hexData,clipboard:clipboard,onAction:handleCtxAction,onClose:function(){setContext(null);}}),
-  React.createElement(ClipboardPreview,{clipboard:clipboard}),
-  toast&&React.createElement(Toast,{msg:toast.msg,color:toast.color})
- );
-}
-
-// ── COMMS TAB (receives msgs/setMsgs as props from App) ───────────────────
-function CommsTab(props){
- var gameState=props.gameState,msgs=props.msgs,setMsgs=props.setMsgs,commsLoading=props.commsLoading,onSend=props.onSend;
- var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
- var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
- var recapTextS=useState(""),setRecapText=recapTextS[1];var recapText=recapTextS[0];
- var recapLoadingS=useState(false),setRecapLoading=recapLoadingS[1];var recapLoading=recapLoadingS[0];
- var endRef=useRef(null),inputRef=useRef(null);
- useEffect(function(){try{var rm=localStorage.getItem("gs_mabel_memory");if(rm)setMemory(rm);}catch(e){};},[]);
- useEffect(function(){if(endRef.current)endRef.current.scrollIntoView({behavior:"smooth"});},[msgs]);
-
- var genRecap=async function(){
-  setRecapLoading(true);setRecapText("");
-  try{
-   var res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:600,system:"You are MABEL. Write a concise session recap log entry. Terse, atmospheric, first person. Include: what happened, key decisions, resource changes, status. Under 300 words.",messages:[{role:"user",content:"Game state: "+JSON.stringify({session:gameState.session,cole:{hp:gameState.cole.hp,en:gameState.cole.en},vela:{hp:gameState.vela.hp,en:gameState.vela.en},ship:{hull:gameState.ship.hull,fuel:gameState.ship.fuel,scraps:gameState.ship.scraps}})+"\nRecent comms:\n"+msgs.slice(-10).map(function(m){return m.role+": "+m.content;}).join("\n")+"\nGenerate session log entry."}]})});
-   var data=await res.json();
-   var txt=(data.content&&data.content.find(function(b){return b.type==="text";}))||{text:""};
-   setRecapText(txt.text||"");
-  }catch(e){setRecapText("[GENERATION ERROR]");}
-  setRecapLoading(false);
- };
-
- var send=function(){if(!input.trim()||commsLoading)return;onSend(input.trim());setInput("");};
-
- return React.createElement("div",{style:{maxWidth:680}},
-  React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}},
-   QUICK_ACTIONS.map(function(qa){return React.createElement("button",{key:qa.label,onClick:function(){onSend(qa.prompt);},disabled:commsLoading,style:{padding:"5px 12px",background:"#88BBFF12",border:"1px solid #88BBFF33",color:"#88BBFF",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},qa.label);})
-  ),
-  React.createElement("div",{style:{background:"#05050e",border:"1px solid "+B2,borderRadius:6,minHeight:340,maxHeight:500,overflowY:"auto",padding:"12px 14px",display:"flex",flexDirection:"column",gap:10,marginBottom:10}},
-   msgs.map(function(m,i){
-    var isA=m.role==="assistant";
-    return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end",animation:"in .2s ease"}},
-     React.createElement("div",{style:{maxWidth:"88%",padding:"8px 12px",borderRadius:4,background:isA?MABEL_C+"10":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"44":"#ffffff1a"),fontFamily:isA?MONO:RAJ,fontSize:isA?11:14,color:isA?MABEL_C:"#ddd",lineHeight:1.75}},
-      isA?React.createElement(MadText,{text:m.content}):m.content
-     ),
-     React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#445",marginTop:2,letterSpacing:1}},isA?"MABEL":"COMMANDER")
-    );
-   }),
-   commsLoading&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:MABEL_C,animation:"pulse 1s infinite"}},"// PROCESSING..."),
-   React.createElement("div",{ref:endRef})
-  ),
-  React.createElement("div",{style:{display:"flex",gap:8,marginBottom:14}},
-   React.createElement("input",{ref:inputRef,value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter"&&!e.shiftKey)send();},placeholder:"Transmit to MABEL...",disabled:commsLoading,style:{flex:1,background:"#06060f",border:"1px solid "+MABEL_C+"44",borderRadius:4,color:"#eee",fontFamily:MONO,fontSize:12,padding:"10px 14px",outline:"none"}}),
-   React.createElement("button",{onClick:send,disabled:commsLoading||!input.trim(),style:{padding:"10px 20px",background:MABEL_C+"18",border:"1px solid "+MABEL_C+"55",color:MABEL_C,borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:11}},commsLoading?"...":"SEND")
-  ),
-  React.createElement("div",{style:{borderTop:"1px solid "+B2,paddingTop:14}},
-   React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
-    React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2}},"SESSION RECAP LOG"),
-    React.createElement("button",{onClick:genRecap,disabled:recapLoading,style:{padding:"5px 14px",background:"#88BBFF12",border:"1px solid #88BBFF44",color:MABEL_C,borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},recapLoading?"COMPOSING...":"GENERATE")
-   ),
-   React.createElement(CopyBox,{text:recapText,loading:recapLoading})
-  )
- );
+  );
 }
 
 // ── APP ────────────────────────────────────────────────────────────────────
 function App(){
  var gsS=useState(function(){try{var r=localStorage.getItem("gs_state");if(r)return merge(JSON.parse(r));}catch(e){}return INIT;}),setGs=gsS[1];var gs=gsS[0];
  var tabS=useState("map"),setTab=tabS[1];var tab=tabS[0];
+ var presetsOpenS=useState(false),setPresetsOpen=presetsOpenS[1];var presetsOpen=presetsOpenS[0];
  var savedS=useState(false),setSaved=savedS[1];
  // Comms lifted to App — shared between CommsTab + MabelMini
  var commsS=useState(COMMS_INIT),setComms=commsS[1];var comms=commsS[0];
@@ -1019,6 +935,16 @@ function App(){
  return React.createElement("div",{style:{minHeight:"100vh",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
   React.createElement(Starfield,null),
+  React.createElement("div",{className:"gs-vig"}),
+  React.createElement("div",{className:"gs-scan"}),
+  React.createElement("div",{className:"gs-vig"}),
+  React.createElement("div",{className:"gs-scan"}),
+  React.createElement("div",{className:"gs-vig"}),
+  React.createElement("div",{className:"gs-scan"}),
+  React.createElement("div",{className:"gs-vig"}),
+  React.createElement("div",{className:"gs-scan"}),
+  React.createElement("div",{className:"gs-vig"}),
+  React.createElement("div",{className:"gs-scan"}),
   // MABEL Mini — globally visible on all tabs
   React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
   React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 60px"}},
@@ -1026,7 +952,18 @@ function App(){
      TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);})
     ),
     React.createElement("div",{style:{paddingTop:20}},
-     tab==="MAP"&&React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name,campaignMap:gs.campaignMap}),
+     tab==="map"&&React.createElement("div",null,
+       React.createElement("div",{style:{marginBottom:10,border:"1px solid "+B2,borderRadius:6,overflow:"hidden"}},
+         React.createElement("div",{onClick:function(){setPresetsOpen(function(p){return !p;});},style:{padding:"7px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:"#0a0a1a",userSelect:"none"}},
+           React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778",letterSpacing:2}},"▸  LOAD MAP PRESET"),
+           React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#556"}},presetsOpen?"▲":"▼")
+    ),
+    presetsOpen&&React.createElement("div",{style:{padding:"10px 12px",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:6,background:"#07071299"}},
+      MAP_PRESETS.map(function(pr){return React.createElement("button",{key:pr.name,onClick:function(){upHex(pr.map);setPresetsOpen(false);},style:{padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},pr.name);})
+    )
+  ),
+  React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name})
+),
      tab==="CREW"&&React.createElement("div",null,
       React.createElement("div",{style:{display:"flex",gap:16,flexWrap:"wrap",marginBottom:24}},
        React.createElement(CharCard,{name:gs.cole.name,data:gs.cole,accent:"#FFD166",onChange:function(k,v){upC("cole",k,v);},onNameChange:function(n){setGs(function(p){return Object.assign({},p,{cole:Object.assign({},p.cole,{name:n})});});}}),
