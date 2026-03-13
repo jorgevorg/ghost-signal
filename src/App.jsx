@@ -1006,8 +1006,8 @@ function App(){
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #222230",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
      TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);})
     ),
-    React.createElement("div",{style:Object.assign({paddingTop:20},tab!=="MAP"?{visibility:"hidden",position:"absolute",top:0,left:0,width:"100%",pointerEvents:"none"}:{})},
-     React.createElement("div",{style:{display:tab==="map"?"block":"none"}},
+    React.createElement("div",{style:{paddingTop:20}},
+     React.createElement("div",{style:{display:tab==="MAP"?"block":"none"}},
        React.createElement("div",{style:{marginBottom:10,border:"1px solid "+B2,borderRadius:6,overflow:"hidden"}},
          React.createElement("div",{onClick:function(){setPresetsOpen(function(p){return !p;});},style:{padding:"7px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:"#0a0a1a",userSelect:"none"}},
            React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778",letterSpacing:2}},"▸  LOAD MAP PRESET"),
