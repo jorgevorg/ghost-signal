@@ -988,7 +988,7 @@ function App(){
  var TABS=["MAP","CREW","SHIP","LOGS","COMMS"];
  var TAB_C={MAP:"#cc88ff",CREW:"#FFD166",SHIP:"#00FFD0",LOGS:"#FF6EC7",COMMS:"#88BBFF"};
 
- return React.createElement("div",{style:{minHeight:"100vh",background:BG,color:"#ddd",position:"relative",zIndex:1}},
+ return React.createElement("div",{style:{height:"100vh",overflow:"hidden",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
   React.createElement(Starfield,null),
   React.createElement("div",{className:"gs-scan"}),
@@ -1002,11 +1002,11 @@ function App(){
   React.createElement("div",{className:"gs-scan"}),
   // MABEL Mini — globally visible on all tabs
   React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
-  React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 60px"}},
+  React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box"}},
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #222230",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
      TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);})
     ),
-    React.createElement("div",{style:{paddingTop:20}},
+    React.createElement("div",{style:{paddingTop:20,flex:1,overflowY:"auto",minHeight:0,paddingBottom:60}},
      React.createElement("div",{style:{display:tab==="MAP"?"block":"none"}},
        React.createElement("div",{style:{marginBottom:10,border:"1px solid "+B2,borderRadius:6,overflow:"hidden"}},
          React.createElement("div",{onClick:function(){setPresetsOpen(function(p){return !p;});},style:{padding:"7px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:"#0a0a1a",userSelect:"none"}},
