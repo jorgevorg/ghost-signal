@@ -566,7 +566,7 @@ function DiceRoller(props){
  var rollFree=function(expr){var ex=expr||fe;var res=parseExpr(ex);if(!res)return;setFe(ex);setFr(res);var ds=res.dice.map(function(d){return d.r;}).join(",");addH({mode:"FREE",label:ex.toUpperCase()+" ["+ds+"]"+(res.mod?(res.mod>0?"+":"")+res.mod:"")+" = "+res.total,total:res.total,d66:!!res.d66});};
  var mBtn=function(id,lbl){var a=mode===id;return React.createElement("button",{onClick:function(){setMode(id);},style:{flex:1,padding:"5px 0",background:a?"#FF206022":"transparent",border:"1px solid "+(a?"#FF2060":B1),color:a?"#FF2060":"#bbb",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1.5}},lbl);};
  var charBtns=function(active,setActive,onSelect){return ["cole","vela"].map(function(c){var a=active===c,cc=c==="cole"?"#FFD166":"#FF2060";return React.createElement("button",{key:c,onClick:function(){setActive(c);if(onSelect)onSelect();},style:{flex:1,padding:"4px 0",background:a?cc+"22":"transparent",border:"1px solid "+(a?cc:B1),color:a?cc:"#bbb",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},charLabel(c));});};
- return React.createElement("div",{style:{position:"fixed",bottom:16,right:16,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,zIndex:100,overflow:"hidden"}},
+ return React.createElement("div",{style:{position:"fixed",bottom:16,right:64,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,zIndex:100,overflow:"hidden"}},
   React.createElement("div",{onClick:function(){setCol(!col);},style:{padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid "+B2,cursor:"pointer"}},
    React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:"#FF2060",letterSpacing:3}},"DICE MATRIX"),
    React.createElement("span",{style:{color:"#aaa",fontSize:12}},col?"▲":"▼")
@@ -647,7 +647,7 @@ function MabelMini(props){
  useEffect(function(){if(open&&endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs,open]);
  var lastMsg=msgs[msgs.length-1];
  var send=function(){if(!input.trim()||loading)return;onSend(input.trim());setInput("");};
- return React.createElement("div",{style:{position:"fixed",bottom:16,left:16,width:open?360:200,zIndex:200,background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s"}},
+ return React.createElement("div",{style:{position:"fixed",bottom:16,left:64,width:open?360:200,zIndex:200,background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s"}},
   React.createElement("div",{onClick:function(){setOpen(!open);},style:{padding:"8px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:MABEL_C+"08",borderBottom:open?"1px solid "+MABEL_C+"33":"none"}},
    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
     React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 6px "+MABEL_C,animation:"pulse 2s infinite"}}),
@@ -840,12 +840,12 @@ function HexMap(props){
   var ctxAccent=ctxData&&ctxData.type&&IC[ctxData.type]?IC[ctxData.type]:ctxData&&SHIP_COLORS[ctxData.type]?SHIP_COLORS[ctxData.type]:"#00FFD0";
   var hovData=hov!==null?(hexMap[hov]||null):null;
   var hovAccent=hovData&&hovData.type&&IC[hovData.type]?IC[hovData.type]:hovData&&SHIP_COLORS[hovData.type]?SHIP_COLORS[hovData.type]:"#99aabb";
-  return React.createElement("div",{ref:mapRef,style:{position:"relative",borderRadius:12,border:"1px solid "+B3,overflow:"hidden",background:"transparent",height:"calc(100vh - 260px)"},onClick:function(){setCtx(null);}},
+  return React.createElement("div",{ref:mapRef,style:{position:"relative",borderRadius:12,border:"1px solid "+B3,overflow:"hidden",background:"transparent",height:"calc(100vh - 220px)"},onClick:function(){setCtx(null);}},
     React.createElement("div",{style:{position:"absolute",top:10,left:12,zIndex:30,display:"flex",gap:8}},
       React.createElement("button",{onClick:function(){setShowIds(!showIds);},style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:showIds?"#7744cc33":"transparent",border:"1px solid "+(showIds?"#9966cc":B3),color:showIds?"#cc88ff":"#aaa",borderRadius:4,cursor:"pointer",letterSpacing:2}},showIds?"HIDE IDs":"SHOW IDs"),
       sel.length>0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:"#cc88ff22",border:"1px solid #cc88ff55",color:"#cc88ff",borderRadius:4,letterSpacing:1}},sel.length+" SELECTED")
     ),
-    React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100vh - 340px)",viewBox:"-310 -275 620 550",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
+    React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100vh - 300px)",viewBox:"-310 -290 620 580",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
       React.createElement("defs",null,React.createElement("pattern",{id:"hatch",width:"7",height:"7",patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"},React.createElement("line",{x1:"0",y1:"0",x2:"0",y2:"7",stroke:"#1e2a3a",strokeWidth:"1.3"}))),
       React.createElement("g",{transform:"translate("+pan.x+","+pan.y+") scale("+mapZoom+")"},
         HEXES.map(function(hex){
