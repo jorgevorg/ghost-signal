@@ -820,7 +820,7 @@ function HexMap(props){
   };
   var openCtx=function(hex,e){
     e.preventDefault();e.stopPropagation();if(hex.isStar||movedRef.current)return;
-    var zoom=parseFloat(document.documentElement.style.zoom||document.body.style.zoom)||1;
+    var zoom=parseFloat(getComputedStyle(document.documentElement).zoom)||1;
     var px=(e.clientX/zoom)+2;
     var py=(e.clientY/zoom)+2;
     setCtx({hexId:hex.id,popX:px,popY:py});setEd(null);
@@ -830,7 +830,7 @@ function HexMap(props){
   var copyHex=function(hexId,mode){var d=hexMap[hexId]||{};setCb({mode:mode,tile:(mode==="token")?null:(d.type||null),token:(mode==="tile")?false:(d.ship||false)});addToast("Copied ("+mode+")","#00FFD0");setCtx(null);};
   var cutHex=function(hexId,mode){var d=hexMap[hexId]||{};setCb({mode:mode,tile:(mode==="token")?null:(d.type||null),token:(mode==="tile")?false:(d.ship||false)});var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(mode==="tile"||mode==="both")delete h.type;if(mode==="token"||mode==="both")h.ship=false;m[hexId]=h;onUpdate(m);addToast("Cut ("+mode+")","#FFD166");setCtx(null);};
   var pasteHex=function(hexId){if(!cb)return;var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(cb.mode==="tile"||cb.mode==="both"){if(cb.tile)h.type=cb.tile;}if(cb.mode==="token"||cb.mode==="both"){h.ship=cb.token;}m[hexId]=h;onUpdate(m);addToast("Pasted","#cc88ff");setCtx(null);};
-  var clearHex=function(hexId,mode){var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(mode==="tile"||mode==="both")delete h.type;if(mode==="token"||mode==="both")h.ship=false;if(!h.type&&!h.ship&&!h.name&&!h.notes)delete m[hexId];else m[hexId]=h;onUpdate(m);addToast("Cleared ("+mode+")","#FF2060");setCtx(null);};
+  var clearHex=function(hexId,mode){var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(mode==="tile"||mode==="both"){delete h.type;delete h.name;delete h.notes;}if(mode==="token"||mode==="both")h.ship=false;if(!h.type&&!h.ship&&!h.name&&!h.notes)delete m[hexId];else m[hexId]=h;onUpdate(m);addToast("Cleared ("+mode+")","#FF2060");setCtx(null);};
   var iS={width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#eee",fontFamily:RAJ,fontSize:14,padding:"7px 10px",outline:"none",boxSizing:"border-box",marginBottom:8};
   var ringColor=function(ring){return ring===1?"#CC662211":ring===2?"#BBAA4411":ring===3?"#CCCCCC11":"#111828";};
   var ringStroke=function(ring){return ring===1?"#CC6622aa":ring===2?"#BBAA44aa":ring===3?"#CCCCCCaa":"#3d4d6a";};
@@ -857,7 +857,7 @@ function HexMap(props){
           return React.createElement("g",{key:hex.id,
             onClick:function(e){openHex(hex,e);},
             onContextMenu:function(e){openCtx(hex,e);},
-            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){var mr=mapRef.current.getBoundingClientRect();setHovPos({x:e.clientX-mr.left,y:e.clientY-mr.top});setHov(hex.id);}},
+            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){var zoom=parseFloat(getComputedStyle(document.documentElement).zoom)||1;var mr=mapRef.current.getBoundingClientRect();setHovPos({x:(e.clientX-mr.left)/zoom,y:(e.clientY-mr.top)/zoom});setHov(hex.id);}},
             onMouseLeave:function(){setHov(null);},
             style:{cursor:"pointer"}},
             React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hexFill,stroke:hexStroke,strokeWidth:strokeW}),
@@ -868,7 +868,7 @@ function HexMap(props){
         })
       )
     ),
-    hov!==null&&hovData&&React.createElement("div",{style:{position:"absolute",left:Math.min(hovPos.x+14,((mapRef.current&&mapRef.current.offsetWidth)||600)-234),top:Math.min(hovPos.y+10,((mapRef.current&&mapRef.current.offsetHeight)||400)-190),width:224,background:"rgba(4,4,18,0.97)",border:"1px solid "+hovAccent+"55",borderRadius:8,padding:"10px 13px",zIndex:50,pointerEvents:"none",boxShadow:"0 0 20px "+hovAccent+"18"}},
+    hov!==null&&hovData&&React.createElement("div",{style:{position:"absolute",left:Math.min(hovPos.x+14,((mapRef.current&&mapRef.current.offsetWidth)||600)-234),top:Math.min(hovPos.y+10,((mapRef.current&&mapRef.current.offsetHeight)||400)-190),width:224,background:"rgba(4,4,18,0.97)",border:"1px solid "+hovAccent+"55",borderRadius:8,padding:"10px 13px",zIndex:99998,pointerEvents:"none",boxShadow:"0 0 20px "+hovAccent+"18"}},
       React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:3,marginBottom:3}},"HEX-"+String(hov).padStart(3,"0")),
       hovData.name&&React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:hovAccent,letterSpacing:2,marginBottom:5}},hovData.name),
       hovData.type&&React.createElement("div",{style:{display:"inline-flex",alignItems:"center",background:hovAccent+"18",border:"1px solid "+hovAccent+"44",borderRadius:3,padding:"3px 8px",marginBottom:6}},React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:hovAccent,letterSpacing:1}},TYPE_LABELS[hovData.type]||hovData.type.toUpperCase())),
@@ -890,7 +890,7 @@ function HexMap(props){
       cb&&React.createElement("div",{onClick:function(){pasteHex(ctx.hexId);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#cc88ff",letterSpacing:1}},"PASTE"+(cb.tile?" ["+cb.tile.toUpperCase()+"]":"")),
       React.createElement("div",{style:{height:1,background:B2,margin:"3px 0"}}),
       [["CLEAR TILE","tile"],["CLEAR TOKEN","token"],["CLEAR BOTH","both"]].map(function(r){return React.createElement("div",{key:r[0],onClick:function(){clearHex(ctx.hexId,r[1]);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#FF2060",letterSpacing:1}},r[0]);}),
-      React.createElement("div",{onClick:function(){setEd(null);},style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#445",letterSpacing:1}},"CANCEL")
+      React.createElement("div",{onClose:function(){setCtx(null);}})),document.body),style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#445",letterSpacing:1}},"CANCEL")
     ),
     ed!==null&&React.createElement("div",{style:{position:"absolute",top:12,right:12,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,padding:16,zIndex:20}},
       React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
