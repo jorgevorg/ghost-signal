@@ -821,7 +821,7 @@ function HexMap(props){
   var openCtx=function(hex,e){
     e.preventDefault();e.stopPropagation();if(hex.isStar||movedRef.current)return;
     var zoom=parseFloat(getComputedStyle(document.documentElement).zoom)||1;
-    var px=(e.clientX/zoom)+2;
+    var px=e.clientX+2;
     var py=(e.clientY/zoom)+2;
     setCtx({hexId:hex.id,popX:px,popY:py});setEd(null);
   };
