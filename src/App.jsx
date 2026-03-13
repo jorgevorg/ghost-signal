@@ -700,8 +700,8 @@ function ContextMenu(props){
  };
  var Sep=function(){return React.createElement("div",{style:{borderTop:"1px solid "+B2,margin:"3px 0"}});};
  // Clamp to viewport
- var vw=window.innerWidth,vh=window.innerHeight;
- var cx=Math.max(4,Math.min(x,vw-175)),cy=Math.max(4,Math.min(y,vh-280));
+ var mL=props.mL||0,mT=props.mT||0,mR=props.mR||window.innerWidth,mB=props.mB||window.innerHeight;
+ var cx=Math.max(mL+4,Math.min(x,mR-175)),cy=Math.max(mT+4,Math.min(y,mB-280));
  return React.createElement("div",{style:{position:"fixed",left:cx,top:cy,zIndex:99999,background:"#08080f",border:"1px solid "+B3,borderRadius:4,padding:"4px 0",minWidth:165,boxShadow:"0 8px 24px #000000cc"},onMouseDown:function(e){e.stopPropagation();}},
   Item("Copy Tile","copy:tile",!hasTile,"#FFD166","⎘"),
   Item("Copy Token","copy:token",!hasToken,"#FFD166","⎘"),
@@ -857,7 +857,7 @@ function HexMap(props){
           return React.createElement("g",{key:hex.id,
             onClick:function(e){openHex(hex,e);},
             onContextMenu:function(e){openCtx(hex,e);},
-            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){var zoom=parseFloat(getComputedStyle(document.documentElement).zoom)||1;var mr=mapRef.current.getBoundingClientRect();setHovPos({x:(e.clientX-mr.left)/zoom,y:(e.clientY-mr.top)/zoom});setHov(hex.id);}},
+            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){var mr=mapRef.current.getBoundingClientRect();setHovPos({x:e.clientX+12,y:e.clientY+12,mL:mr.left,mT:mr.top,mR:mr.right,mB:mr.bottom});setHov(hex.id);}},
             onMouseLeave:function(){setHov(null);},
             style:{cursor:"pointer"}},
             React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hexFill,stroke:hexStroke,strokeWidth:strokeW}),
