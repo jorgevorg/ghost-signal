@@ -845,7 +845,7 @@ function HexMap(props){
       React.createElement("button",{onClick:function(){setShowIds(!showIds);},style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:showIds?"#7744cc33":"transparent",border:"1px solid "+(showIds?"#9966cc":B3),color:showIds?"#cc88ff":"#aaa",borderRadius:4,cursor:"pointer",letterSpacing:2}},showIds?"HIDE IDs":"SHOW IDs"),
       sel.length>0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:"#cc88ff22",border:"1px solid #cc88ff55",color:"#cc88ff",borderRadius:4,letterSpacing:1}},sel.length+" SELECTED")
     ),
-    React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100vh - 180px)",viewBox:"-310 -290 620 670",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
+    React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100%)",viewBox:"-310 -290 620 670",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
       React.createElement("defs",null,React.createElement("pattern",{id:"hatch",width:"7",height:"7",patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"},React.createElement("line",{x1:"0",y1:"0",x2:"0",y2:"7",stroke:"#1e2a3a",strokeWidth:"1.3"}))),
       React.createElement("g",{transform:"translate("+pan.x+","+pan.y+") rotate(90) scale("+mapZoom+")"},
         HEXES.map(function(hex){
