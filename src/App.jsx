@@ -644,7 +644,7 @@ function MabelMini(props){
  var openS=useState(false),setOpen=openS[1];var open=openS[0];
  var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
  var endRef=useRef(null);
- useEffect(function(){if(open&&endRef.current)endRef.current.scrollIntoView({behavior:"instant"});},[msgs,open]);
+ useEffect(function(){if(open&&endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs,open]);
  var lastMsg=msgs[msgs.length-1];
  var send=function(){if(!input.trim()||loading)return;onSend(input.trim());setInput("");};
  return React.createElement("div",{style:{position:"fixed",bottom:16,left:16,width:open?360:200,zIndex:200,background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s"}},
@@ -728,7 +728,7 @@ function CommsTab(props){
  var recapLoadingS=useState(false),setRecapLoading=recapLoadingS[1];var recapLoading=recapLoadingS[0];
  var endRef=useRef(null),inputRef=useRef(null);
  useEffect(function(){try{var rm=localStorage.getItem("gs_mabel_memory");if(rm)setMemory(rm);}catch(e){};},[]);
- useEffect(function(){if(endRef.current)endRef.current.scrollIntoView({behavior:"instant"});},[msgs]);
+ useEffect(function(){if(endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs]);
 
  var genRecap=async function(){
   setRecapLoading(true);setRecapText("");
