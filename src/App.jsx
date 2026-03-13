@@ -840,12 +840,12 @@ function HexMap(props){
   var ctxAccent=ctxData&&ctxData.type&&IC[ctxData.type]?IC[ctxData.type]:ctxData&&SHIP_COLORS[ctxData.type]?SHIP_COLORS[ctxData.type]:"#00FFD0";
   var hovData=hov!==null?(hexMap[hov]||null):null;
   var hovAccent=hovData&&hovData.type&&IC[hovData.type]?IC[hovData.type]:hovData&&SHIP_COLORS[hovData.type]?SHIP_COLORS[hovData.type]:"#99aabb";
-  return React.createElement("div",{ref:mapRef,style:{position:"relative",borderRadius:12,border:"1px solid "+B3,overflow:"hidden",background:"transparent",height:"calc(100vh - 180px)"},onClick:function(){setCtx(null);}},
+  return React.createElement("div",{ref:mapRef,style:{position:"relative",borderRadius:12,border:"1px solid "+B3,overflow:"hidden",background:"transparent",height:"calc(100vh - 140px)"},onClick:function(){setCtx(null);}},
     React.createElement("div",{style:{position:"absolute",top:10,left:12,zIndex:30,display:"flex",gap:8}},
       React.createElement("button",{onClick:function(){setShowIds(!showIds);},style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:showIds?"#7744cc33":"transparent",border:"1px solid "+(showIds?"#9966cc":B3),color:showIds?"#cc88ff":"#aaa",borderRadius:4,cursor:"pointer",letterSpacing:2}},showIds?"HIDE IDs":"SHOW IDs"),
       sel.length>0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:"#cc88ff22",border:"1px solid #cc88ff55",color:"#cc88ff",borderRadius:4,letterSpacing:1}},sel.length+" SELECTED")
     ),
-    React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100vh - 260px)",viewBox:"-310 -290 620 610",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
+    React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100vh - 220px)",viewBox:"-310 -290 620 640",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
       React.createElement("defs",null,React.createElement("pattern",{id:"hatch",width:"7",height:"7",patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"},React.createElement("line",{x1:"0",y1:"0",x2:"0",y2:"7",stroke:"#1e2a3a",strokeWidth:"1.3"}))),
       React.createElement("g",{transform:"translate("+pan.x+","+pan.y+") scale("+mapZoom+")"},
         HEXES.map(function(hex){
