@@ -5,7 +5,7 @@ import * as THREE from "three";
 const MONO="'Share Tech Mono',monospace",ORB="'Orbitron',sans-serif",RAJ="'Rajdhani',sans-serif",BG="#0a0a14";
 const B1="#5a5a7a",B2="#35354f",B3="#6a6a8a";
 const css=`@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap');
-html,body{background:#080810!important;margin:0;padding:0;zoom:1.15}
+html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;height:100%;width:100%}
 @keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
@@ -777,6 +777,8 @@ function CommsTab(props){
 // ── APP ────────────────────────────────────────────────────────────────────
 function HexMap(props){
   var hexMap=props.hexMap,onUpdate=props.onUpdate,shipName=props.shipName||"THE INDESTRUCTIBLE II";
+  var mapZoomS=useState(1),setMapZoom=mapZoomS[1];var mapZoom=mapZoomS[0];
+  var handleWheel=function(e){e.preventDefault();setMapZoom(function(z){var next=z-(e.deltaY*0.001);return Math.min(Math.max(next,0.4),3);});};
   var edS=useState(null),setEd=edS[1];var ed=edS[0];
   var ctxS=useState(null),setCtx=ctxS[1];var ctx=ctxS[0];
   var hovS=useState(null),setHov=hovS[1];var hov=hovS[0];
@@ -845,7 +847,7 @@ function HexMap(props){
     ),
     React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100vh - 340px)",viewBox:"-310 -275 620 550",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
       React.createElement("defs",null,React.createElement("pattern",{id:"hatch",width:"7",height:"7",patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"},React.createElement("line",{x1:"0",y1:"0",x2:"0",y2:"7",stroke:"#1e2a3a",strokeWidth:"1.3"}))),
-      React.createElement("g",{transform:"translate("+pan.x+","+pan.y+")"},
+      React.createElement("g",{transform:"translate("+pan.x+","+pan.y+") scale("+mapZoom+")"},
         HEXES.map(function(hex){
           if(hex.isStar)return React.createElement("g",{key:"star"},React.createElement("circle",{cx:hex.x,cy:hex.y,r:50,fill:"#FF2060",opacity:.07}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:36,fill:"#FF2060",opacity:.15}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:24,fill:"#FF4070",opacity:.7}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:16,fill:"#FF2060"}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:9,fill:"#ff9090"}));
           var d=hexMap[hex.id]||{},isShip=!!d.ship,isSel=ed===hex.id||(ctx&&ctx.hexId===hex.id)||sel.includes(hex.id);
