@@ -17,7 +17,10 @@ html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1
 @keyframes cutMarch{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-24}}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0d0d1a}::-webkit-scrollbar-thumb{background:#FF206044;border-radius:2px}
+@keyframes bootGlow{0%,100%{text-shadow:0 0 30px #FF206066,0 0 60px #FF206022}50%{text-shadow:0 0 80px #FF2060cc,0 0 160px #FF206055}}
 @keyframes scanmove{0%{background-position:0 0}100%{background-position:0 4px}}
+@keyframes bootGlow{0%{opacity:0;filter:brightness(3)}100%{opacity:1;filter:brightness(1)}}
+@keyframes bootGlow{0%{opacity:0;filter:brightness(3)}100%{opacity:1;filter:brightness(1)}}
 .gs-scan{pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,220,180,.016) 2px,rgba(0,220,180,.016) 4px);z-index:997;animation:scanmove .12s linear infinite}`;
 
 const CAMPAIGN_MAPS=[
@@ -256,9 +259,34 @@ function Typewriter(props){
  return React.createElement("span",{style:{color:color,fontFamily:MONO}},shown,!done&&React.createElement("span",{style:{animation:"blink 1s infinite",color:color}},"█"));
 }
 function TypewriterLines(props){
- var lines=props.lines;
+ var lines=props.lines,onAllDone=props.onAllDone;
  var curS=useState(0),setCur=curS[1];var cur=curS[0];
- return React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8}},lines.map(function(l,i){return i<=cur?React.createElement("div",{key:i},React.createElement(Typewriter,{text:l.text,speed:l.speed||30,color:l.color||"#00FFD0",onDone:function(){if(i===cur)setCur(function(c){return c+1;});}})):null;}));
+ useEffect(function(){if(cur>=lines.length&&onAllDone)onAllDone();},[cur]);
+ return React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:5}},
+  lines.map(function(l,i){return i<=cur?React.createElement("div",{key:i,style:{animation:"in .1s ease"}},React.createElement(Typewriter,{text:l.text,speed:l.speed||20,color:l.color||"#00FFD0",onDone:function(){if(i===cur)setCur(function(c){return c+1;});}})):null;})
+ );
+}
+
+// ── BOOT SEQUENCE ───────────────────────────────────────────────────────
+function BootSequence(props){
+ var onDone=props.onDone;
+ var phaseS=useState(0),setPhase=phaseS[1];var phase=phaseS[0];
+ var LINES=[
+  {text:"GHOST SIGNAL OS v4.1.7 — INITIALIZING...",speed:18,color:"#00FFD0"},
+  {text:"RUNNING SYSTEM DIAGNOSTICS...",speed:20,color:"#88BBFF"},
+  {text:"NAVIGATION MATRIX: ONLINE",speed:22,color:"#00FFD0"},
+  {text:"COMMS RELAY: ACTIVE",speed:22,color:"#00FFD0"},
+  {text:"WEAPONS ARRAY: NOMINAL",speed:22,color:"#00FFD0"},
+  {text:"LOADING CAMPAIGN DATA...",speed:18,color:"#88BBFF"},
+  {text:"ALL SYSTEMS NOMINAL.",speed:20,color:"#FFD166"},
+ ];
+ return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center"}},
+  phase===0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:0,width:480,padding:40}},
+   React.createElement("div",{style:{fontFamily:"'Orbitron',sans-serif",fontSize:11,color:"#FF2060",letterSpacing:4,marginBottom:24,opacity:.7}},"GHOST SIGNAL"),
+   React.createElement(TypewriterLines,{lines:LINES,onAllDone:function(){setPhase(1);setTimeout(onDone,600);}})
+  ),
+  phase===1&&React.createElement("div",{style:{fontFamily:"'Orbitron',sans-serif",fontSize:36,fontWeight:900,color:"#00FFD0",letterSpacing:12,animation:"bootGlow 0.6s ease"}},"GHOST SIGNAL")
+ );
 }
 
 // ── STARFIELD ─────────────────────────────────────────────────────────────
@@ -926,6 +954,7 @@ function HexMap(props){
 
 // ── APP ────────────────────────────────────────────────────────────────────
 function App(){
+ var bootS=useState(true),setBoot=bootS[1];var boot=bootS[0];
  var gsS=useState(function(){try{var r=localStorage.getItem("gs_state");if(r)return merge(JSON.parse(r));}catch(e){}return INIT;}),setGs=gsS[1];var gs=gsS[0];
  var tabS=useState("map"),setTab=tabS[1];var tab=tabS[0];
  var presetsOpenS=useState(false),setPresetsOpen=presetsOpenS[1];var presetsOpen=presetsOpenS[0];
@@ -992,7 +1021,8 @@ function App(){
 
  return React.createElement("div",{style:{height:"100vh",overflow:"hidden",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
-  React.createElement(Starfield,null),
+  boot&&React.createElement(BootSequence,{onDone:function(){setBoot(false);}}),
+   React.createElement(Starfield,null),
   React.createElement("div",{className:"gs-scan"}),
   React.createElement("div",{className:"gs-vig"}),
   React.createElement("div",{className:"gs-scan"}),
