@@ -753,7 +753,7 @@ function HexMap(props){
     return function(){window.removeEventListener("keydown",handler);};
   },[cb,sel,hexMap]);
   var onMD=function(e){dragRef.current={sx:e.clientX-offRef.current.x,sy:e.clientY-offRef.current.y};movedRef.current=false;};
-  var onMM=function(e){if(!dragRef.current)return;var nx=e.clientX-dragRef.current.sx,ny=e.clientY-dragRef.current.sy;if(Math.abs(nx-offRef.current.x)>3||Math.abs(ny-offRef.current.y)>3)movedRef.current=true;offRef.current={x:nx,y:ny};setPan({x:nx,y:ny});};
+  var onMM=function(e){if(e.buttons===0){dragRef.current=null;return;}if(!dragRef.current)return;var nx=e.clientX-dragRef.current.sx,ny=e.clientY-dragRef.current.sy;if(Math.abs(nx-offRef.current.x)>3||Math.abs(ny-offRef.current.y)>3)movedRef.current=true;offRef.current={x:nx,y:ny};setPan({x:nx,y:ny});};
   var onMU=function(){dragRef.current=null;};
   var openHex=function(hex,e){
     e.stopPropagation();if(hex.isStar||movedRef.current)return;
