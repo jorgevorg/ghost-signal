@@ -700,8 +700,8 @@ function ContextMenu(props){
  };
  var Sep=function(){return React.createElement("div",{style:{borderTop:"1px solid "+B2,margin:"3px 0"}});};
  // Clamp to viewport
- var mL=props.mL||0,mT=props.mT||0,mR=props.mR||window.innerWidth,mB=props.mB||window.innerHeight;
- var cx=Math.max(mL+4,Math.min(x,mR-175)),cy=Math.max(mT+4,Math.min(y,mB-280));
+ var cz=1.3225;
+ var cx=Math.max(4,Math.min(x,window.innerWidth/cz-175)),cy=Math.max(4,Math.min(y,window.innerHeight/cz-280));
  return React.createElement("div",{style:{position:"fixed",left:cx,top:cy,zIndex:99999,background:"#08080f",border:"1px solid "+B3,borderRadius:4,padding:"4px 0",minWidth:165,boxShadow:"0 8px 24px #000000cc"},onMouseDown:function(e){e.stopPropagation();}},
   Item("Copy Tile","copy:tile",!hasTile,"#FFD166","⎘"),
   Item("Copy Token","copy:token",!hasToken,"#FFD166","⎘"),
@@ -820,8 +820,9 @@ function HexMap(props){
   };
   var openCtx=function(hex,e){
     e.preventDefault();e.stopPropagation();if(hex.isStar||movedRef.current)return;
-    var px=e.clientX+2;
-    var py=e.clientY+2;
+    var cz=1.3225;
+    var px=e.clientX/cz+2;
+    var py=e.clientY/cz+2;
     setCtx({hexId:hex.id,popX:px,popY:py});setEd(null);
   };
   var save=function(){var m=Object.assign({},hexMap);m[ed]=form;onUpdate(m);setEd(null);};
@@ -856,7 +857,7 @@ function HexMap(props){
           return React.createElement("g",{key:hex.id,
             onClick:function(e){openHex(hex,e);},
             onContextMenu:function(e){openCtx(hex,e);},
-            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){setHovPos({x:e.clientX+12,y:e.clientY+12});setHov(hex.id);}},
+            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){var cz2=1.3225;setHovPos({x:e.clientX/cz2+12,y:e.clientY/cz2+12});setHov(hex.id);}},
             onMouseLeave:function(){setHov(null);},
             style:{cursor:"pointer"}},
             React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hexFill,stroke:hexStroke,strokeWidth:strokeW}),
@@ -867,7 +868,7 @@ function HexMap(props){
         })
       )
     ),
-    hov!==null&&hovData&&React.createElement("div",{style:{position:"fixed",left:Math.max(4,Math.min(hovPos.x,window.innerWidth-234)),top:Math.max(4,Math.min(hovPos.y,window.innerHeight-190)),width:224,background:"rgba(4,4,18,0.97)",border:"1px solid "+hovAccent+"55",borderRadius:8,padding:"10px 13px",zIndex:99998,pointerEvents:"none",boxShadow:"0 0 20px "+hovAccent+"18"}},
+    hov!==null&&hovData&&React.createElement("div",{style:{position:"fixed",left:Math.max(4,Math.min(hovPos.x,window.innerWidth/1.3225-234)),top:Math.max(4,Math.min(hovPos.y,window.innerHeight/1.3225-190)),width:224,background:"rgba(4,4,18,0.97)",border:"1px solid "+hovAccent+"55",borderRadius:8,padding:"10px 13px",zIndex:99998,pointerEvents:"none",boxShadow:"0 0 20px "+hovAccent+"18"}},
       React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:3,marginBottom:3}},"HEX-"+String(hov).padStart(3,"0")),
       hovData.name&&React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:hovAccent,letterSpacing:2,marginBottom:5}},hovData.name),
       hovData.type&&React.createElement("div",{style:{display:"inline-flex",alignItems:"center",background:hovAccent+"18",border:"1px solid "+hovAccent+"44",borderRadius:3,padding:"3px 8px",marginBottom:6}},React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:hovAccent,letterSpacing:1}},TYPE_LABELS[hovData.type]||hovData.type.toUpperCase())),
