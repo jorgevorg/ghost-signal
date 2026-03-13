@@ -5,7 +5,7 @@ import * as THREE from "three";
 const MONO="'Share Tech Mono',monospace",ORB="'Orbitron',sans-serif",RAJ="'Rajdhani',sans-serif",BG="#0a0a14";
 const B1="#5a5a7a",B2="#35354f",B3="#6a6a8a";
 const css=`@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap');
-html,body{background:#080810!important;margin:0;padding:0;zoom:1.25}
+html,body{background:#080810!important;margin:0;padding:0}
 @keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
