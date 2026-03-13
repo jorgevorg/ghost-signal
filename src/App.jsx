@@ -890,7 +890,7 @@ function HexMap(props){
       cb&&React.createElement("div",{onClick:function(){pasteHex(ctx.hexId);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#cc88ff",letterSpacing:1}},"PASTE"+(cb.tile?" ["+cb.tile.toUpperCase()+"]":"")),
       React.createElement("div",{style:{height:1,background:B2,margin:"3px 0"}}),
       [["CLEAR TILE","tile"],["CLEAR TOKEN","token"],["CLEAR BOTH","both"]].map(function(r){return React.createElement("div",{key:r[0],onClick:function(){clearHex(ctx.hexId,r[1]);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#FF2060",letterSpacing:1}},r[0]);}),
-      React.createElement("div",{onClose:function(){setCtx(null);}})),document.body),style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#445",letterSpacing:1}},"CANCEL")
+      React.createElement("div",{onClick:function(){setCtx(null);},style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#445",letterSpacing:1}},"CANCEL")
     ),
     ed!==null&&React.createElement("div",{style:{position:"absolute",top:12,right:12,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,padding:16,zIndex:20}},
       React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
