@@ -702,7 +702,7 @@ function ContextMenu(props){
  // Clamp to viewport
  var vw=window.innerWidth,vh=window.innerHeight;
  var cx=Math.max(4,Math.min(x,vw-175)),cy=Math.max(4,Math.min(y,vh-280));
- return React.createElement("div",{style:{position:"fixed",left:cx,top:cy,zIndex:500,background:"#08080f",border:"1px solid "+B3,borderRadius:4,padding:"4px 0",minWidth:165,boxShadow:"0 8px 24px #000000cc"},onMouseDown:function(e){e.stopPropagation();}},
+ return React.createElement("div",{style:{position:"fixed",left:cx,top:cy,zIndex:99999,background:"#08080f",border:"1px solid "+B3,borderRadius:4,padding:"4px 0",minWidth:165,boxShadow:"0 8px 24px #000000cc"},onMouseDown:function(e){e.stopPropagation();}},
   Item("Copy Tile","copy:tile",!hasTile,"#FFD166","⎘"),
   Item("Copy Token","copy:token",!hasToken,"#FFD166","⎘"),
   Item("Copy Both","copy:both",!hasTile&&!hasToken,"#FFD166","⎘"),
@@ -820,9 +820,9 @@ function HexMap(props){
   };
   var openCtx=function(hex,e){
     e.preventDefault();e.stopPropagation();if(hex.isStar||movedRef.current)return;
-    var mr=mapRef.current.getBoundingClientRect();
-    var px=e.clientX+2;
-    var py=e.clientY+2;
+    var zoom=parseFloat(document.documentElement.style.zoom||document.body.style.zoom)||1;
+    var px=(e.clientX/zoom)+2;
+    var py=(e.clientY/zoom)+2;
     setCtx({hexId:hex.id,popX:px,popY:py});setEd(null);
   };
   var save=function(){var m=Object.assign({},hexMap);m[ed]=form;onUpdate(m);setEd(null);};
@@ -890,7 +890,7 @@ function HexMap(props){
       cb&&React.createElement("div",{onClick:function(){pasteHex(ctx.hexId);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#cc88ff",letterSpacing:1}},"PASTE"+(cb.tile?" ["+cb.tile.toUpperCase()+"]":"")),
       React.createElement("div",{style:{height:1,background:B2,margin:"3px 0"}}),
       [["CLEAR TILE","tile"],["CLEAR TOKEN","token"],["CLEAR BOTH","both"]].map(function(r){return React.createElement("div",{key:r[0],onClick:function(){clearHex(ctx.hexId,r[1]);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#FF2060",letterSpacing:1}},r[0]);}),
-      React.createElement("div",{onClick:function(){setCtx(null);},style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#445",letterSpacing:1}},"CANCEL")
+      React.createElement("div",{onClick:function(){setEd(null);},style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#445",letterSpacing:1}},"CANCEL")
     ),
     ed!==null&&React.createElement("div",{style:{position:"absolute",top:12,right:12,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,padding:16,zIndex:20}},
       React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
@@ -1014,7 +1014,7 @@ function App(){
            React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#556"}},presetsOpen?"▲":"▼")
     ),
     presetsOpen&&React.createElement("div",{style:{padding:"10px 12px",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:6,background:"#07071299"}},
-      CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("button",{key:cm.id,onClick:function(){upHex(MAP_PRESETS[cm.id]);setPresetsOpen(false);},style:{padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name);})
+      MAP_PRESETS.map(function(pr){return React.createElement("button",{key:pr.name,onClick:function(){upHex(pr.map);setPresetsOpen(false);},style:{padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},pr.name);})
     )
   ),
   React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name})
