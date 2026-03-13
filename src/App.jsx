@@ -865,7 +865,7 @@ function HexMap(props){
             React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hexFill,stroke:hexStroke,strokeWidth:strokeW}),
             d.type&&React.createElement(HexIcon,{t:d.type,x:hex.x,y:hex.y,hexId:hex.id}),
             isShip&&!isBarrier&&!isBase&&React.createElement("text",{x:hex.x,y:hex.y-HS*.5,textAnchor:"middle",fontSize:11,fontFamily:"monospace",fill:"#FF2060",opacity:.9},"⍙"),
-            showIds&&React.createElement("text",{x:hex.x,y:hex.y+HS*.55,textAnchor:"middle",fill:"#99aabb",fontSize:8,fontFamily:MONO,opacity:.9,transform:"rotate(-90,"+hex.x+","+(hex.y+HS*.55)+")"},String(hex.id).padStart(3,"0"))
+            showIds&&React.createElement("text",{x:hex.x+HS*.55,y:hex.y,textAnchor:"middle",dominantBaseline:"middle",fill:"#99aabb",fontSize:8,fontFamily:MONO,opacity:.9,transform:"rotate(-90,"+(hex.x+HS*.55)+","+hex.y+")"},String(hex.id).padStart(3,"0"))
           );
         })
       )
