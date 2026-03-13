@@ -775,6 +775,7 @@ function HexMap(props){
   var cutHex=function(hexId,mode){var d=hexMap[hexId]||{};setCb({mode:mode,tile:(mode==="token")?null:(d.type||null),token:(mode==="tile")?false:(d.ship||false)});var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(mode==="tile"||mode==="both")delete h.type;if(mode==="token"||mode==="both")h.ship=false;m[hexId]=h;onUpdate(m);addToast("Cut ("+mode+")","#FFD166");setCtx(null);};
   var pasteHex=function(hexId){if(!cb)return;var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(cb.mode==="tile"||cb.mode==="both"){if(cb.tile)h.type=cb.tile;}if(cb.mode==="token"||cb.mode==="both"){h.ship=cb.token;}m[hexId]=h;onUpdate(m);addToast("Pasted","#cc88ff");setCtx(null);};
   var clearHex=function(hexId,mode){var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(mode==="tile"||mode==="both")delete h.type;if(mode==="token"||mode==="both")h.ship=false;if(!h.type&&!h.ship&&!h.name&&!h.notes)delete m[hexId];else m[hexId]=h;onUpdate(m);addToast("Cleared ("+mode+")","#FF2060");setCtx(null);};
+  var iS={width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#eee",fontFamily:RAJ,fontSize:14,padding:"7px 10px",outline:"none",boxSizing:"border-box",marginBottom:8};
   var ringColor=function(ring){return ring===1?"#CC662211":ring===2?"#BBAA4411":ring===3?"#CCCCCC11":"#111828";};
   var ringStroke=function(ring){return ring===1?"#CC6622aa":ring===2?"#BBAA44aa":ring===3?"#CCCCCCaa":"#3d4d6a";};
   var ctxData=ctx?(hexMap[ctx.hexId]||{}):null;
