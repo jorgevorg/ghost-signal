@@ -726,6 +726,7 @@ function HexMap(props){
   var ctxS=useState(null),setCtx=ctxS[1];var ctx=ctxS[0];
   var hovS=useState(null),setHov=hovS[1];var hov=hovS[0];
   var hovPosS=useState({x:0,y:0}),setHovPos=hovPosS[1];var hovPos=hovPosS[0];
+  var panS=useState({x:0,y:0}),setPan=panS[1];var pan=panS[0];
   var formS=useState({name:"",type:"",notes:"",ship:false}),setForm=formS[1];var form=formS[0];
   var showIdsS=useState(false),setShowIds=showIdsS[1];var showIds=showIdsS[0];
   var confirmClearS=useState(false),setConfirmClear=confirmClearS[1];var confirmClear=confirmClearS[0];
@@ -752,7 +753,7 @@ function HexMap(props){
     return function(){window.removeEventListener("keydown",handler);};
   },[cb,sel,hexMap]);
   var onMD=function(e){dragRef.current={sx:e.clientX-offRef.current.x,sy:e.clientY-offRef.current.y};movedRef.current=false;};
-  var onMM=function(e){if(!dragRef.current)return;var nx=e.clientX-dragRef.current.sx,ny=e.clientY-dragRef.current.sy;if(Math.abs(nx-offRef.current.x)>3||Math.abs(ny-offRef.current.y)>3)movedRef.current=true;offRef.current={x:nx,y:ny};if(grpRef.current)grpRef.current.setAttribute("transform","translate("+nx+","+ny+")");};
+  var onMM=function(e){if(!dragRef.current)return;var nx=e.clientX-dragRef.current.sx,ny=e.clientY-dragRef.current.sy;if(Math.abs(nx-offRef.current.x)>3||Math.abs(ny-offRef.current.y)>3)movedRef.current=true;offRef.current={x:nx,y:ny};setPan({x:nx,y:ny});};
   var onMU=function(){dragRef.current=null;};
   var openHex=function(hex,e){
     e.stopPropagation();if(hex.isStar||movedRef.current)return;
