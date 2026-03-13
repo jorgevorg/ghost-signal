@@ -851,7 +851,7 @@ function HexMap(props){
           var d=hexMap[hex.id]||{},isShip=!!d.ship,isSel=ed===hex.id||(ctx&&ctx.hexId===hex.id)||sel.includes(hex.id);
           var isBarrier=d.type==="barrier",isBase=d.type==="base";
           var hasD=!!(d.notes&&d.notes.trim()||d.type);
-          var hexFill=isBarrier?BARRIER_C+"18":isBase?BASE_C+"22":isShip?"#FF206022":hasD?ringColor(hex.ring):"url(#hatch)";
+          var hexFill=isBarrier?BARRIER_C+"18":isBase?BASE_C+"22":isShip?"#FF206022":hasD?ringColor(hex.ring):"#111828";
           var hexStroke=isSel?"#cc88ff":isBarrier?BARRIER_C:isBase?BASE_C:isShip?"#FF2060":hasD?ringStroke(hex.ring):"#3d4d6a";
           var strokeW=isBarrier||isBase?2.5:isSel||isShip?2:1.5;
           return React.createElement("g",{key:hex.id,
