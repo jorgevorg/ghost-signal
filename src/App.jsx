@@ -279,27 +279,28 @@ function BootSequence(props){
  useEffect(function(){
   var ts=[];
   var t=function(fn,ms){var id=setTimeout(fn,ms);ts.push(id);};
-  t(function(){setPhase(1);},150);
-  t(function(){setPhase(2);},550);
-  t(function(){setPhase(3);},900);
-  t(function(){setPhase(4);},1620);
-  t(function(){setPhase(5);},2050);
-  t(function(){setPhase(6);},2480);
-  t(function(){var i=0;var iv=setInterval(function(){i++;setHexReveal(i);if(i>=HEXES.length)clearInterval(iv);},38);ts.push(iv);},2480);
-  t(function(){setPhase(7);},4100);
-  t(function(){setPhase(8);},4800);
-  t(function(){setFading(true);},5500);
-  t(function(){onDone();},6000);
+  t(function(){setPhase(1);},200);
+  t(function(){setPhase(2);},750);
+  t(function(){setPhase(3);},1200);
+  t(function(){setPhase(4);},2200);
+  t(function(){setPhase(5);},2900);
+  t(function(){setPhase(6);},3500);
+  t(function(){var i=0;var iv=setInterval(function(){i++;setHexReveal(i);if(i>=HEXES.length)clearInterval(iv);},38);ts.push(iv);},3500);
+  t(function(){setPhase(7);},5400);
+  t(function(){setPhase(8);},6200);
+  t(function(){setFading(true);},7200);
+  t(function(){onDone();},7800);
   return function(){ts.forEach(function(id){clearTimeout(id);clearInterval(id);});};
  },[]);
  if(fading)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,animation:"bootFadeOut 0.55s ease forwards",pointerEvents:"none"}});
  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,overflow:"hidden"}},
+  React.createElement("div",{style:{position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.22) 2px,rgba(0,0,0,.22) 4px)",zIndex:2,pointerEvents:"none"}}),
   phase>=1&&phase<=2&&React.createElement("div",{style:{position:"absolute",left:0,right:0,top:"50%",transform:"translateY(-50%)",height:phase===1?"3px":"130vh",background:"linear-gradient(to bottom,transparent,#ffffff22 40%,#ffffff55 50%,#ffffff22 60%,transparent)",transition:"height 0.4s cubic-bezier(0.25,0.46,0.45,0.94)",boxShadow:"0 0 80px 40px #ffffff0a",zIndex:15,pointerEvents:"none"}}),
   phase===2&&React.createElement("div",{style:{position:"absolute",inset:0,zIndex:14,pointerEvents:"none",background:"repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(0,220,180,.03) 1px,rgba(0,220,180,.03) 2px)",animation:"scanmove 0.07s linear infinite",opacity:.6}}),
   phase>=3&&React.createElement("svg",{style:{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:8,pointerEvents:"none"},viewBox:"0 0 "+W+" "+H},
    React.createElement("defs",null,React.createElement("filter",{id:"bootGlowF",x:"-20%",y:"-20%",width:"140%",height:"140%"},React.createElement("feGaussianBlur",{stdDeviation:"3",result:"blur"}),React.createElement("feMerge",null,React.createElement("feMergeNode",{in:"blur"}),React.createElement("feMergeNode",{in:"SourceGraphic"})))),
    React.createElement("rect",{x:mapLeft,y:mapTop,width:mapW,height:mapH,rx:12,fill:"none",stroke:"#00FFD0",strokeWidth:1.8,filter:"url(#bootGlowF)",strokeDasharray:borderLen,strokeDashoffset:phase===3?borderLen:0,style:{transition:"stroke-dashoffset 0.65s linear"}}),
-   phase>=4&&[[mapLeft,mapTop],[mapLeft+mapW,mapTop],[mapLeft,mapTop+mapH],[mapLeft+mapW,mapTop+mapH]].map(function(pt,i){return React.createElement("circle",{key:i,cx:pt[0],cy:pt[1],r:5,fill:"#00FFD0",filter:"url(#bootGlowF)",style:{animation:"pulse 1.2s ease infinite",animationDelay:(i*0.12)+"s"}});})
+   phase>=4&&[[mapLeft+10,mapTop+10],[mapLeft+mapW-10,mapTop+10],[mapLeft+10,mapTop+mapH-10],[mapLeft+mapW-10,mapTop+mapH-10]].map(function(pt,i){return React.createElement("circle",{key:i,cx:pt[0],cy:pt[1],r:4,fill:"#cc88ff",filter:"url(#bootGlowF)",style:{animation:"pulse 1.2s ease infinite",animationDelay:(i*0.12)+"s"}});})
   ),
   phase>=4&&React.createElement("div",{style:{position:"fixed",bottom:64,left:64,width:220,background:"rgba(8,8,18,0.96)",border:"1px solid #88BBFF44",borderRadius:8,zIndex:20,animation:"slideLeft 0.35s cubic-bezier(0.25,0.46,0.45,0.94)",overflow:"hidden",boxShadow:"0 0 24px #88BBFF0a"}},
    React.createElement("div",{style:{padding:"8px 12px",display:"flex",alignItems:"center",gap:8,background:"#88BBFF06",borderBottom:"1px solid #88BBFF22"}},
@@ -1018,7 +1019,7 @@ function HexMap(props){
 function App(){
  var bootS=useState(true),setBoot=bootS[1];var boot=bootS[0];
  var gsS=useState(function(){try{var r=localStorage.getItem("gs_state");if(r)return merge(JSON.parse(r));}catch(e){}return INIT;}),setGs=gsS[1];var gs=gsS[0];
- var tabS=useState("map"),setTab=tabS[1];var tab=tabS[0];
+ var tabS=useState("MAP"),setTab=tabS[1];var tab=tabS[0];
  var presetsOpenS=useState(false),setPresetsOpen=presetsOpenS[1];var presetsOpen=presetsOpenS[0];
  var savedS=useState(false),setSaved=savedS[1];
  // Comms lifted to App — shared between CommsTab + MabelMini
