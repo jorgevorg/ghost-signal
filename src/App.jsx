@@ -820,7 +820,6 @@ function HexMap(props){
   };
   var openCtx=function(hex,e){
     e.preventDefault();e.stopPropagation();if(hex.isStar||movedRef.current)return;
-    var zoom=parseFloat(getComputedStyle(document.documentElement).zoom)||1;
     var px=e.clientX+2;
     var py=e.clientY+2;
     setCtx({hexId:hex.id,popX:px,popY:py});setEd(null);
@@ -857,7 +856,7 @@ function HexMap(props){
           return React.createElement("g",{key:hex.id,
             onClick:function(e){openHex(hex,e);},
             onContextMenu:function(e){openCtx(hex,e);},
-            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){var mr=mapRef.current.getBoundingClientRect();setHovPos({x:e.clientX+12,y:e.clientY+12,mL:mr.left,mT:mr.top,mR:mr.right,mB:mr.bottom});setHov(hex.id);}},
+            onMouseEnter:function(e){if(!dragRef.current&&(d.type||d.ship||d.name||d.notes)){setHovPos({x:e.clientX+12,y:e.clientY+12});setHov(hex.id);}},
             onMouseLeave:function(){setHov(null);},
             style:{cursor:"pointer"}},
             React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hexFill,stroke:hexStroke,strokeWidth:strokeW}),
@@ -868,7 +867,7 @@ function HexMap(props){
         })
       )
     ),
-    hov!==null&&hovData&&React.createElement("div",{style:{position:"absolute",left:Math.min(hovPos.x+14,((mapRef.current&&mapRef.current.offsetWidth)||600)-234),top:Math.min(hovPos.y+10,((mapRef.current&&mapRef.current.offsetHeight)||400)-190),width:224,background:"rgba(4,4,18,0.97)",border:"1px solid "+hovAccent+"55",borderRadius:8,padding:"10px 13px",zIndex:99998,pointerEvents:"none",boxShadow:"0 0 20px "+hovAccent+"18"}},
+    hov!==null&&hovData&&React.createElement("div",{style:{position:"fixed",left:Math.max(4,Math.min(hovPos.x,window.innerWidth-234)),top:Math.max(4,Math.min(hovPos.y,window.innerHeight-190)),width:224,background:"rgba(4,4,18,0.97)",border:"1px solid "+hovAccent+"55",borderRadius:8,padding:"10px 13px",zIndex:99998,pointerEvents:"none",boxShadow:"0 0 20px "+hovAccent+"18"}},
       React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:3,marginBottom:3}},"HEX-"+String(hov).padStart(3,"0")),
       hovData.name&&React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:hovAccent,letterSpacing:2,marginBottom:5}},hovData.name),
       hovData.type&&React.createElement("div",{style:{display:"inline-flex",alignItems:"center",background:hovAccent+"18",border:"1px solid "+hovAccent+"44",borderRadius:3,padding:"3px 8px",marginBottom:6}},React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:hovAccent,letterSpacing:1}},TYPE_LABELS[hovData.type]||hovData.type.toUpperCase())),
