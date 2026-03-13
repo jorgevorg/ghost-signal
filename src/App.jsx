@@ -701,7 +701,7 @@ function ContextMenu(props){
  var Sep=function(){return React.createElement("div",{style:{borderTop:"1px solid "+B2,margin:"3px 0"}});};
  // Clamp to viewport
  var vw=window.innerWidth,vh=window.innerHeight;
- var cx=Math.min(x,vw-175),cy=Math.min(y,vh-280);
+ var cx=Math.max(4,Math.min(x,vw-175)),cy=Math.max(4,Math.min(y,vh-280));
  return React.createElement("div",{style:{position:"fixed",left:cx,top:cy,zIndex:500,background:"#08080f",border:"1px solid "+B3,borderRadius:4,padding:"4px 0",minWidth:165,boxShadow:"0 8px 24px #000000cc"},onMouseDown:function(e){e.stopPropagation();}},
   Item("Copy Tile","copy:tile",!hasTile,"#FFD166","⎘"),
   Item("Copy Token","copy:token",!hasToken,"#FFD166","⎘"),
@@ -821,8 +821,8 @@ function HexMap(props){
   var openCtx=function(hex,e){
     e.preventDefault();e.stopPropagation();if(hex.isStar||movedRef.current)return;
     var mr=mapRef.current.getBoundingClientRect();
-    var px=Math.max(8,Math.min(mr.width-226,e.clientX-mr.left+12));
-    var py=Math.max(8,Math.min(mr.height-340,e.clientY-mr.top-8));
+    var px=e.clientX+2;
+    var py=e.clientY+2;
     setCtx({hexId:hex.id,popX:px,popY:py});setEd(null);
   };
   var save=function(){var m=Object.assign({},hexMap);m[ed]=form;onUpdate(m);setEd(null);};
