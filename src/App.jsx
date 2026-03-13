@@ -269,27 +269,89 @@ function TypewriterLines(props){
 
 // ── BOOT SEQUENCE ───────────────────────────────────────────────────────
 function BootSequence(props){
- var onDone=props.onDone;
+ var onDone=props.onDone,hexMap=props.hexMap||{},shipName=props.shipName||"THE INDESTRUCTIBLE II";
  var phaseS=useState(0),setPhase=phaseS[1];var phase=phaseS[0];
- var LINES=[
-  {text:"GHOST SIGNAL OS v4.1.7 — INITIALIZING...",speed:18,color:"#00FFD0"},
-  {text:"RUNNING SYSTEM DIAGNOSTICS...",speed:20,color:"#88BBFF"},
-  {text:"NAVIGATION MATRIX: ONLINE",speed:22,color:"#00FFD0"},
-  {text:"COMMS RELAY: ACTIVE",speed:22,color:"#00FFD0"},
-  {text:"WEAPONS ARRAY: NOMINAL",speed:22,color:"#00FFD0"},
-  {text:"LOADING CAMPAIGN DATA...",speed:18,color:"#88BBFF"},
-  {text:"ALL SYSTEMS NOMINAL.",speed:20,color:"#FFD166"},
- ];
- return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center"}},
-  phase===0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:0,width:480,padding:40}},
-   React.createElement("div",{style:{fontFamily:"'Orbitron',sans-serif",fontSize:11,color:"#FF2060",letterSpacing:4,marginBottom:24,opacity:.7}},"GHOST SIGNAL"),
-   React.createElement(TypewriterLines,{lines:LINES,onAllDone:function(){setPhase(1);setTimeout(onDone,600);}})
+ var hexRevealS=useState(0),setHexReveal=hexRevealS[1];var hexReveal=hexRevealS[0];
+ var fadingS=useState(false),setFading=fadingS[1];var fading=fadingS[0];
+ var W=window.innerWidth/1.3225,H=window.innerHeight/1.3225;
+ var mapW=Math.min(1100,W-32),mapLeft=(W-mapW)/2,mapTop=70,mapH=H-mapTop-80;
+ var borderLen=Math.round(2*(mapW+mapH));
+ useEffect(function(){
+  var ts=[];
+  var t=function(fn,ms){var id=setTimeout(fn,ms);ts.push(id);};
+  t(function(){setPhase(1);},150);
+  t(function(){setPhase(2);},550);
+  t(function(){setPhase(3);},900);
+  t(function(){setPhase(4);},1620);
+  t(function(){setPhase(5);},2050);
+  t(function(){setPhase(6);},2480);
+  t(function(){var i=0;var iv=setInterval(function(){i++;setHexReveal(i);if(i>=HEXES.length)clearInterval(iv);},38);ts.push(iv);},2480);
+  t(function(){setPhase(7);},4100);
+  t(function(){setPhase(8);},4800);
+  t(function(){setFading(true);},5500);
+  t(function(){onDone();},6000);
+  return function(){ts.forEach(function(id){clearTimeout(id);clearInterval(id);});};
+ },[]);
+ if(fading)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,animation:"bootFadeOut 0.55s ease forwards",pointerEvents:"none"}});
+ return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,overflow:"hidden"}},
+  phase>=1&&phase<=2&&React.createElement("div",{style:{position:"absolute",left:0,right:0,top:"50%",transform:"translateY(-50%)",height:phase===1?"3px":"130vh",background:"linear-gradient(to bottom,transparent,#ffffff22 40%,#ffffff55 50%,#ffffff22 60%,transparent)",transition:"height 0.4s cubic-bezier(0.25,0.46,0.45,0.94)",boxShadow:"0 0 80px 40px #ffffff0a",zIndex:15,pointerEvents:"none"}}),
+  phase===2&&React.createElement("div",{style:{position:"absolute",inset:0,zIndex:14,pointerEvents:"none",background:"repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(0,220,180,.03) 1px,rgba(0,220,180,.03) 2px)",animation:"scanmove 0.07s linear infinite",opacity:.6}}),
+  phase>=3&&React.createElement("svg",{style:{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:8,pointerEvents:"none"},viewBox:"0 0 "+W+" "+H},
+   React.createElement("defs",null,React.createElement("filter",{id:"bootGlowF",x:"-20%",y:"-20%",width:"140%",height:"140%"},React.createElement("feGaussianBlur",{stdDeviation:"3",result:"blur"}),React.createElement("feMerge",null,React.createElement("feMergeNode",{in:"blur"}),React.createElement("feMergeNode",{in:"SourceGraphic"})))),
+   React.createElement("rect",{x:mapLeft,y:mapTop,width:mapW,height:mapH,rx:12,fill:"none",stroke:"#00FFD0",strokeWidth:1.8,filter:"url(#bootGlowF)",strokeDasharray:borderLen,strokeDashoffset:phase===3?borderLen:0,style:{transition:"stroke-dashoffset 0.65s linear"}}),
+   phase>=4&&[[mapLeft,mapTop],[mapLeft+mapW,mapTop],[mapLeft,mapTop+mapH],[mapLeft+mapW,mapTop+mapH]].map(function(pt,i){return React.createElement("circle",{key:i,cx:pt[0],cy:pt[1],r:5,fill:"#00FFD0",filter:"url(#bootGlowF)",style:{animation:"pulse 1.2s ease infinite",animationDelay:(i*0.12)+"s"}});})
   ),
-  phase===1&&React.createElement("div",{style:{fontFamily:"'Orbitron',sans-serif",fontSize:36,fontWeight:900,color:"#00FFD0",letterSpacing:12,animation:"bootGlow 0.6s ease"}},"GHOST SIGNAL")
+  phase>=4&&React.createElement("div",{style:{position:"fixed",bottom:64,left:64,width:220,background:"rgba(8,8,18,0.96)",border:"1px solid #88BBFF44",borderRadius:8,zIndex:20,animation:"slideLeft 0.35s cubic-bezier(0.25,0.46,0.45,0.94)",overflow:"hidden",boxShadow:"0 0 24px #88BBFF0a"}},
+   React.createElement("div",{style:{padding:"8px 12px",display:"flex",alignItems:"center",gap:8,background:"#88BBFF06",borderBottom:"1px solid #88BBFF22"}},
+    React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:"#88BBFF",boxShadow:"0 0 8px #88BBFF",animation:"pulse 1.5s infinite"}}),
+    React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#88BBFF",letterSpacing:2}},"MABEL"),
+    React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#88BBFF55",marginLeft:"auto"}},phase>=6?"ONLINE":"INIT...")
+   ),
+   React.createElement("div",{style:{padding:"8px 12px",fontFamily:MONO,fontSize:9,color:"#88BBFF55",letterSpacing:1,lineHeight:1.7}},phase>=7?"Navigation matrix: ONLINE":"Running diagnostics...")
+  ),
+  phase>=4&&React.createElement("div",{style:{position:"fixed",bottom:64,right:64,width:220,background:"rgba(8,8,18,0.96)",border:"1px solid #FF206044",borderRadius:8,zIndex:20,animation:"slideRight 0.35s cubic-bezier(0.25,0.46,0.45,0.94)",overflow:"hidden",boxShadow:"0 0 24px #FF20600a"}},
+   React.createElement("div",{style:{padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid #35354f"}},
+    React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:"#FF2060",letterSpacing:3}},"DICE MATRIX"),
+    React.createElement("span",{style:{color:"#555",fontSize:11}},"▼")
+   ),
+   React.createElement("div",{style:{padding:"8px 14px",display:"flex",gap:4,flexWrap:"wrap"}},
+    [4,6,8,10,12,20].map(function(d){var dc={4:"#FF6B35",6:"#FFD166",8:"#00FFD0",10:"#FF6EC7",12:"#cc88ff",20:"#FF2060"}[d]||"#ccc";return React.createElement("div",{key:d,style:{padding:"3px 6px",fontFamily:MONO,fontSize:8,color:dc,border:"1px solid "+dc+"33",borderRadius:2,opacity:phase>=6?0.8:0.3,transition:"opacity 0.3s",transitionDelay:(d*0.015)+"s"}},"d"+d);})
+   )
+  ),
+  phase>=5&&React.createElement("div",{style:{position:"absolute",left:mapLeft,top:mapTop,width:mapW,height:mapH,overflow:"hidden",borderRadius:12,zIndex:7}},
+   React.createElement("svg",{width:"100%",height:"100%",viewBox:"-310 -290 620 670",style:{display:"block"}},
+    React.createElement("g",{transform:"rotate(90)"},
+     React.createElement("g",{style:{animation:"in 0.5s ease"}},
+      React.createElement("circle",{cx:0,cy:0,r:60,fill:"#FF2060",opacity:.05}),
+      React.createElement("circle",{cx:0,cy:0,r:44,fill:"#FF2060",opacity:.1}),
+      React.createElement("circle",{cx:0,cy:0,r:30,fill:"#FF2060",opacity:.2}),
+      React.createElement("circle",{cx:0,cy:0,r:20,fill:"#FF4070",opacity:.7}),
+      React.createElement("circle",{cx:0,cy:0,r:14,fill:"#FF2060"}),
+      React.createElement("circle",{cx:0,cy:0,r:7,fill:"#ff9090"})
+     ),
+     phase>=6&&HEXES.filter(function(h){return h.isStar===false;}).map(function(hex,idx){
+      if(idx>=hexReveal)return null;
+      var d=hexMap[hex.id]||{};
+      var isBarrier=d.type==="barrier",isBase=d.type==="base",hasD=!!d.type;
+      var ringC=hex.ring===1?"#CC662211":hex.ring===2?"#BBAA4411":"#CCCCCC11";
+      var ringS=hex.ring===1?"#CC6622aa":hex.ring===2?"#BBAA44aa":"#CCCCCCaa";
+      var hf=isBarrier?BARRIER_C+"18":isBase?BASE_C+"22":hasD?ringC:"#111828";
+      var hs=isBarrier?BARRIER_C:isBase?BASE_C:hasD?ringS:"#2d3d5a";
+      return React.createElement("g",{key:hex.id,style:{animation:"hexAppear 0.25s ease"}},
+       React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hf,stroke:hs,strokeWidth:1.5}),
+       phase>=7&&d.type?React.createElement(HexIcon,{t:d.type,x:hex.x,y:hex.y,hexId:hex.id,anim:false}):null
+      );
+     })
+    )
+   )
+  ),
+  phase>=8&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:40,pointerEvents:"none",animation:"titleFlash 0.9s ease forwards"}},
+   React.createElement("div",{style:{fontFamily:ORB,fontSize:52,fontWeight:900,color:"#00FFD0",letterSpacing:18,textAlign:"center",textShadow:"0 0 40px #00FFD0cc,0 0 80px #00FFD066,0 0 160px #00FFD022"}},"GHOST SIGNAL"),
+   React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0aa",letterSpacing:8,marginTop:14}},"ALL SYSTEMS NOMINAL")
+  )
  );
 }
 
-// ── STARFIELD ─────────────────────────────────────────────────────────────
 function Starfield(){
  var ref=useRef(null);
  useEffect(function(){
@@ -1021,7 +1083,7 @@ function App(){
 
  return React.createElement("div",{style:{height:"100vh",overflow:"hidden",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
-  boot&&React.createElement(BootSequence,{onDone:function(){setBoot(false);}}),
+  boot&&React.createElement(BootSequence,{onDone:function(){setBoot(false);},hexMap:gs.hexMap,shipName:gs.ship.name}),
    React.createElement(Starfield,null),
   React.createElement("div",{className:"gs-scan"}),
   React.createElement("div",{className:"gs-vig"}),
@@ -1046,7 +1108,7 @@ function App(){
            React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#556"}},presetsOpen?"▲":"▼")
     ),
     presetsOpen&&React.createElement("div",{style:{padding:"10px 12px",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:6,background:"#07071299"}},
-      MAP_PRESETS.map(function(pr){return React.createElement("button",{key:pr.name,onClick:function(){upHex(pr.map);setPresetsOpen(false);},style:{padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},pr.name);})
+      CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("button",{key:cm.id,onClick:function(){upHex(MAP_PRESETS[cm.id]);setPresetsOpen(false);},style:{padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name);})
     )
   ),
   React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name})
