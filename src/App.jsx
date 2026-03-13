@@ -720,6 +720,61 @@ function ContextMenu(props){
 }
 
 // ── HEX MAP (Batch 1) ──────────────────────────────────────────────────────
+function CommsTab(props){
+ var gameState=props.gameState,msgs=props.msgs,setMsgs=props.setMsgs,commsLoading=props.commsLoading,onSend=props.onSend;
+ var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
+ var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
+ var recapTextS=useState(""),setRecapText=recapTextS[1];var recapText=recapTextS[0];
+ var recapLoadingS=useState(false),setRecapLoading=recapLoadingS[1];var recapLoading=recapLoadingS[0];
+ var endRef=useRef(null),inputRef=useRef(null);
+ useEffect(function(){try{var rm=localStorage.getItem("gs_mabel_memory");if(rm)setMemory(rm);}catch(e){};},[]);
+ useEffect(function(){if(endRef.current)endRef.current.scrollIntoView({behavior:"smooth"});},[msgs]);
+
+ var genRecap=async function(){
+  setRecapLoading(true);setRecapText("");
+  try{
+   var res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:600,system:"You are MABEL. Write a concise session recap log entry. Terse, atmospheric, first person. Include: what happened, key decisions, resource changes, status. Under 300 words.",messages:[{role:"user",content:"Game state: "+JSON.stringify({session:gameState.session,cole:{hp:gameState.cole.hp,en:gameState.cole.en},vela:{hp:gameState.vela.hp,en:gameState.vela.en},ship:{hull:gameState.ship.hull,fuel:gameState.ship.fuel,scraps:gameState.ship.scraps}})+"\nRecent comms:\n"+msgs.slice(-10).map(function(m){return m.role+": "+m.content;}).join("\n")+"\nGenerate session log entry."}]})});
+   var data=await res.json();
+   var txt=(data.content&&data.content.find(function(b){return b.type==="text";}))||{text:""};
+   setRecapText(txt.text||"");
+  }catch(e){setRecapText("[GENERATION ERROR]");}
+  setRecapLoading(false);
+ };
+
+ var send=function(){if(!input.trim()||commsLoading)return;onSend(input.trim());setInput("");};
+
+ return React.createElement("div",{style:{maxWidth:680}},
+  React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}},
+   QUICK_ACTIONS.map(function(qa){return React.createElement("button",{key:qa.label,onClick:function(){onSend(qa.prompt);},disabled:commsLoading,style:{padding:"5px 12px",background:"#88BBFF12",border:"1px solid #88BBFF33",color:"#88BBFF",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},qa.label);})
+  ),
+  React.createElement("div",{style:{background:"#05050e",border:"1px solid "+B2,borderRadius:6,minHeight:340,maxHeight:500,overflowY:"auto",padding:"12px 14px",display:"flex",flexDirection:"column",gap:10,marginBottom:10}},
+   msgs.map(function(m,i){
+    var isA=m.role==="assistant";
+    return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end",animation:"in .2s ease"}},
+     React.createElement("div",{style:{maxWidth:"88%",padding:"8px 12px",borderRadius:4,background:isA?MABEL_C+"10":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"44":"#ffffff1a"),fontFamily:isA?MONO:RAJ,fontSize:isA?11:14,color:isA?MABEL_C:"#ddd",lineHeight:1.75}},
+      isA?React.createElement(MadText,{text:m.content}):m.content
+     ),
+     React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#445",marginTop:2,letterSpacing:1}},isA?"MABEL":"COMMANDER")
+    );
+   }),
+   commsLoading&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:MABEL_C,animation:"pulse 1s infinite"}},"// PROCESSING..."),
+   React.createElement("div",{ref:endRef})
+  ),
+  React.createElement("div",{style:{display:"flex",gap:8,marginBottom:14}},
+   React.createElement("input",{ref:inputRef,value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter"&&!e.shiftKey)send();},placeholder:"Transmit to MABEL...",disabled:commsLoading,style:{flex:1,background:"#06060f",border:"1px solid "+MABEL_C+"44",borderRadius:4,color:"#eee",fontFamily:MONO,fontSize:12,padding:"10px 14px",outline:"none"}}),
+   React.createElement("button",{onClick:send,disabled:commsLoading||!input.trim(),style:{padding:"10px 20px",background:MABEL_C+"18",border:"1px solid "+MABEL_C+"55",color:MABEL_C,borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:11}},commsLoading?"...":"SEND")
+  ),
+  React.createElement("div",{style:{borderTop:"1px solid "+B2,paddingTop:14}},
+   React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
+    React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2}},"SESSION RECAP LOG"),
+    React.createElement("button",{onClick:genRecap,disabled:recapLoading,style:{padding:"5px 14px",background:"#88BBFF12",border:"1px solid #88BBFF44",color:MABEL_C,borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},recapLoading?"COMPOSING...":"GENERATE")
+   ),
+   React.createElement(CopyBox,{text:recapText,loading:recapLoading})
+  )
+ );
+}
+
+// ── APP ────────────────────────────────────────────────────────────────────
 function HexMap(props){
   var hexMap=props.hexMap,onUpdate=props.onUpdate,shipName=props.shipName||"THE INDESTRUCTIBLE II";
   var edS=useState(null),setEd=edS[1];var ed=edS[0];
