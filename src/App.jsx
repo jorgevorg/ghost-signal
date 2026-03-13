@@ -1014,7 +1014,7 @@ function App(){
            React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#556"}},presetsOpen?"▲":"▼")
     ),
     presetsOpen&&React.createElement("div",{style:{padding:"10px 12px",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:6,background:"#07071299"}},
-      MAP_PRESETS.map(function(pr){return React.createElement("button",{key:pr.name,onClick:function(){upHex(pr.map);setPresetsOpen(false);},style:{padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},pr.name);})
+      CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("button",{key:cm.id,onClick:function(){upHex(MAP_PRESETS[cm.id]);setPresetsOpen(false);},style:{padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name);})
     )
   ),
   React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name})
