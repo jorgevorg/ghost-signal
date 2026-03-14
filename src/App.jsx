@@ -624,7 +624,6 @@ function DiceRoller(props){
  var csS=useState("grace"),setCs=csS[1];var cs=csS[0];
  var cmS=useState(0),setCm=cmS[1];var cm=cmS[0];
  var prS=useState(null),setPr=prS[1];var pr=prS[0];
-  var shipPopupS=useState(null),setShipPopup=shipPopupS[1];var shipPopup=shipPopupS[0];
  var crS=useState(null),setCr=crS[1];var cr=crS[0];
  var dkS=useState("cole"),setDk=dkS[1];var dk=dkS[0];
  var dwS=useState(0),setDw=dwS[1];var dw=dwS[0];
@@ -875,6 +874,7 @@ function HexMap(props){
   var panS=useState({x:0,y:0}),setPan=panS[1];var pan=panS[0];
   var formS=useState({name:"",type:"",notes:"",ships:[]}),setForm=formS[1];var form=formS[0];
   var showIdsS=useState(false),setShowIds=showIdsS[1];var showIds=showIdsS[0];
+  var shipPopupS=useState(null),setShipPopup=shipPopupS[1];var shipPopup=shipPopupS[0];
   var confirmClearS=useState(false),setConfirmClear=confirmClearS[1];var confirmClear=confirmClearS[0];
   var cbS=useState(null),setCb=cbS[1];var cb=cbS[0];
   var selS=useState([]),setSel=selS[1];var sel=selS[0];
