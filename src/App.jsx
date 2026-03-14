@@ -27,6 +27,7 @@ html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1
 @keyframes slideRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
 @keyframes titleFlash{0%{opacity:0;transform:scale(1.08)}15%{opacity:1;transform:scale(1)}100%{opacity:1}}
 @keyframes bootFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes dangerPulse{0%,100%{box-shadow:0 0 8px #FF206066,0 0 16px #FF206022;opacity:1}50%{box-shadow:0 0 22px #FF2060cc,0 0 44px #FF206055;opacity:.85}}
 @keyframes glitch{0%,88%,100%{transform:translateX(0)}90%{transform:translateX(-3px)}92%{transform:translateX(3px)}94%{transform:translateX(-2px)}96%{transform:translateX(2px)}}
 `;
 
@@ -262,6 +263,7 @@ function Typewriter(props){
  var text=props.text,speed=props.speed||14,color=props.color||"#00FFD0",onDone=props.onDone;
  var shownS=useState(""),setShown=shownS[1];var shown=shownS[0];
  var doneS=useState(false),setDone=doneS[1];var done=doneS[0];
+ var clearConfirmS=useState(false),setClearConfirm=clearConfirmS[1];var clearConfirm=clearConfirmS[0];
  useEffect(function(){setShown("");setDone(false);var i=0;var t=setInterval(function(){i++;setShown(text.slice(0,i));if(i>=text.length){setDone(true);clearInterval(t);if(onDone)onDone();}},speed);return function(){clearInterval(t);};},[text]);
  return React.createElement("span",{style:{color:color,fontFamily:MONO}},shown,!done&&React.createElement("span",{style:{animation:"blink 1s infinite",color:color}},"█"));
 }
@@ -330,7 +332,10 @@ function BootSequence(props){
   phase>=3&&React.createElement("svg",{style:{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:8,pointerEvents:"none",animation:"in 0.5s ease"},viewBox:"0 0 "+W+" "+H},
    React.createElement("defs",null,React.createElement("filter",{id:"bootGlowF",x:"-20%",y:"-20%",width:"140%",height:"140%"},React.createElement("feGaussianBlur",{stdDeviation:"3",result:"blur"}),React.createElement("feMerge",null,React.createElement("feMergeNode",{in:"blur"}),React.createElement("feMergeNode",{in:"SourceGraphic"})))),
    React.createElement("rect",{x:mapLeft,y:mapTop,width:mapW,height:mapH,rx:12,fill:"none",stroke:"#00FFD0",strokeWidth:1.8,filter:"url(#bootGlowF)",strokeDasharray:borderLen,strokeDashoffset:phase===3?borderLen:0,style:{transition:"stroke-dashoffset 0.65s linear"}}),
-   phase>=4&&[[mapLeft+10,mapTop+10],[mapLeft+mapW-10,mapTop+10],[mapLeft+10,mapTop+mapH-10],[mapLeft+mapW-10,mapTop+mapH-10]].map(function(pt,i){return React.createElement("circle",{key:i,cx:pt[0],cy:pt[1],r:4,fill:"#cc88ff",filter:"url(#bootGlowF)",style:{animation:"pulse 1.2s ease infinite",animationDelay:(i*0.12)+"s"}});})
+   
+   //PULSING DOTS
+   //phase>=4&&[[mapLeft+10,mapTop+10],[mapLeft+mapW-10,mapTop+10],[mapLeft+10,mapTop+mapH-10],[mapLeft+mapW-10,mapTop+mapH-10]].map(function(pt,i){return React.createElement("circle",{key:i,cx:pt[0],cy:pt[1],r:4,fill:"#cc88ff",filter:"url(#bootGlowF)",style:{animation:"pulse 1.2s ease infinite",animationDelay:(i*0.12)+"s"}});})
+  
   ),
   phase>=4&&React.createElement("div",{style:{position:"fixed",bottom:64,left:64,width:220,background:"rgba(8,8,18,0.96)",border:"1px solid #88BBFF44",borderRadius:8,zIndex:20,animation:"slideLeft 0.35s cubic-bezier(0.25,0.46,0.45,0.94)",overflow:"hidden",boxShadow:"0 0 24px #88BBFF0a"}},
    React.createElement("div",{style:{padding:"8px 12px",display:"flex",alignItems:"center",gap:8,background:"#88BBFF06",borderBottom:"1px solid #88BBFF22"}},
