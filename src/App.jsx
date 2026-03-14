@@ -916,7 +916,7 @@ function HexMap(props){
     setCtx({hexId:hex.id,popX:px,popY:py});setEd(null);
   };
   var save=function(){var m=Object.assign({},hexMap);m[ed]=form;onUpdate(m);setEd(null);};
-  var clear=function(){if(!confirmClear){setConfirmClear(true);return;}var m=Object.assign({},hexMap);delete m[ed];onUpdate(m);setEd(null);setConfirmClear(false);};
+  var clear=function(){var m=Object.assign({},hexMap);delete m[ed];onUpdate(m);setEd(null);};
   var copyHex=function(hexId,mode){var d=hexMap[hexId]||{};setCb({mode:mode,tile:(mode==="token")?null:(d.type||null),token:(mode==="tile")?[]:(d.ships||[])});addToast("Copied ("+mode+")","#00FFD0");setCtx(null);};
   var cutHex=function(hexId,mode){var d=hexMap[hexId]||{};setCb({mode:mode,tile:(mode==="token")?null:(d.type||null),token:(mode==="tile")?[]:(d.ships||[])});var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(mode==="tile"||mode==="both")delete h.type;if(mode==="token"||mode==="both")h.ships=[];m[hexId]=h;onUpdate(m);addToast("Cut ("+mode+")","#FFD166");setCtx(null);};
   var pasteHex=function(hexId){if(!cb)return;var m=Object.assign({},hexMap);var h=Object.assign({},m[hexId]||{});if(cb.mode==="tile"||cb.mode==="both"){if(cb.tile)h.type=cb.tile;}if(cb.mode==="token"||cb.mode==="both"){h.ships=cb.token;}m[hexId]=h;onUpdate(m);addToast("Pasted","#cc88ff");setCtx(null);};
@@ -951,8 +951,8 @@ function HexMap(props){
             onMouseLeave:function(){setHov(null);},
             style:{cursor:"pointer"}},
             React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hexFill,stroke:hexStroke,strokeWidth:strokeW}),
-            d.type&&React.createElement("g",{transform:isShip&&!isBarrier&&!isBase?("translate("+hex.x+","+hex.y+") scale(0.58) translate("+(0-hex.x)+","+(0-hex.y)+")"):""},React.createElement(HexIcon,{t:d.type,x:hex.x,y:hex.y,hexId:hex.id})),
-            isShip&&!isBarrier&&!isBase&&(d.ships||[]).map(function(sn,si){var xOff=d.ships.length===1?0:si===0?-11:si===1?11:0;var yOff=si>1?12:4;return React.createElement(HexIcon,{key:sn+"-"+si,t:sn,x:hex.x+xOff,y:hex.y+yOff,hexId:hex.id});}),
+            d.type&&React.createElement("g",{transform:isShip&&!isBarrier?("translate("+hex.x+","+hex.y+") scale(0.58) translate("+(0-hex.x)+","+(0-hex.y)+")"):""},React.createElement(HexIcon,{t:d.type,x:hex.x,y:hex.y,hexId:hex.id})),
+            isShip&&!isBarrier&&(d.ships||[]).map(function(sn,si){var xOff=d.ships.length===1?0:si===0?-8:si===1?8:0;var yOff=si>1?8:0;var sx=hex.x+xOff,sy=hex.y+yOff;return React.createElement("g",{key:sn+"-"+si,transform:"translate("+sx+","+sy+") scale(0.45) translate("+(0-sx)+","+(0-sy)+")"},React.createElement(HexIcon,{t:sn,x:sx,y:sy,hexId:hex.id}));}),
             false&&!isBarrier&&!isBase&&React.createElement("text",{x:hex.x,y:hex.y-HS*.5,textAnchor:"middle",fontSize:11,fontFamily:"monospace",fill:"#FF2060",opacity:.9},"⍙"),
             showIds&&React.createElement("text",{x:hex.x+HS*.55,y:hex.y,textAnchor:"middle",dominantBaseline:"middle",fill:"#99aabb",fontSize:8,fontFamily:MONO,opacity:.9,transform:"rotate(-90,"+(hex.x+HS*.55)+","+hex.y+")"},String(hex.id).padStart(3,"0"))
           );
