@@ -280,22 +280,22 @@ function BootSequence(props){
   var ts=[];
   var t=function(fn,ms){var id=setTimeout(fn,ms);ts.push(id);};
   t(function(){setPhase(1);},200);
-  t(function(){setPhase(2);},750);
-  t(function(){setPhase(3);},1200);
-  t(function(){setPhase(4);},2200);
-  t(function(){setPhase(5);},2900);
-  t(function(){setPhase(6);},3500);
-  t(function(){var i=0;var iv=setInterval(function(){i++;setHexReveal(i);if(i>=HEXES.length)clearInterval(iv);},38);ts.push(iv);},3500);
-  t(function(){setPhase(7);},5400);
-  t(function(){setPhase(8);},6200);
-  t(function(){setFading(true);},7200);
-  t(function(){onDone();},7800);
+  t(function(){setPhase(2);},650);
+  t(function(){setPhase(3);},1100);
+  t(function(){setPhase(4);},1900);
+  t(function(){setPhase(5);},2400);
+  t(function(){setPhase(6);},2900);
+  t(function(){var i=0;var iv=setInterval(function(){i++;setHexReveal(i);if(i>=HEXES.length)clearInterval(iv);},38);ts.push(iv);},2900);
+  t(function(){setPhase(7);},4600);
+  t(function(){setPhase(8);},5400);
+  t(function(){setFading(true);if(props.onStartFade)props.onStartFade();},7600);
+  t(function(){onDone();},9200);
   return function(){ts.forEach(function(id){clearTimeout(id);clearInterval(id);});};
  },[]);
- if(fading)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,animation:"bootFadeOut 0.55s ease forwards",pointerEvents:"none"}});
+ if(fading)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,animation:"bootFadeOut 1.5s ease forwards",pointerEvents:"none"}});
  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,overflow:"hidden"}},
-  React.createElement("div",{style:{position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.22) 2px,rgba(0,0,0,.22) 4px)",zIndex:2,pointerEvents:"none"}}),
-  phase>=1&&phase<=2&&React.createElement("div",{style:{position:"absolute",left:0,right:0,top:"50%",transform:"translateY(-50%)",height:phase===1?"3px":"130vh",background:"linear-gradient(to bottom,transparent,#ffffff22 40%,#ffffff55 50%,#ffffff22 60%,transparent)",transition:"height 0.4s cubic-bezier(0.25,0.46,0.45,0.94)",boxShadow:"0 0 80px 40px #ffffff0a",zIndex:15,pointerEvents:"none"}}),
+  React.createElement("div",{style:{position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.42) 3px,rgba(0,0,0,.42) 6px)",zIndex:2,pointerEvents:"none"}}),
+  phase>=1&&phase<=2&&React.createElement("div",{style:{position:"absolute",left:0,right:0,top:"50%",transform:"translateY(-50%)",height:phase===1?"3px":"130vh",background:"radial-gradient(ellipse 120% 50% at 50% 50%,#00e5ff2a 0%,#ffffff18 30%,transparent 75%)",filter:"blur(14px)",transition:"height 0.5s cubic-bezier(0.2,0.8,0.4,1)",boxShadow:"0 0 120px 60px #00e5ff06",zIndex:15,pointerEvents:"none"}}),
   phase===2&&React.createElement("div",{style:{position:"absolute",inset:0,zIndex:14,pointerEvents:"none",background:"repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(0,220,180,.03) 1px,rgba(0,220,180,.03) 2px)",animation:"scanmove 0.07s linear infinite",opacity:.6}}),
   phase>=3&&React.createElement("svg",{style:{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:8,pointerEvents:"none"},viewBox:"0 0 "+W+" "+H},
    React.createElement("defs",null,React.createElement("filter",{id:"bootGlowF",x:"-20%",y:"-20%",width:"140%",height:"140%"},React.createElement("feGaussianBlur",{stdDeviation:"3",result:"blur"}),React.createElement("feMerge",null,React.createElement("feMergeNode",{in:"blur"}),React.createElement("feMergeNode",{in:"SourceGraphic"})))),
@@ -346,8 +346,8 @@ function BootSequence(props){
     )
    )
   ),
-  phase>=8&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:40,pointerEvents:"none",animation:"titleFlash 0.9s ease forwards"}},
-   React.createElement("div",{style:{fontFamily:ORB,fontSize:52,fontWeight:900,color:"#00FFD0",letterSpacing:18,textAlign:"center",textShadow:"0 0 40px #00FFD0cc,0 0 80px #00FFD066,0 0 160px #00FFD022"}},"GHOST SIGNAL"),
+  phase>=8&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:40,pointerEvents:"none",animation:"titleFlash 0.8s ease forwards,glitch 2.5s ease 1.5s infinite"}},
+   React.createElement("div",{style:{fontFamily:ORB,fontSize:52,fontWeight:900,color:"#00FFD0",letterSpacing:18,textAlign:"center",textShadow:"-2px 0 0 #FF206066,2px 0 0 #88BBFF66,0 0 40px #00FFD0cc,0 0 80px #00FFD066,0 0 160px #00FFD022"}},"GHOST SIGNAL"),
    React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0aa",letterSpacing:8,marginTop:14}},"ALL SYSTEMS NOMINAL")
   )
  );
@@ -1018,6 +1018,7 @@ function HexMap(props){
 // ── APP ────────────────────────────────────────────────────────────────────
 function App(){
  var bootS=useState(true),setBoot=bootS[1];var boot=bootS[0];
+var bootFadingS=useState(false),setBootFading=bootFadingS[1];var bootFading=bootFadingS[0];
  var gsS=useState(function(){try{var r=localStorage.getItem("gs_state");if(r)return merge(JSON.parse(r));}catch(e){}return INIT;}),setGs=gsS[1];var gs=gsS[0];
  var tabS=useState("MAP"),setTab=tabS[1];var tab=tabS[0];
  var presetsOpenS=useState(false),setPresetsOpen=presetsOpenS[1];var presetsOpen=presetsOpenS[0];
@@ -1084,7 +1085,7 @@ function App(){
 
  return React.createElement("div",{style:{height:"100vh",overflow:"hidden",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
-  boot&&React.createElement(BootSequence,{onDone:function(){setBoot(false);},hexMap:gs.hexMap,shipName:gs.ship.name}),
+  boot&&React.createElement(BootSequence,{onDone:function(){setBoot(false);},onStartFade:function(){setBootFading(true);},hexMap:gs.hexMap,shipName:gs.ship.name}),
    React.createElement(Starfield,null),
   React.createElement("div",{className:"gs-scan"}),
   React.createElement("div",{className:"gs-vig"}),
@@ -1097,7 +1098,7 @@ function App(){
   React.createElement("div",{className:"gs-scan"}),
   // MABEL Mini — globally visible on all tabs
   React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
-  React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box"}},
+  React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box",opacity:bootFading||!boot?1:0,transition:bootFading?"opacity 1.5s ease":"none"}},
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #222230",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
      TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);})
     ),
