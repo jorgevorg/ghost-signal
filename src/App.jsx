@@ -62,7 +62,7 @@ const mkC=()=>({hp:20,hpMax:20,en:20,enMax:20,armor:0,hyp:0,exp:0,serum:0,vigor:
 const mkCole=()=>Object.assign(mkC(),{name:"Cole Remington Vayne",vigor:2,grace:3,mind:0,tech:1,weapons:[{name:"Laser Blaster",mod1:"Reflex Sight",mod2:""},{name:"",mod1:"",mod2:""}],inventory:["Health Pack ×2","Contraband Package ×2","","","","","",""]});
 const mkVela=()=>Object.assign(mkC(),{name:"Vela // Séance",vigor:1,grace:2,mind:4,tech:3,memory:["Ladybug (cyberdefense drone)","HACK_Trojan — Breach the enemy for MIN turns","HACK_Javelin — d10+MIN damage; Breached enemies take ×2 damage","","",""],inventory:["Energy Cell ×2","Health Pack ×2","Starship Parts ×2","Stratogen Hormones ×2","","","",""]});
 const mkS=()=>({name:"THE INDESTRUCTIBLE II",hull:20,hullMax:20,fuel:20,fuelMax:20,scraps:0,control:"Vector Cockpit — Start combat with 1 Shield",engines:"Oxygen Jets — Roll 2d6; +1 die on first turn",modules:["G.R.E. Missiles — Deal 8 damage (5-6)","Particle Cannons — Deal 3 damage, stacks (3-5)","",""],cargo:Array(6).fill("")});
-const INIT={session:0,logs:[],cole:mkCole(),vela:mkVela(),ship:mkS(),hexMap:{},crew:Array(4).fill(null).map(mkCrew),campaignMap:null};
+const INIT={session:0,logs:[],cole:mkCole(),vela:mkVela(),ship:mkS(),hexMap:{},crew:Array(4).fill(null).map(mkCrew),campaignMap:null,chapter:1};
 
 const merge=function(sv){
  var ec=function(c,base){
@@ -82,6 +82,7 @@ const merge=function(sv){
 };
 
 const HS=42,SQ3=Math.sqrt(3);
+const SHIP_DATA={seance:{name:"THE INDESTRUCTIBLE II",cls:"C",hull:20,act:2,color:"#FF2060",skill:"+2 damage vs ships in critical condition"},twinrotor:{name:"TWINROTOR HAULER",cls:"B",hull:20,act:3,color:"#FFB84D",skill:"Critical: +1 extra Action per turn"},snowstorm:{name:"SNOWSTORM DELTA",cls:"B",hull:20,act:2,color:"#00E5FF",skill:"Critical: gain 2 Shields"},epsilon:{name:"EPSILON INTERCEPTOR",cls:"B",hull:20,act:3,color:"#7EC8E3",skill:"Critical: enemy attacks deal -2 damage"},voyager:{name:"A-1 VOYAGER",cls:"A",hull:20,act:3,color:"#FF8C42",skill:"Restore 1 Hull when gaining a Shield"},orionmoth:{name:"ORION MOTH",cls:"B",hull:20,act:3,color:"#80DD44",skill:"First time reaching critical: gain 2 Shields"},eclipsewarden:{name:"ECLIPSE WARDEN",cls:"A",hull:20,act:4,color:"#CC88FF",skill:"Critical: +1 extra Action per turn"}};
 const HD=[{q:1,r:0},{q:1,r:-1},{q:0,r:-1},{q:-1,r:0},{q:-1,r:1},{q:0,r:1}];
 const h2p=function(q,r){return{x:HS*SQ3*(q+r/2),y:HS*1.5*r};};
 const hPts=function(cx,cy,s){if(s==null)s=HS*.92;return Array.from({length:6},function(_,i){var a=Math.PI/3*i+Math.PI/6;return(cx+Math.cos(a)*s)+","+(cy+Math.sin(a)*s);}).join(" ");};
@@ -623,6 +624,7 @@ function DiceRoller(props){
  var csS=useState("grace"),setCs=csS[1];var cs=csS[0];
  var cmS=useState(0),setCm=cmS[1];var cm=cmS[0];
  var prS=useState(null),setPr=prS[1];var pr=prS[0];
+  var shipPopupS=useState(null),setShipPopup=shipPopupS[1];var shipPopup=shipPopupS[0];
  var crS=useState(null),setCr=crS[1];var cr=crS[0];
  var dkS=useState("cole"),setDk=dkS[1];var dk=dkS[0];
  var dwS=useState(0),setDw=dwS[1];var dw=dwS[0];
@@ -952,7 +954,7 @@ function HexMap(props){
             style:{cursor:"pointer"}},
             React.createElement("polygon",{points:hPts(hex.x,hex.y),fill:hexFill,stroke:hexStroke,strokeWidth:strokeW}),
             d.type&&React.createElement("g",{transform:isShip&&!isBarrier?("translate("+hex.x+","+hex.y+") scale(0.58) translate("+(0-hex.x)+","+(0-hex.y)+")"):""},React.createElement(HexIcon,{t:d.type,x:hex.x,y:hex.y,hexId:hex.id})),
-            isShip&&!isBarrier&&(d.ships||[]).map(function(sn,si){var xOff=d.ships.length===1?0:si===0?-8:si===1?8:0;var yOff=si>1?8:0;var sx=hex.x+xOff,sy=hex.y+yOff;return React.createElement("g",{key:sn+"-"+si,transform:"translate("+sx+","+sy+") scale(0.45) translate("+(0-sx)+","+(0-sy)+")"},React.createElement(HexIcon,{t:sn,x:sx,y:sy,hexId:hex.id}));}),
+            isShip&&!isBarrier&&(d.ships||[]).map(function(sn,si){var xOff=d.ships.length===1?0:si===0?-8:si===1?8:0;var yOff=si>1?8:0;var sx=hex.x+xOff,sy=hex.y+yOff;return React.createElement("g",{key:sn+"-"+si,transform:"translate("+sx+","+sy+") scale(0.45) translate("+(0-sx)+","+(0-sy)+")",style:{cursor:"pointer",pointerEvents:"all"},onClick:function(e){e.stopPropagation();setShipPopup({ship:sn,x:e.clientX,y:e.clientY});}},React.createElement(HexIcon,{t:sn,x:sx,y:sy,hexId:hex.id}));}),
             false&&!isBarrier&&!isBase&&React.createElement("text",{x:hex.x,y:hex.y-HS*.5,textAnchor:"middle",fontSize:11,fontFamily:"monospace",fill:"#FF2060",opacity:.9},"⍙"),
             showIds&&React.createElement("text",{x:hex.x+HS*.55,y:hex.y,textAnchor:"middle",dominantBaseline:"middle",fill:"#99aabb",fontSize:8,fontFamily:MONO,opacity:.9,transform:"rotate(-90,"+(hex.x+HS*.55)+","+hex.y+")"},String(hex.id).padStart(3,"0"))
           );
@@ -1076,7 +1078,7 @@ function App(){
  var upHex=function(newMap){setGs(function(p){return Object.assign({},p,{hexMap:newMap});});};
  var addLog=function(log){setGs(function(p){return Object.assign({},p,{logs:p.logs.concat([Object.assign({id:Date.now()},log)])});});};
  var upSession=function(n){setGs(function(p){return Object.assign({},p,{session:n});});};
- var upCampaign=function(cm){setGs(function(p){return Object.assign({},p,{campaignMap:cm});});};
+ var upCampaign=function(cm){setGs(function(p){return Object.assign({},p,{campaignMap:cm,chapter:p.campaignMap?Math.min((p.chapter||1)+1,3):1});});};
 
  var TABS=["MAP","CREW","SHIP","LOGS","COMMS"];
  var TAB_C={MAP:"#cc88ff",CREW:"#FFD166",SHIP:"#00FFD0",LOGS:"#FF6EC7",COMMS:"#88BBFF"};
@@ -1098,7 +1100,9 @@ function App(){
   React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
   React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box"}},
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #222230",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
-     TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);})
+     tab==="MAP"&&gs.campaignMap&&React.createElement("div",{style:{position:"fixed",bottom:20,left:20,maxWidth:220,background:"rgba(8,8,18,0.94)",border:"1px solid #cc88ff33",borderRadius:6,padding:"12px 16px",fontFamily:MONO,zIndex:1000,pointerEvents:"none"}},React.createElement("div",{style:{color:"#cc88ff77",fontSize:7,letterSpacing:3,marginBottom:6}},(gs.chapter||1===1?"SYSTEM I — OUTER RING — d6":gs.chapter||1===2?"SYSTEM II — MID RING — d10":"SYSTEM III — INNER RING — d12")),React.createElement("div",{style:{color:"#cc88ff",fontSize:12,fontFamily:ORB,letterSpacing:3,marginBottom:6}},gs.campaignMap.name),React.createElement("div",{style:{color:"#8888aa",fontSize:8,lineHeight:"1.6",marginBottom:10}},gs.campaignMap.desc),React.createElement("div",{style:{height:1,background:"#cc88ff22",marginBottom:8}}),React.createElement("div",{style:{color:"#cc88ff55",fontSize:7,letterSpacing:2}},"TILES MAPPED: "+Object.keys(hexMap).length+" / 36")),
+  shipPopup&&SHIP_DATA[shipPopup.ship]&&React.createElement("div",{style:{position:"fixed",top:shipPopup.y+12,left:shipPopup.x+12,background:"rgba(6,6,16,0.98)",border:"1px solid "+(SHIP_DATA[shipPopup.ship].color)+"66",borderRadius:6,padding:"10px 14px",fontFamily:MONO,zIndex:1001,minWidth:210},onClick:function(){setShipPopup(null);}},React.createElement("div",{style:{color:SHIP_DATA[shipPopup.ship].color,fontSize:10,fontFamily:ORB,letterSpacing:2,marginBottom:6}},SHIP_DATA[shipPopup.ship].name),React.createElement("div",{style:{color:"#ffffff66",fontSize:8,letterSpacing:2,marginBottom:6}},"CLASS "+SHIP_DATA[shipPopup.ship].cls+"  •  HULL 20  •  ACT "+SHIP_DATA[shipPopup.ship].act),React.createElement("div",{style:{height:1,background:"#ffffff18",margin:"4px 0 8px"}}),React.createElement("div",{style:{color:"#aaaacc",fontSize:8,lineHeight:"1.6"}},SHIP_DATA[shipPopup.ship].skill),React.createElement("div",{style:{color:"#ffffff22",fontSize:7,marginTop:8,textAlign:"right"}},"CLICK TO DISMISS")),
+  TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);})
     ),
     React.createElement("div",{style:{paddingTop:20,flex:1,overflowY:"auto",minHeight:0,paddingBottom:60}},
      React.createElement("div",{style:{display:tab==="MAP"?"block":"none"}},
