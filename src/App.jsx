@@ -27,7 +27,7 @@ html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1
 @keyframes slideRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
 @keyframes titleFlash{0%{opacity:0;transform:scale(1.08)}15%{opacity:1;transform:scale(1)}100%{opacity:1}}
 @keyframes bootFadeOut{from{opacity:1}to{opacity:0}}
-@keyframes dangerPulse{0%,100%{box-shadow:0 0 8px #FF206066,0 0 16px #FF206022;opacity:1}50%{box-shadow:0 0 22px #FF2060cc,0 0 44px #FF206055;opacity:.85}}
+@keyframes dangerPulse{0%,100%{box-shadow:inset 0 0 8px #FF206066,inset 0 0 16px #FF206022;opacity:1}50%{box-shadow:inset 0 0 22px #FF2060cc,inset 0 0 44px #FF206055;opacity:.85}}
 @keyframes glitch{0%,88%,100%{transform:translateX(0)}90%{transform:translateX(-3px)}92%{transform:translateX(3px)}94%{transform:translateX(-2px)}96%{transform:translateX(2px)}}
 `;
 
