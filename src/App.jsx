@@ -1033,6 +1033,7 @@ function App(){
  var bootS=useState(true),setBoot=bootS[1];var boot=bootS[0];
  var gsS=useState(function(){try{var r=localStorage.getItem("gs_state");if(r)return merge(JSON.parse(r));}catch(e){}return INIT;}),setGs=gsS[1];var gs=gsS[0];
  var tabS=useState("MAP"),setTab=tabS[1];var tab=tabS[0];
+ var savedPresetsS=useState(function(){try{var s=localStorage.getItem("gs_saved_presets");return s?JSON.parse(s):MAP_PRESETS;}catch(e){return MAP_PRESETS;}}),setSavedPresets=savedPresetsS[1];var savedPresets=savedPresetsS[0];
  var presetsOpenS=useState(false),setPresetsOpen=presetsOpenS[1];var presetsOpen=presetsOpenS[0];
  var savedS=useState(false),setSaved=savedS[1];
  // Comms lifted to App — shared between CommsTab + MabelMini
@@ -1122,7 +1123,7 @@ function App(){
            React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#556"}},presetsOpen?"▲":"▼")
     ),
     presetsOpen&&React.createElement("div",{style:{padding:"10px 12px",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:6,background:"#07071299"}},
-      CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("button",{key:cm.id,onClick:function(){upHex(MAP_PRESETS[cm.id]);setPresetsOpen(false);},style:{padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name);})
+      CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("div",{key:cm.id,style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("button",{onClick:function(){upHex(savedPresets[cm.id]||MAP_PRESETS[cm.id]);setPresetsOpen(false);},style:{flex:1,padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name),React.createElement("button",{onClick:function(){var updated=Object.assign({},savedPresets);updated[cm.id]=hexMap;setSavedPresets(updated);try{localStorage.setItem("gs_saved_presets",JSON.stringify(updated));}catch(e){}},style:{padding:"5px 8px",background:"#00FFD011",border:"1px solid #00FFD033",color:"#00FFD0",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1,flexShrink:0}},"SAVE"));})
     )
   ),
   React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name})
