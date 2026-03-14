@@ -895,6 +895,7 @@ function HexMap(props){
   var toastS=useState([]),setToast=toastS[1];var toast=toastS[0];
   var grpRef=useRef(null),dragRef=useRef(null),offRef=useRef({x:0,y:0}),movedRef=useRef(false);
   var svgRef=useRef(null),mapRef=useRef(null);
+  var confirmClearS = useState(false), setConfirmClear = confirmClearS[1]; var confirmClear = confirmClearS[0];
   var addToast=function(msg,color){var id=Date.now();setToast(function(p){return p.concat([{id:id,msg:msg,color:color||"#00FFD0"}]);});setTimeout(function(){setToast(function(p){return p.filter(function(t){return t.id!==id;});});},2200);};
   useEffect(function(){
     var handler=function(e){
