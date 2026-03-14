@@ -21,7 +21,14 @@ html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1
 @keyframes scanmove{0%{background-position:0 0}100%{background-position:0 4px}}
 @keyframes bootGlow{0%{opacity:0;filter:brightness(3)}100%{opacity:1;filter:brightness(1)}}
 @keyframes bootGlow{0%{opacity:0;filter:brightness(3)}100%{opacity:1;filter:brightness(1)}}
-.gs-scan{pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,220,180,.016) 2px,rgba(0,220,180,.016) 4px);z-index:997;animation:scanmove .12s linear infinite}`;
+.gs-scan{pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,220,180,.016) 2px,rgba(0,220,180,.016) 4px);z-index:997;animation:scanmove .12s linear infinite}
+@keyframes hexAppear{from{opacity:0;transform:scale(0.4)}to{opacity:1;transform:scale(1)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+@keyframes titleFlash{0%{opacity:0;transform:scale(1.08)}15%{opacity:1;transform:scale(1)}100%{opacity:1}}
+@keyframes bootFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes glitch{0%,88%,100%{transform:translateX(0)}90%{transform:translateX(-3px)}92%{transform:translateX(3px)}94%{transform:translateX(-2px)}96%{transform:translateX(2px)}}
+`;
 
 const CAMPAIGN_MAPS=[
  {id:"01",name:"VIVARIUM",level:2,desc:"Four derelict O'Neill cylinders house rare flora and fauna. After decades without human supervision, their current status is unclear."},
@@ -273,6 +280,8 @@ function BootSequence(props){
  var phaseS=useState(0),setPhase=phaseS[1];var phase=phaseS[0];
  var hexRevealS=useState(0),setHexReveal=hexRevealS[1];var hexReveal=hexRevealS[0];
  var fadingS=useState(false),setFading=fadingS[1];var fading=fadingS[0];
+ var titleTextS=useState(""),setTitleText=titleTextS[1];var titleText=titleTextS[0];
+ var subTextS=useState(""),setSubText=subTextS[1];var subText=subTextS[0];
  var W=window.innerWidth/1.3225,H=window.innerHeight/1.3225;
  var mapW=Math.min(1100,W-32),mapLeft=(W-mapW)/2,mapTop=70,mapH=H-mapTop-80;
  var borderLen=Math.round(2*(mapW+mapH));
@@ -287,7 +296,7 @@ function BootSequence(props){
   t(function(){setPhase(6);},2900);
   t(function(){var i=0;var iv=setInterval(function(){i++;setHexReveal(i);if(i>=HEXES.length)clearInterval(iv);},38);ts.push(iv);},2900);
   t(function(){setPhase(7);},4600);
-  t(function(){setPhase(8);},5400);
+  t(function(){setPhase(8);var tl="GHOST SIGNAL";var sl="ALL SYSTEMS NOMINAL";var i=0;var iv2=setInterval(function(){i++;if(i<=tl.length){setTitleText(tl.slice(0,i));}else if(i>tl.length+8){var si=i-tl.length-8;if(si<=sl.length)setSubText(sl.slice(0,si));}if(i>=tl.length+8+sl.length)clearInterval(iv2);},85);ts.push(iv2);},5400);
   t(function(){setFading(true);if(props.onStartFade)props.onStartFade();},7600);
   t(function(){onDone();},9200);
   return function(){ts.forEach(function(id){clearTimeout(id);clearInterval(id);});};
@@ -295,9 +304,9 @@ function BootSequence(props){
  if(fading)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,animation:"bootFadeOut 1.5s ease forwards",pointerEvents:"none"}});
  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,overflow:"hidden"}},
   React.createElement("div",{style:{position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.42) 3px,rgba(0,0,0,.42) 6px)",zIndex:2,pointerEvents:"none"}}),
-  phase>=1&&phase<=2&&React.createElement("div",{style:{position:"absolute",left:0,right:0,top:"50%",transform:"translateY(-50%)",height:phase===1?"3px":"130vh",background:"radial-gradient(ellipse 120% 50% at 50% 50%,#00e5ff2a 0%,#ffffff18 30%,transparent 75%)",filter:"blur(14px)",transition:"height 0.5s cubic-bezier(0.2,0.8,0.4,1)",boxShadow:"0 0 120px 60px #00e5ff06",zIndex:15,pointerEvents:"none"}}),
+  phase>=1&&React.createElement("div",{style:{position:"absolute",left:0,right:0,top:"50%",transform:"translateY(-50%)",height:phase===1?"3px":"130vh",background:"radial-gradient(ellipse 120% 50% at 50% 50%,#00e5ff2a 0%,#ffffff18 30%,transparent 75%)",filter:"blur(14px)",opacity:phase<=2?1:0.06,transition:phase<=2?"height 0.5s cubic-bezier(0.2,0.8,0.4,1)":"opacity 2.5s ease",boxShadow:"0 0 120px 60px #00e5ff06",zIndex:3,pointerEvents:"none"}}),
   phase===2&&React.createElement("div",{style:{position:"absolute",inset:0,zIndex:14,pointerEvents:"none",background:"repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(0,220,180,.03) 1px,rgba(0,220,180,.03) 2px)",animation:"scanmove 0.07s linear infinite",opacity:.6}}),
-  phase>=3&&React.createElement("svg",{style:{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:8,pointerEvents:"none"},viewBox:"0 0 "+W+" "+H},
+  phase>=3&&React.createElement("svg",{style:{position:"absolute",inset:0,width:"100%",height:"100%",zIndex:8,pointerEvents:"none",animation:"in 0.5s ease"},viewBox:"0 0 "+W+" "+H},
    React.createElement("defs",null,React.createElement("filter",{id:"bootGlowF",x:"-20%",y:"-20%",width:"140%",height:"140%"},React.createElement("feGaussianBlur",{stdDeviation:"3",result:"blur"}),React.createElement("feMerge",null,React.createElement("feMergeNode",{in:"blur"}),React.createElement("feMergeNode",{in:"SourceGraphic"})))),
    React.createElement("rect",{x:mapLeft,y:mapTop,width:mapW,height:mapH,rx:12,fill:"none",stroke:"#00FFD0",strokeWidth:1.8,filter:"url(#bootGlowF)",strokeDasharray:borderLen,strokeDashoffset:phase===3?borderLen:0,style:{transition:"stroke-dashoffset 0.65s linear"}}),
    phase>=4&&[[mapLeft+10,mapTop+10],[mapLeft+mapW-10,mapTop+10],[mapLeft+10,mapTop+mapH-10],[mapLeft+mapW-10,mapTop+mapH-10]].map(function(pt,i){return React.createElement("circle",{key:i,cx:pt[0],cy:pt[1],r:4,fill:"#cc88ff",filter:"url(#bootGlowF)",style:{animation:"pulse 1.2s ease infinite",animationDelay:(i*0.12)+"s"}});})
@@ -319,7 +328,7 @@ function BootSequence(props){
     [4,6,8,10,12,20].map(function(d){var dc={4:"#FF6B35",6:"#FFD166",8:"#00FFD0",10:"#FF6EC7",12:"#cc88ff",20:"#FF2060"}[d]||"#ccc";return React.createElement("div",{key:d,style:{padding:"3px 6px",fontFamily:MONO,fontSize:8,color:dc,border:"1px solid "+dc+"33",borderRadius:2,opacity:phase>=6?0.8:0.3,transition:"opacity 0.3s",transitionDelay:(d*0.015)+"s"}},"d"+d);})
    )
   ),
-  phase>=5&&React.createElement("div",{style:{position:"absolute",left:mapLeft,top:mapTop,width:mapW,height:mapH,overflow:"hidden",borderRadius:12,zIndex:7}},
+  phase>=5&&React.createElement("div",{style:{position:"absolute",left:mapLeft,top:mapTop,width:mapW,height:mapH,overflow:"hidden",borderRadius:12,zIndex:7,animation:"in 0.5s ease"}},
    React.createElement("svg",{width:"100%",height:"100%",viewBox:"-310 -290 620 670",style:{display:"block"}},
     React.createElement("g",{transform:"rotate(90)"},
      React.createElement("g",{style:{animation:"in 0.5s ease"}},
@@ -347,8 +356,8 @@ function BootSequence(props){
    )
   ),
   phase>=8&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:40,pointerEvents:"none",animation:"titleFlash 0.8s ease forwards,glitch 2.5s ease 1.5s infinite"}},
-   React.createElement("div",{style:{fontFamily:ORB,fontSize:52,fontWeight:900,color:"#00FFD0",letterSpacing:18,textAlign:"center",textShadow:"-2px 0 0 #FF206066,2px 0 0 #88BBFF66,0 0 40px #00FFD0cc,0 0 80px #00FFD066,0 0 160px #00FFD022"}},"GHOST SIGNAL"),
-   React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0aa",letterSpacing:8,marginTop:14}},"ALL SYSTEMS NOMINAL")
+   React.createElement("div",{style:{fontFamily:ORB,fontSize:52,fontWeight:900,color:"#00FFD0",letterSpacing:18,textAlign:"center",textShadow:"-2px 0 0 #FF206066,2px 0 0 #88BBFF66,0 0 40px #00FFD0cc,0 0 80px #00FFD066,0 0 160px #00FFD022",minHeight:"1.2em"}},titleText,React.createElement("span",{style:{animation:"blink 0.5s step-end infinite",color:"#00FFD0",textShadow:"none"}},"_")),
+   React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0aa",letterSpacing:8,marginTop:14,minHeight:"1em"}},subText,subText.length>0&&subText!=="ALL SYSTEMS NOMINAL"&&React.createElement("span",{style:{animation:"blink 0.5s step-end infinite"}},"_"))
   )
  );
 }
