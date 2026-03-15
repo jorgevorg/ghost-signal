@@ -54,7 +54,7 @@ const RING_PHASES=[
   {id:"inner",label:"INNER RING",c:"#FF6B35",die:12,desc:"Inner core — solar flares, Helios Farms, extreme heat. This is the end game."},
 ];
 const BARRIER_C="#FF8C00",BASE_C="#cc88ff";const IC={settlement:"#FFD166",research:"#aaaaff",flare:"#FF6B35",helios:"#FFE566",asteroid:"#998877",starcruiser:"#cc88ff",pirate:"#FF2060",barrier:BARRIER_C,base:BASE_C};
-const SHIP_COLORS={seance:"#FF2060",twinrotor:"#FFB84D",snowstorm:"#00E5FF",epsilon:"#7EC8E3",voyager:"#FF8C42",orionmoth:"#80DD44",eclipsewarden:"#CC88FF"};
+const SHIP_COLORS={seance:"#FF2060",twinrotor:"#FFB84D",snowstorm:"#00E5FF",epsilon:"#7EC8E3",voyager:"#FF8C42",orionmoth:"#80DD44",eclipsewarden:"#CC88FF",vectorace:"#FF6B6B",duskwing:"#CC3366",smuggler:"#C8A040",scarab:"#40C896",mantis:"#A0D040",beluga:"#6688BB",starpredator:"#FF2200",shell4:"#5577AA",theclaw:"#DD1133",stingray:"#00AAEE",edgecharger:"#FFAA11",tarrasque:"#882200"};
 const HEX_SYMBOLS={small:"◉",medium:"◉",giant:"◉",medium_moon1:"◉",medium_moon2:"◉",ring:"◎",void:"○",settlement:"⏣",research:"⌖",flare:"☢",asteroid:"✸",helios:"⍟",starcruiser:"⯅",pirate:"☠",twinrotor:"⯅",snowstorm:"⯅",epsilon:"⯅",voyager:"⯅",orionmoth:"⯅",eclipsewarden:"⯅",barrier:"⬡",base:"⬡"};
 const TYPE_LABELS={small:"Small Planet",medium:"Medium Planet",giant:"Giant Planet",medium_moon1:"Planet + Moon",medium_moon2:"Planet + 2 Moons",ring:"Ringed Planet",void:"Void Planet",settlement:"Settlement",research:"Research Station",asteroid:"Asteroid Sea",helios:"Helios Farm",flare:"Solar Flare",starcruiser:"Star Cruiser",pirate:"Pirate Hideout",seance:"THE INDESTRUCTIBLE II",twinrotor:"Twinrotor Hauler",snowstorm:"Snowstorm Delta",epsilon:"Epsilon Interceptor",voyager:"A-1 Voyager",orionmoth:"Orion Moth",eclipsewarden:"Eclipse Warden",barrier:"Barrier Tile",base:"Faction Base"};
 const HEX_FLAVOR={small:"A compact rocky world. Mineral traces detected.",medium:"Temperate conditions. Possible signs of past habitation.",giant:"Massive gas giant. Gravity well extends several hexes.",medium_moon1:"A planet with a natural satellite. Tidal forces active.",medium_moon2:"Twin-moon system. Navigational complexity.",ring:"A ringed world. The rings are navigable but unpredictable.",void:"Hollow resonance detected. Origin: unknown.",settlement:"Populated zone. Docking and resupply available.",research:"Active station. Encrypted transmissions detected.",asteroid:"Dense asteroid field. Rich in rare minerals.",helios:"Solar energy farm. Helios array fully operational.",flare:"Active solar flare zone. Hull integrity warning.",starcruiser:"Large vessel. Transponder signal: unregistered.",pirate:"Hostile signatures on all frequencies.",seance:"THE INDESTRUCTIBLE II. Right where you left her.",barrier:"Impassable. Navigation locked out.",base:"Faction-controlled territory. Approach with caution."};
@@ -177,6 +177,95 @@ if(SHIP_COLORS[t]){var sc=SHIP_COLORS[t];
   React.createElement("polygon",{points:"11,0 22,6 9,12",fill:sc,opacity:.8}),
   React.createElement("rect",{x:-8,y:10,width:5,height:4,rx:1,fill:sc,opacity:.9}),
   React.createElement("rect",{x:3,y:10,width:5,height:4,rx:1,fill:sc,opacity:.9})
+ );
+ if(t==="vectorace") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-13 -2,8 2,8",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,-9 -13,7 -2,7",fill:sc,opacity:.85}),
+  React.createElement("polygon",{points:"0,-9 13,7 2,7",fill:sc,opacity:.85}),
+  React.createElement("rect",{x:-4,y:6,width:3,height:4,rx:1,fill:sc,opacity:.9}),
+  React.createElement("rect",{x:1,y:6,width:3,height:4,rx:1,fill:sc,opacity:.9})
+ );
+ if(t==="duskwing") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 6px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-15 -2.5,10 2.5,10",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,-10 -17,9 -3,9",fill:sc,opacity:.86}),
+  React.createElement("polygon",{points:"0,-10 17,9 3,9",fill:sc,opacity:.86}),
+  React.createElement("rect",{x:-5,y:7,width:4,height:5,rx:1.5,fill:sc,opacity:.9}),
+  React.createElement("rect",{x:1,y:7,width:4,height:5,rx:1.5,fill:sc,opacity:.9})
+ );
+ if(t==="smuggler") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-10 -17,6 17,6",fill:sc,opacity:.9}),
+  React.createElement("ellipse",{cx:0,cy:-3,rx:3.5,ry:2.5,fill:"#ffffff",opacity:.3}),
+  React.createElement("rect",{x:-15,y:4,width:5,height:5,rx:1.5,fill:sc,opacity:.88}),
+  React.createElement("rect",{x:10,y:4,width:5,height:5,rx:1.5,fill:sc,opacity:.88})
+ );
+ if(t==="scarab") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("ellipse",{cx:0,cy:2,rx:9,ry:10,fill:sc,opacity:.88}),
+  React.createElement("ellipse",{cx:0,cy:-4,rx:5,ry:4,fill:sc,opacity:.95}),
+  React.createElement("polygon",{points:"0,-12 -3,-8 3,-8",fill:"#ffffff",opacity:.35}),
+  React.createElement("rect",{x:-7,y:9,width:5,height:4,rx:1,fill:sc,opacity:.9}),
+  React.createElement("rect",{x:2,y:9,width:5,height:4,rx:1,fill:sc,opacity:.9})
+ );
+ if(t==="mantis") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-17 -2.5,12 2.5,12",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,-8 -16,-2 -6,5",fill:sc,opacity:.82}),
+  React.createElement("polygon",{points:"0,-8 16,-2 6,5",fill:sc,opacity:.82}),
+  React.createElement("ellipse",{cx:0,cy:13,rx:3,ry:2,fill:"#ffffff",opacity:.28})
+ );
+ if(t==="beluga") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("ellipse",{cx:0,cy:2,rx:11,ry:9,fill:sc,opacity:.88}),
+  React.createElement("polygon",{points:"0,-13 -4,-4 4,-4",fill:sc,opacity:.9}),
+  React.createElement("ellipse",{cx:-10,cy:7,rx:4,ry:3,fill:sc,opacity:.85}),
+  React.createElement("ellipse",{cx:10,cy:7,rx:4,ry:3,fill:sc,opacity:.85}),
+  React.createElement("ellipse",{cx:-10,cy:9,rx:2,ry:1.5,fill:"#ffffff",opacity:.25}),
+  React.createElement("ellipse",{cx:10,cy:9,rx:2,ry:1.5,fill:"#ffffff",opacity:.25})
+ );
+ if(t==="starpredator") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"bb)"},
+  React.createElement("polygon",{points:"0,-18 -3.5,13 3.5,13",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"-3.5,-3 -18,11 -3.5,11",fill:sc,opacity:.84}),
+  React.createElement("polygon",{points:"3.5,-3 18,11 3.5,11",fill:sc,opacity:.84}),
+  React.createElement("polygon",{points:"-2,11 -7,18 -2,18",fill:sc,opacity:.78}),
+  React.createElement("polygon",{points:"2,11 7,18 2,18",fill:sc,opacity:.78}),
+  React.createElement("ellipse",{cx:0,cy:-10,rx:1.8,ry:3.5,fill:"#ffffff",opacity:.35})
+ );
+ if(t==="shell4") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-13 -13,2 -11,13 11,13 13,2",fill:sc,opacity:.88}),
+  React.createElement("polygon",{points:"0,-13 -3,-4 3,-4",fill:"#ffffff",opacity:.3}),
+  React.createElement("polygon",{points:"-13,2 -21,7 -11,13",fill:sc,opacity:.82}),
+  React.createElement("polygon",{points:"13,2 21,7 11,13",fill:sc,opacity:.82}),
+  React.createElement("rect",{x:-8,y:11,width:6,height:4,rx:1,fill:sc,opacity:.9}),
+  React.createElement("rect",{x:2,y:11,width:6,height:4,rx:1,fill:sc,opacity:.9})
+ );
+ if(t==="theclaw") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 6px "+sc+"bb)"},
+  React.createElement("rect",{x:-7,y:-4,width:14,height:12,rx:2,fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,-12 -4,-4 4,-4",fill:sc,opacity:.95}),
+  React.createElement("polygon",{points:"-7,0 -20,10 -7,16",fill:sc,opacity:.85}),
+  React.createElement("polygon",{points:"7,0 20,10 7,16",fill:sc,opacity:.85}),
+  React.createElement("polygon",{points:"-20,10 -23,18 -14,18",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"20,10 23,18 14,18",fill:sc,opacity:.9})
+ );
+ if(t==="stingray") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-13 -21,3 0,13 21,3",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,13 -2,20 2,20",fill:sc,opacity:.8}),
+  React.createElement("ellipse",{cx:0,cy:-2,rx:4,ry:5,fill:"#ffffff",opacity:.28})
+ );
+ if(t==="edgecharger") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"99)"},
+  React.createElement("rect",{x:-10,y:-5,width:20,height:14,rx:2.5,fill:sc,opacity:.88}),
+  React.createElement("polygon",{points:"0,-12 -5,-5 5,-5",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"-10,-5 -18,-10 -10,-1",fill:sc,opacity:.85}),
+  React.createElement("polygon",{points:"10,-5 18,-10 10,-1",fill:sc,opacity:.85}),
+  React.createElement("ellipse",{cx:-7,cy:11,rx:3,ry:2,fill:"#ffffff",opacity:.28}),
+  React.createElement("ellipse",{cx:0,cy:11,rx:3,ry:2,fill:"#ffffff",opacity:.28}),
+  React.createElement("ellipse",{cx:7,cy:11,rx:3,ry:2,fill:"#ffffff",opacity:.28})
+ );
+ if(t==="tarrasque") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 7px "+sc+"cc)"},
+  React.createElement("polygon",{points:"0,-14 -15,-3 -13,13 13,13 15,-3",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,-14 -4,-2 4,-2",fill:"#ffffff",opacity:.35}),
+  React.createElement("polygon",{points:"-15,-3 -25,3 -13,13",fill:sc,opacity:.82}),
+  React.createElement("polygon",{points:"15,-3 25,3 13,13",fill:sc,opacity:.82}),
+  React.createElement("rect",{x:-10,y:11,width:7,height:5,rx:1,fill:sc,opacity:.9}),
+  React.createElement("rect",{x:3,y:11,width:7,height:5,rx:1,fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"-8,14 -12,21 -8,21",fill:sc,opacity:.8}),
+  React.createElement("polygon",{points:"8,14 12,21 8,21",fill:sc,opacity:.8})
  );
  return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
   React.createElement("polygon",{points:"0,-12 -8,8 8,8",fill:sc,opacity:.88}),
@@ -454,7 +543,10 @@ function HexTypeSelect(props){
   {label:"LOCATIONS",types:["settlement","research","asteroid","helios","flare"]},
   {label:"THREATS",types:["starcruiser","pirate"]},
   {label:"PLAYER SHIP",types:["seance"]},
-  {label:"SHIPS",types:["twinrotor","snowstorm","epsilon","voyager","orionmoth","eclipsewarden"]},
+  {label:"CLASS A",types:["twinrotor","snowstorm","epsilon","voyager","orionmoth","eclipsewarden"]},
+  {label:"CLASS B/C",types:["vectorace","duskwing","smuggler","scarab","mantis","beluga"]},
+  {label:"HEAVY",types:["starpredator","shell4","stingray","edgecharger"]},
+  {label:"TITANS",types:["theclaw","tarrasque"]},
  ];
  var allTypes=[];GROUPS.forEach(function(g){g.types.forEach(function(t){allTypes.push(t);});});
  var getLabel=function(t){return t==="seance"?shipName:(TYPE_LABELS[t]||t);};
@@ -1158,7 +1250,7 @@ React.createElement("div",{style:{position:"absolute",top:10,right:12,zIndex:30,
       React.createElement(HexTypeSelect,{value:form.type,onChange:function(v){setForm(function(p){return Object.assign({},p,{type:v});});},shipName:shipName}),
       React.createElement("textarea",{value:form.notes,onChange:function(e){setForm(function(p){return Object.assign({},p,{notes:e.target.value});});},placeholder:"Sensor data / field notes...",rows:4,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:14,padding:"9px 12px",outline:"none",resize:"none",boxSizing:"border-box",lineHeight:1.7,marginBottom:8}}),
       React.createElement("label",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:14,cursor:"pointer"}},
-        React.createElement("select",{value:(form.ships&&form.ships[0])||"",onChange:function(e){var v=e.target.value;setForm(function(p){return Object.assign({},p,{ships:v?[v]:[]});});},style:{background:"#080810",border:"1px solid #FF206055",color:"#FF2060",fontFamily:MONO,fontSize:9,borderRadius:3,padding:"2px 6px",outline:"none"}},React.createElement("option",{value:""},"— NO SHIP TOKEN —"),React.createElement("option",{value:"seance"},"THE INDESTRUCTIBLE II"),React.createElement("option",{value:"twinrotor"},"TWINROTOR HAULER"),React.createElement("option",{value:"snowstorm"},"SNOWSTORM DELTA"),React.createElement("option",{value:"epsilon"},"EPSILON INTERCEPTOR"),React.createElement("option",{value:"voyager"},"A-1 VOYAGER"),React.createElement("option",{value:"orionmoth"},"ORION MOTH"),React.createElement("option",{value:"eclipsewarden"},"ECLIPSE WARDEN")),
+        React.createElement("select",{value:(form.ships&&form.ships[0])||"",onChange:function(e){var v=e.target.value;setForm(function(p){return Object.assign({},p,{ships:v?[v]:[]});});},style:{background:"#080810",border:"1px solid #FF206055",color:"#FF2060",fontFamily:MONO,fontSize:9,borderRadius:3,padding:"2px 6px",outline:"none"}},React.createElement("option",{value:""},"— NO SHIP TOKEN —"),React.createElement("option",{value:"seance"},"THE INDESTRUCTIBLE II"),React.createElement("option",{value:"twinrotor"},"TWINROTOR HAULER"),React.createElement("option",{value:"snowstorm"},"SNOWSTORM DELTA"),React.createElement("option",{value:"epsilon"},"EPSILON INTERCEPTOR"),React.createElement("option",{value:"voyager"},"A-1 VOYAGER"),React.createElement("option",{value:"orionmoth"},"ORION MOTH"),React.createElement("option",{value:"eclipsewarden"},"ECLIPSE WARDEN"),React.createElement("option",{value:"",disabled:true},"── CLASS B/C ──"),React.createElement("option",{value:"vectorace"},"VECTOR ACE FIGHTER"),React.createElement("option",{value:"duskwing"},"DUSKWING"),React.createElement("option",{value:"smuggler"},"SMUGGLER SPEEDER"),React.createElement("option",{value:"scarab"},"SCARAB INTERCEPTOR"),React.createElement("option",{value:"mantis"},"VECTOR-7 MANTIS"),React.createElement("option",{value:"beluga"},"BELUGA TRANSPORTER"),React.createElement("option",{value:"",disabled:true},"── HEAVY ──"),React.createElement("option",{value:"starpredator"},"STARPREDATOR"),React.createElement("option",{value:"shell4"},"SHELL-4 TRANSPORTER"),React.createElement("option",{value:"stingray"},"STINGRAY FRONTIER"),React.createElement("option",{value:"edgecharger"},"EDGECHARGER W"),React.createElement("option",{value:"",disabled:true},"── TITANS ──"),React.createElement("option",{value:"theclaw"},"THE CLAW"),React.createElement("option",{value:"tarrasque"},"TARRASQUE TITAN")),
         React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:"#ccc"}},"SHIP IS HERE")
       ),
       React.createElement("div",{style:{display:"flex",gap:8}},
