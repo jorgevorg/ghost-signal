@@ -123,15 +123,60 @@ function HexIcon(props){
    React.createElement("text",{x:x,y:y+5,textAnchor:"middle",fontSize:15,fontFamily:"monospace",fill:BASE_C},"⬡")
   );
  }
- if(t==="seance") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2s ease-in-out infinite":"none",color:"#FF2060"},filter:"drop-shadow(0 0 6px #FF206099)"},
-  React.createElement("polygon",{points:"0,-16 -13,9 13,9",fill:"#FF2060",opacity:.92}),
-  React.createElement("polygon",{points:"0,-16 -2.5,1 2.5,1",fill:"#ff9090",opacity:.95}),
-  React.createElement("rect",{x:-14,y:7,width:5,height:7,rx:2,fill:"#FF2060",opacity:.9}),
-  React.createElement("rect",{x:9,y:7,width:5,height:7,rx:2,fill:"#FF2060",opacity:.9}),
-  React.createElement("circle",{cx:-11,cy:15,r:3.5,fill:"#FF2060"}),
-  React.createElement("circle",{cx:11,cy:15,r:3.5,fill:"#FF2060"})
+ if(t==="seance") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 6px #FF206099)"},
+ React.createElement("polygon",{points:"0,-15 -2.5,10 2.5,10",fill:"#FF2060",opacity:.9}),
+ React.createElement("polygon",{points:"0,-10 -17,9 -3,9",fill:"#FF2060",opacity:.86}),
+ React.createElement("polygon",{points:"0,-10 17,9 3,9",fill:"#FF2060",opacity:.86}),
+ React.createElement("ellipse",{cx:0,cy:-7,rx:1.8,ry:3.5,fill:"#ff9090",opacity:.7}),
+ React.createElement("rect",{x:-5,y:7,width:4,height:5,rx:1.5,fill:"#FF2060",opacity:.9}),
+ React.createElement("rect",{x:1,y:7,width:4,height:5,rx:1.5,fill:"#FF2060",opacity:.9})
+);
+if(SHIP_COLORS[t]){var sc=SHIP_COLORS[t];
+ if(t==="twinrotor") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("rect",{x:-7,y:-7,width:14,height:14,rx:2.5,fill:sc,opacity:.88}),
+  React.createElement("polygon",{points:"0,-13 -4.5,-7 4.5,-7",fill:sc,opacity:.9}),
+  React.createElement("ellipse",{cx:-13,cy:3,rx:5,ry:7,fill:sc,opacity:.85}),
+  React.createElement("ellipse",{cx:13,cy:3,rx:5,ry:7,fill:sc,opacity:.85}),
+  React.createElement("ellipse",{cx:-13,cy:8,rx:2.5,ry:1.8,fill:"#ffffff",opacity:.28}),
+  React.createElement("ellipse",{cx:13,cy:8,rx:2.5,ry:1.8,fill:"#ffffff",opacity:.28})
  );
- if(SHIP_COLORS[t]){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none",color:sc},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+ if(t==="snowstorm") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-15 -19,10 19,10",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,-15 -1.5,5 1.5,5",fill:"#ffffff",opacity:.45}),
+  React.createElement("rect",{x:-14,y:8,width:5,height:4,rx:1,fill:sc,opacity:.85}),
+  React.createElement("rect",{x:-3,y:8,width:6,height:4,rx:1,fill:sc,opacity:.85}),
+  React.createElement("rect",{x:9,y:8,width:5,height:4,rx:1,fill:sc,opacity:.85})
+ );
+ if(t==="epsilon") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-18 -3.5,12 3.5,12",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"-3.5,1 -14,11 -3.5,11",fill:sc,opacity:.78}),
+  React.createElement("polygon",{points:"3.5,1 14,11 3.5,11",fill:sc,opacity:.78}),
+  React.createElement("ellipse",{cx:0,cy:13,rx:3,ry:2,fill:"#ffffff",opacity:.28})
+ );
+ if(t==="voyager") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("polygon",{points:"0,-16 -5,8 5,8",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"-5,-2 -15,8 -5,8",fill:sc,opacity:.84}),
+  React.createElement("polygon",{points:"5,-2 15,8 5,8",fill:sc,opacity:.84}),
+  React.createElement("polygon",{points:"-2,8 -7,15 -2,15",fill:sc,opacity:.78}),
+  React.createElement("polygon",{points:"2,8 7,15 2,15",fill:sc,opacity:.78}),
+  React.createElement("ellipse",{cx:0,cy:-8,rx:2,ry:3.5,fill:"#ffffff",opacity:.32})
+ );
+ if(t==="orionmoth") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
+  React.createElement("ellipse",{cx:0,cy:0,rx:3,ry:11,fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,-8 -18,-2 -6,6",fill:sc,opacity:.8}),
+  React.createElement("polygon",{points:"0,-8 18,-2 6,6",fill:sc,opacity:.8}),
+  React.createElement("polygon",{points:"-2,5 -11,13 -3,13",fill:sc,opacity:.72}),
+  React.createElement("polygon",{points:"2,5 11,13 3,13",fill:sc,opacity:.72})
+ );
+ if(t==="eclipsewarden") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"bb)"},
+  React.createElement("polygon",{points:"0,-13 -11,0 -9,12 9,12 11,0",fill:sc,opacity:.9}),
+  React.createElement("polygon",{points:"0,-13 -3,-3 3,-3",fill:"#ffffff",opacity:.38}),
+  React.createElement("polygon",{points:"-11,0 -22,6 -9,12",fill:sc,opacity:.8}),
+  React.createElement("polygon",{points:"11,0 22,6 9,12",fill:sc,opacity:.8}),
+  React.createElement("rect",{x:-8,y:10,width:5,height:4,rx:1,fill:sc,opacity:.9}),
+  React.createElement("rect",{x:3,y:10,width:5,height:4,rx:1,fill:sc,opacity:.9})
+ );
+ return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
   React.createElement("polygon",{points:"0,-12 -8,8 8,8",fill:sc,opacity:.88}),
   React.createElement("rect",{x:-9,y:6,width:4,height:5,rx:1,fill:sc,opacity:.8}),
   React.createElement("rect",{x:5,y:6,width:4,height:5,rx:1,fill:sc,opacity:.8})
