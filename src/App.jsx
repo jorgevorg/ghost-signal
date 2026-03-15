@@ -924,13 +924,13 @@ function MissionPanel(props){
     React.createElement("circle",{cx:38,cy:38,r:5,fill:"#FF4070",opacity:0.85,filter:"url(#ringGlowF)"}),
     React.createElement("circle",{cx:38,cy:38,r:2.5,fill:"#ff9090"})
   );
-  return React.createElement("div",{style:{position:"absolute",left:12,top:12,width:col?34:252,zIndex:20,
+  return React.createElement("div",{style:{position:"absolute",left:12,top:12,width:col?160:252,zIndex:20,
       background:"rgba(7,7,18,0.96)",border:"1px solid "+ac+"44",borderRadius:8,
       boxShadow:"0 0 28px "+ac+"0c",transition:"width 0.25s",overflow:"hidden",animation:"missionIn 0.35s ease"}},
     React.createElement("div",{onClick:function(){setCol(!col);},
-      style:{padding:"9px 11px",display:"flex",justifyContent:col?"center":"space-between",alignItems:"center",
+      style:{padding:"9px 11px",display:"flex",justifyContent:"space-between",alignItems:"center",
         cursor:"pointer",borderBottom:col?"none":"1px solid "+B2,background:ac+"07",gap:6}},
-      !col&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:7}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:7}},
         React.createElement("div",{style:{width:6,height:6,borderRadius:"50%",background:ac,
           boxShadow:"0 0 6px "+ac,animation:"pulse 2s infinite",flexShrink:0}}),
         React.createElement("span",{style:{fontFamily:ORB,fontSize:8,color:ac,letterSpacing:3,whiteSpace:"nowrap"}},"MISSION STATUS")
