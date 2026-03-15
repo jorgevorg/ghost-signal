@@ -877,7 +877,7 @@ function MapLegend(props){
       background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"10px 13px",maxWidth:234}},
     cm
       ?React.createElement("div",{style:{marginBottom:8,paddingBottom:8,borderBottom:"1px solid "+B3+"66"}},
-          React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:ac+"88",letterSpacing:2.5,marginBottom:3}},"MAP CONFIG"),
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:ac+"88",letterSpacing:2.5,marginBottom:3}},"SYSTEM DOSSIER"),
           React.createElement("div",{style:{fontFamily:ORB,fontSize:11,color:ac,letterSpacing:2,marginBottom:5,lineHeight:1.3}},cm.name),
           React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#888",lineHeight:1.5}},cm.desc)
         )
@@ -971,8 +971,7 @@ function MissionPanel(props){
           })
         )
       ),
-      React.createElement("div",{style:{fontFamily:RAJ,fontSize:11.5,color:"#778",lineHeight:1.55,
-          marginBottom:10,paddingLeft:8,borderLeft:"2px solid "+ac+"33",fontStyle:"italic"}},rp.desc),
+      
       
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:9}},
         React.createElement("div",{style:{width:5,height:5,borderRadius:"50%",background:"#FF2060",
