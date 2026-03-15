@@ -659,7 +659,7 @@ function DiceRoller(props){
  var rollFree=function(expr){var ex=expr||fe;var res=parseExpr(ex);if(!res)return;setFe(ex);setFr(res);var ds=res.dice.map(function(d){return d.r;}).join(",");addH({mode:"FREE",label:ex.toUpperCase()+" ["+ds+"]"+(res.mod?(res.mod>0?"+":"")+res.mod:"")+" = "+res.total,total:res.total,d66:!!res.d66});};
  var mBtn=function(id,lbl){var a=mode===id;return React.createElement("button",{onClick:function(){setMode(id);},style:{flex:1,padding:"5px 0",background:a?"#FF206022":"transparent",border:"1px solid "+(a?"#FF2060":B1),color:a?"#FF2060":"#bbb",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1.5}},lbl);};
  var charBtns=function(active,setActive,onSelect){return ["cole","vela"].map(function(c){var a=active===c,cc=c==="cole"?"#FFD166":"#FF2060";return React.createElement("button",{key:c,onClick:function(){setActive(c);if(onSelect)onSelect();},style:{flex:1,padding:"4px 0",background:a?cc+"22":"transparent",border:"1px solid "+(a?cc:B1),color:a?cc:"#bbb",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},charLabel(c));});};
- return React.createElement("div",{style:{position:"fixed",bottom:35,right:60,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,zIndex:100,overflow:"hidden"}},
+ return React.createElement("div",{style:{position:"fixed",bottom:35,right:24,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,zIndex:100,overflow:"hidden"}},
   React.createElement("div",{onClick:function(){setCol(!col);},style:{padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid "+B2,cursor:"pointer"}},
    React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:"#FF2060",letterSpacing:3}},"DICE MATRIX"),
    React.createElement("span",{style:{color:"#aaa",fontSize:12}},col?"▲":"▼")
@@ -740,7 +740,7 @@ function MabelMini(props){
  useEffect(function(){if(open&&endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs,open]);
  var lastMsg=msgs[msgs.length-1];
  var send=function(){if(!input.trim()||loading)return;onSend(input.trim());setInput("");};
- return React.createElement("div",{style:{position:"fixed",bottom:35,left:"calc(50vw - 29.5px)",width:open?360:200,zIndex:200,transform:"translateX(-50%)",background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s"}},
+ return React.createElement("div",{style:{position:"fixed",bottom:35,left:"calc(50vw - 11.5px)",transform:"translateX(-50%)",width:open?360:200,zIndex:200,transform:"translateX(-50%)",background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s"}},
   React.createElement("div",{onClick:function(){setOpen(!open);},style:{padding:"8px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:MABEL_C+"08",borderBottom:open?"1px solid "+MABEL_C+"33":"none"}},
    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
     React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 6px "+MABEL_C,animation:"pulse 2s infinite"}}),
