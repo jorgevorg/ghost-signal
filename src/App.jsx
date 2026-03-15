@@ -873,7 +873,7 @@ function MapLegend(props){
   var rp=RING_PHASES.find(function(r){return r.id===phase;})||RING_PHASES[0];
   var ac=rp.c;
   var cm=gs.campaignMap;
-  return React.createElement("div",{style:{position:"absolute",bottom:12,left:12,zIndex:20,
+  return React.createElement("div",{style:{position:"fixed",bottom:12,left:12,zIndex:20,
       background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"10px 13px",maxWidth:234}},
     cm
       ?React.createElement("div",{style:{marginBottom:8,paddingBottom:8,borderBottom:"1px solid "+B3+"66"}},
