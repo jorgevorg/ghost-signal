@@ -935,7 +935,7 @@ function MissionPanel(props){
           boxShadow:"0 0 6px "+ac,animation:"pulse 2s infinite",flexShrink:0}}),
         React.createElement("span",{style:{fontFamily:ORB,fontSize:8,color:ac,letterSpacing:3,whiteSpace:"nowrap"}},"MISSION STATUS")
       ),
-      React.createElement("span",{style:{color:ac+"99",fontSize:9,fontFamily:MONO,flexShrink:0}},col?"▶":"◀")
+      React.createElement("span",{style:{color:ac+"99",fontSize:9,fontFamily:MONO,flexShrink:0}},col?"▼":"▲")
     ),
     !col&&React.createElement("div",{style:{padding:"12px 13px"}},
       React.createElement("div",{style:{display:"flex",gap:10,alignItems:"center",marginBottom:10}},
