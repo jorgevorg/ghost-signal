@@ -747,7 +747,7 @@ function MabelMini(props){
     React.createElement("div",{ref:endRef})
    ),
    React.createElement("div",{style:{padding:"8px 10px",borderTop:"1px solid "+MABEL_C+"22",display:"flex",gap:6}},
-    React.createElement("input",{value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter")send();},placeholder:"Query MABEL...",style:{flex:1,background:"transparent",border:"1px solid "+MABEL_C+"33",borderRadius:3,color:"#eee",fontFamily:MONO,fontSize:10,padding:"5px 8px",outline:"none"}}),
+    React.createElement("div",{style:{display:"flex",gap:4,padding:"4px 8px 2px",overflowX:"auto",flexShrink:0}},QUICK_ACTIONS.slice(0,4).map(function(qa,qi){return React.createElement("button",{key:qi,onClick:function(){setInput(qa.prompt);},style:{flexShrink:0,fontFamily:MONO,fontSize:8,padding:"2px 8px",background:"transparent",border:"1px solid "+MABEL_C+"44",color:MABEL_C+"99",borderRadius:10,cursor:"pointer",whiteSpace:"nowrap",letterSpacing:.5}},qa.label);})),React.createElement("input",{value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter")send();},placeholder:"Query MABEL...",style:{flex:1,background:"transparent",border:"1px solid "+MABEL_C+"33",borderRadius:3,color:"#eee",fontFamily:MONO,fontSize:10,padding:"5px 8px",outline:"none"}}),
     React.createElement("button",{onClick:send,disabled:loading,style:{padding:"5px 10px",background:MABEL_C+"14",border:"1px solid "+MABEL_C+"44",color:MABEL_C,borderRadius:3,cursor:loading?"not-allowed":"pointer",fontFamily:MONO,fontSize:10}},loading?"...":"►")
    )
   )
@@ -1138,7 +1138,7 @@ function App(){
  var presetsOpenS=useState(false),setPresetsOpen=presetsOpenS[1];var presetsOpen=presetsOpenS[0];
  var savedS=useState(false),setSaved=savedS[1];
  // Comms lifted to App — shared between CommsTab + MabelMini
- var commsS=useState(COMMS_INIT),setComms=commsS[1];var comms=commsS[0];
+ var commsS=useState(function(){try{var s=localStorage.getItem("gs_comms");return s?JSON.parse(s):COMMS_INIT;}catch(e){return COMMS_INIT;}}),setComms=commsS[1];var comms=commsS[0];useEffect(function(){try{localStorage.setItem("gs_comms",JSON.stringify(comms.slice(-60)));}catch(e){};},[comms]);
  var commsLoadingS=useState(false),setCommsLoading=commsLoadingS[1];var commsLoading=commsLoadingS[0];
  var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
  var histLoadedS=useState(false),setHistLoaded=histLoadedS[1];
