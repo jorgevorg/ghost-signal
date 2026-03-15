@@ -327,23 +327,6 @@ function BootSequence(props){
    //phase>=4&&[[mapLeft+10,mapTop+10],[mapLeft+mapW-10,mapTop+10],[mapLeft+10,mapTop+mapH-10],[mapLeft+mapW-10,mapTop+mapH-10]].map(function(pt,i){return React.createElement("circle",{key:i,cx:pt[0],cy:pt[1],r:4,fill:"#cc88ff",filter:"url(#bootGlowF)",style:{animation:"pulse 1.2s ease infinite",animationDelay:(i*0.12)+"s"}});})
   
   ),
-  phase>=4&&React.createElement("div",{style:{position:"fixed",bottom:64,right:16,width:220,background:"rgba(8,8,18,0.96)",border:"1px solid #88BBFF44",borderRadius:8,zIndex:20,animation:"slideLeft 0.35s cubic-bezier(0.25,0.46,0.45,0.94)",overflow:"hidden",boxShadow:"0 0 24px #88BBFF0a"}},
-   React.createElement("div",{style:{padding:"8px 12px",display:"flex",alignItems:"center",gap:8,background:"#88BBFF06",borderBottom:"1px solid #88BBFF22"}},
-    React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:"#88BBFF",boxShadow:"0 0 8px #88BBFF",animation:"pulse 1.5s infinite"}}),
-    React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#88BBFF",letterSpacing:2}},"MABEL"),
-    React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#88BBFF55",marginLeft:"auto"}},phase>=5?"ONLINE":"INIT...")
-   ),
-   React.createElement("div",{style:{padding:"8px 12px",fontFamily:MONO,fontSize:9,color:"#88BBFF55",letterSpacing:1,lineHeight:1.7}},phase>=6?"Navigation matrix: ONLINE":"Running diagnostics...")
-  ),
-  phase>=4&&React.createElement("div",{style:{position:"fixed",bottom:12,right:12,width:220,background:"rgba(8,8,18,0.96)",border:"1px solid #FF206044",borderRadius:8,zIndex:20,animation:"slideRight 0.35s cubic-bezier(0.25,0.46,0.45,0.94)",overflow:"hidden",boxShadow:"0 0 24px #FF20600a"}},
-   React.createElement("div",{style:{padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid #35354f"}},
-    React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:"#FF2060",letterSpacing:3}},"DICE MATRIX"),
-    React.createElement("span",{style:{color:"#555",fontSize:11}},"▼")
-   ),
-   React.createElement("div",{style:{padding:"8px 14px",display:"flex",gap:4,flexWrap:"wrap"}},
-    [4,6,8,10,12,20].map(function(d){var dc={4:"#FF6B35",6:"#FFD166",8:"#00FFD0",10:"#FF6EC7",12:"#cc88ff",20:"#FF2060"}[d]||"#ccc";return React.createElement("div",{key:d,style:{padding:"3px 6px",fontFamily:MONO,fontSize:8,color:dc,border:"1px solid "+dc+"33",borderRadius:2,opacity:.8}},"d"+d);})
-   )
-  ),
   phase>=5&&React.createElement("div",{style:{position:"absolute",left:mapLeft+24,top:mapTop+24,width:mapW-48,maxHeight:mapH-120,overflow:"hidden",zIndex:10,animation:"in 0.4s ease"}},
    logLines.map(function(l,idx){return React.createElement("div",{key:idx,style:{fontFamily:MONO,fontSize:11,color:idx===logLines.length-1?"#00FFD066":"#00FFD033",letterSpacing:2,lineHeight:2}}," > "+l);}),
    React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0",letterSpacing:2,lineHeight:2}}," > ",curLine,phase<6&&React.createElement("span",{style:{animation:"blink 0.5s step-end infinite"}},"_"))
