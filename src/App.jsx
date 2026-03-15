@@ -740,7 +740,7 @@ function MabelMini(props){
  useEffect(function(){if(open&&endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs,open]);
  var lastMsg=msgs[msgs.length-1];
  var send=function(){if(!input.trim()||loading)return;onSend(input.trim());setInput("");};
- return React.createElement("div",{style:{position:"fixed",bottom:12,left:"50%",width:open?360:200,zIndex:200,transform:"translateX(-50%)",background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s"}},
+ return React.createElement("div",{style:{position:"fixed",bottom:64,left:"50%",width:open?360:200,zIndex:200,transform:"translateX(-50%)",background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s"}},
   React.createElement("div",{onClick:function(){setOpen(!open);},style:{padding:"8px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:MABEL_C+"08",borderBottom:open?"1px solid "+MABEL_C+"33":"none"}},
    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
     React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 6px "+MABEL_C,animation:"pulse 2s infinite"}}),
@@ -873,7 +873,7 @@ function MapLegend(props){
   var rp=RING_PHASES.find(function(r){return r.id===phase;})||RING_PHASES[0];
   var ac=rp.c;
   var cm=gs.campaignMap;
-  return React.createElement("div",{style:{position:"fixed",bottom:12,left:12,zIndex:20,
+  return React.createElement("div",{style:{position:"absolute",bottom:12,left:12,zIndex:20,
       background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"10px 13px",maxWidth:234}},
     cm
       ?React.createElement("div",{style:{marginBottom:8,paddingBottom:8,borderBottom:"1px solid "+B3+"66"}},
