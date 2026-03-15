@@ -917,7 +917,7 @@ function MissionPanel(props){
       var active=phase===pid;
       var rc=RING_PHASES[i].c;
       return React.createElement("g",{key:i},
-        React.createElement("circle",{cx:38,cy:38,r:r,fill:"none",stroke:active?rc:rc+"33",strokeWidth:active?2:1,style:active?{filter:"drop-shadow(0 0 6px "+rc+"88)",animation:"pulse 2.5s ease-in-out infinite"}:{opacity:0.35}}),
+        React.createElement("circle",{cx:38,cy:38,r:r,fill:"none",stroke:active?rc+"77":rc+"1a",strokeWidth:1,strokeDasharray:"2 3",style:active?{filter:"drop-shadow(0 0 3px "+rc+"44)"}:{opacity:0.25}}),
         active&&React.createElement("g",{style:{transformOrigin:"38px 38px",animation:"ringOrbit "+(5+i*2)+"s linear infinite"}},React.createElement("polygon",{points:(42+r)+",38 "+(36+r)+",35 "+(36+r)+",41",fill:rc,style:{filter:"drop-shadow(0 0 6px "+rc+")"}}))
       );
     }),
