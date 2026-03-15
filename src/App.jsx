@@ -918,7 +918,7 @@ function MissionPanel(props){
       var rc=RING_PHASES[i].c;
       return React.createElement("g",{key:i},
         React.createElement("circle",{cx:38,cy:38,r:r,fill:"none",stroke:active?rc:rc+"33",strokeWidth:active?2:1,style:active?{filter:"drop-shadow(0 0 6px "+rc+"88)",animation:"pulse 2.5s ease-in-out infinite"}:{opacity:0.35}}),
-        active&&React.createElement("g",{style:{transformOrigin:"38px 38px",animation:"ringOrbit "+(5+i*2)+"s linear infinite"}},React.createElement("circle",{cx:38+r,cy:38,r:2.5,fill:rc,style:{filter:"drop-shadow(0 0 6px "+rc+")"}}))
+        active&&React.createElement("g",{style:{transformOrigin:"38px 38px",animation:"ringOrbit "+(5+i*2)+"s linear infinite"}},React.createElement("polygon",{points:(42+r)+",38 "+(36+r)+",35 "+(36+r)+",41",fill:rc,style:{filter:"drop-shadow(0 0 6px "+rc+")"}}))
       );
     }),
     React.createElement("circle",{cx:38,cy:38,r:5,fill:"#FF4070",opacity:0.85,filter:"url(#ringGlowF)"}),
@@ -1056,7 +1056,7 @@ React.createElement("div",{style:{position:"absolute",top:10,right:12,zIndex:30,
       React.createElement("defs",null,React.createElement("pattern",{id:"hatch",width:"7",height:"7",patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"},React.createElement("line",{x1:"0",y1:"0",x2:"0",y2:"7",stroke:"#1e2a3a",strokeWidth:"1.3"}))),
       React.createElement("g",{transform:"translate("+pan.x+","+pan.y+") rotate(90) scale("+mapZoom+")"},
         HEXES.map(function(hex){
-          if(hex.isStar)return React.createElement("g",{key:"star"},React.createElement("circle",{cx:hex.x,cy:hex.y,r:50,fill:"#FF2060",opacity:.07}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:36,fill:"#FF2060",opacity:.15}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:24,fill:"#FF4070",opacity:.7}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:16,fill:"#FF2060"}),React.createElement("circle",{cx:hex.x,cy:hex.y,r:9,fill:"#ff9090"}));
+          if(hex.isStar){var sx=hex.x,sy=hex.y;var starSpokes=Array.from({length:8},function(_,si){var a=si*Math.PI/4;return React.createElement("line",{key:si,x1:sx+Math.cos(a)*20,y1:sy+Math.sin(a)*20,x2:sx+Math.cos(a)*36,y2:sy+Math.sin(a)*36,stroke:"#FFD166",strokeWidth:2.5,strokeLinecap:"round",opacity:.85});});return React.createElement("g",{key:"star",style:{animation:"flarePulse 2.2s ease-in-out infinite",transformOrigin:sx+"px "+sy+"px"}},React.createElement("defs",null,React.createElement("radialGradient",{id:"starGrad",cx:"50%",cy:"50%"},React.createElement("stop",{offset:"0%",stopColor:"#ffffff",stopOpacity:"1"}),React.createElement("stop",{offset:"20%",stopColor:"#FFE566",stopOpacity:"1"}),React.createElement("stop",{offset:"55%",stopColor:"#FF6B00",stopOpacity:".9"}),React.createElement("stop",{offset:"100%",stopColor:"#FF2020",stopOpacity:"0"}))),React.createElement("circle",{cx:sx,cy:sy,r:52,fill:"#FF6B00",opacity:.05}),React.createElement("circle",{cx:sx,cy:sy,r:38,fill:"#FFD166",opacity:.1}),React.createElement("circle",{cx:sx,cy:sy,r:24,fill:"url(#starGrad)",filter:"drop-shadow(0 0 14px #FFD16688)"}),React.createElement("circle",{cx:sx,cy:sy,r:14,fill:"#FFE566",opacity:.95,filter:"drop-shadow(0 0 8px #FF6B00)"}),React.createElement("circle",{cx:sx,cy:sy,r:7,fill:"#ffffff",opacity:.92}),starSpokes);}
           var d=hexMap[hex.id]||{},isShip=!!(d.ships&&d.ships.length),isSel=ed===hex.id||(ctx&&ctx.hexId===hex.id)||sel.includes(hex.id);
           var isBarrier=d.type==="barrier",isBase=d.type==="base";
           var hasD=!!(d.notes&&d.notes.trim()||d.type);
