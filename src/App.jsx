@@ -110,6 +110,8 @@ function Toast(props){
 // ── HEX ICONS (Batch 1 — animated, redesigned) ────────────────────────────
 function HexIcon(props){
  var t=props.t,x=props.x,y=props.y,hexId=props.hexId||0,anim=props.anim!==false;
+ if(props.ship2&&!props._p){return React.createElement("g",null,React.createElement("g",{transform:"translate("+(x-9)+","+(y-6)+") scale(0.76) translate(-"+x+",-"+y+")"},React.createElement(HexIcon,{t:t,x:x,y:y,anim:anim,_p:1})),React.createElement("g",{transform:"translate("+(x+9)+","+(y+6)+") scale(0.76) translate(-"+x+",-"+y+")"},React.createElement(HexIcon,{t:props.ship2,x:x,y:y,anim:false,_p:1})));}
+
  var pc=getPlanetColor(hexId),pc2=getPlanetColor(hexId,1),mc=getMoonColor(hexId),gid="pg"+hexId,sid="sh"+hexId;
  if(t==="barrier"){
   return React.createElement("g",null,
