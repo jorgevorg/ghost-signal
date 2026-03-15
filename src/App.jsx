@@ -868,6 +868,34 @@ function CommsTab(props){
 }
 
 // ── APP ────────────────────────────────────────────────────────────────────
+function MapLegend(props){
+  var gs=props.gameState||INIT,phase=props.phase||"outer";
+  var rp=RING_PHASES.find(function(r){return r.id===phase;})||RING_PHASES[0];
+  var ac=rp.c;
+  var cm=gs.campaignMap;
+  return React.createElement("div",{style:{position:"absolute",bottom:12,left:12,zIndex:20,
+      background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"10px 13px",maxWidth:234}},
+    cm
+      ?React.createElement("div",{style:{marginBottom:8,paddingBottom:8,borderBottom:"1px solid "+B3+"66"}},
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:ac+"88",letterSpacing:2.5,marginBottom:3}},"MAP CONFIG"),
+          React.createElement("div",{style:{fontFamily:ORB,fontSize:11,color:ac,letterSpacing:2,marginBottom:5,lineHeight:1.3}},cm.name),
+          React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#888",lineHeight:1.5}},cm.desc)
+        )
+      :React.createElement("div",{style:{marginBottom:8,paddingBottom:8,borderBottom:"1px solid "+B3+"66",
+          fontFamily:MONO,fontSize:9,color:"#445",letterSpacing:1.5}},
+          "// NO MAP LOADED"),
+    React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:2,marginBottom:5}},"LEGEND"),
+    [[RING_PHASES[0].c,"◎ OUTER RING"],[RING_PHASES[1].c,"◎ MID RING"],[RING_PHASES[2].c,"◎ INNER RING"],
+     ["#FF2060","▲ PLAYER SHIP"],[BARRIER_C,"⬡ BARRIER"],[BASE_C,"⬡ BASE"]
+    ].map(function(row,i){
+      return React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",gap:7,marginBottom:3}},
+        React.createElement("div",{style:{width:8,height:8,background:row[0],flexShrink:0,borderRadius:1,
+          boxShadow:"0 0 4px "+row[0]+"55"}}),
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aabb",letterSpacing:1}},row[1])
+      );
+    })
+  );
+}
 function MissionPanel(props){
   var gs=props.gameState||INIT,phase=props.phase||"outer",setPhase=props.setPhase||function(){};
   var colS=useState(false),setCol=colS[1];var col=colS[0];
@@ -945,15 +973,7 @@ function MissionPanel(props){
       ),
       React.createElement("div",{style:{fontFamily:RAJ,fontSize:11.5,color:"#778",lineHeight:1.55,
           marginBottom:10,paddingLeft:8,borderLeft:"2px solid "+ac+"33",fontStyle:"italic"}},rp.desc),
-      cm?React.createElement("div",{style:{background:ac+"09",border:"1px solid "+ac+"28",borderRadius:5,
-          padding:"9px 11px",marginBottom:10}},
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:ac+"77",letterSpacing:2.5,marginBottom:4}},"MAP CONFIG"),
-        React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:ac,letterSpacing:2.5,marginBottom:5}},cm.name),
-        React.createElement("div",{style:{fontFamily:RAJ,fontSize:11.5,color:"#999",lineHeight:1.55}},cm.desc)
-      ):React.createElement("div",{style:{background:"#ffffff03",border:"1px solid "+B1,borderRadius:5,
-          padding:"9px 11px",marginBottom:10,fontFamily:MONO,fontSize:9,color:"#445",textAlign:"center",letterSpacing:1.5}},
-        "// NO MAP LOADED"),
-      React.createElement("div",{style:{borderTop:"1px solid "+B2,marginBottom:10}}),
+      
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:9}},
         React.createElement("div",{style:{width:5,height:5,borderRadius:"50%",background:"#FF2060",
           boxShadow:"0 0 5px #FF2060",animation:"pulse 2.5s infinite"}}),
@@ -1117,10 +1137,7 @@ React.createElement("div",{style:{position:"absolute",top:10,right:12,zIndex:30,
         React.createElement("button",{onClick:save,style:{flex:2,padding:"10px",background:"#7744cc18",border:"1px solid #9966cc",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:12,letterSpacing:2}},"TRANSMIT")
       )
     ),
-    React.createElement("div",{style:{position:"absolute",bottom:130,left:12,zIndex:30,display:"flex",flexDirection:"column",gap:4,background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"8px 12px"}},
-      React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:2,marginBottom:2}},"LEGEND"),
-      [["#FF2060","▲ SHIP"],["#BBAA44","■ MID RING"],["#CC6622","■ INNER RING"],["#CCCCCC","■ OUTER RING"],["#FF8C00","■ BARRIER"],["#cc88ff","■ FACTION BASE"],["#6a7a8a","░ UNCHARTED"]].map(function(pair){return React.createElement("div",{key:pair[1],style:{display:"flex",alignItems:"center",gap:5}},React.createElement("div",{style:{width:9,height:9,background:pair[0],borderRadius:1}}),React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aabb"}},pair[1]));})
-    ),
+    React.createElement(MapLegend,{gameState:gsForPanel,phase:phase}),
     toast.length>0&&React.createElement("div",{style:{position:"absolute",top:10,left:"50%",transform:"translateX(-50%)",zIndex:70,display:"flex",flexDirection:"column",gap:5,pointerEvents:"none",alignItems:"center"}},
       toast.map(function(t){return React.createElement("div",{key:t.id,style:{background:"rgba(6,6,20,0.95)",border:"1px solid "+t.color+"55",borderRadius:6,padding:"6px 16px",fontFamily:MONO,fontSize:11,color:t.color,letterSpacing:2,animation:"in .2s ease"}},t.msg);})
     ),
