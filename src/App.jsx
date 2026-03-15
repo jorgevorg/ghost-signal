@@ -1077,7 +1077,7 @@ function App(){
  var upHex=function(newMap){setGs(function(p){return Object.assign({},p,{hexMap:newMap});});};
  var addLog=function(log){setGs(function(p){return Object.assign({},p,{logs:p.logs.concat([Object.assign({id:Date.now()},log)])});});};
  var upSession=function(n){setGs(function(p){return Object.assign({},p,{session:n});});};
- var upCampaign=function(cm){setGs(function(p){return Object.assign({},p,{campaignMap:cm,chapter:p.campaignMap?Math.min((p.chapter||1)+1,3):1});});};
+ var upCampaign=function(cm){console.log("upCampaign called",cm);setGs(function(p){return Object.assign({},p,{campaignMap:cm,chapter:p.campaignMap?Math.min((p.chapter||1)+1,3):1});});};
 
  var TABS=["MAP","CREW","SHIP","LOGS","COMMS"];
  var TAB_C={MAP:"#cc88ff",CREW:"#FFD166",SHIP:"#00FFD0",LOGS:"#FF6EC7",COMMS:"#88BBFF"};
