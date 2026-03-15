@@ -1121,7 +1121,7 @@ React.createElement("div",{style:{position:"absolute",top:10,right:12,zIndex:30,
         React.createElement("button",{onClick:save,style:{flex:2,padding:"10px",background:"#7744cc18",border:"1px solid #9966cc",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:12,letterSpacing:2}},"TRANSMIT")
       )
     ),
-    React.createElement("div",{style:{position:"absolute",top:54,left:12,zIndex:30,display:"flex",flexDirection:"column",gap:4,background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"8px 12px"}},
+    React.createElement("div",{style:{position:"absolute",bottom:130,left:12,zIndex:30,display:"flex",flexDirection:"column",gap:4,background:"#06060fdd",border:"1px solid "+B3,borderRadius:6,padding:"8px 12px"}},
       React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:2,marginBottom:2}},"LEGEND"),
       [["#FF2060","▲ SHIP"],["#BBAA44","■ MID RING"],["#CC6622","■ INNER RING"],["#CCCCCC","■ OUTER RING"],["#FF8C00","■ BARRIER"],["#cc88ff","■ FACTION BASE"],["#6a7a8a","░ UNCHARTED"]].map(function(pair){return React.createElement("div",{key:pair[1],style:{display:"flex",alignItems:"center",gap:5}},React.createElement("div",{style:{width:9,height:9,background:pair[0],borderRadius:1}}),React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aabb"}},pair[1]));})
     ),
