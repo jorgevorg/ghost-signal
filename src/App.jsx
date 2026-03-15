@@ -16,7 +16,7 @@ html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1
 @keyframes shipPulse{0%,100%{filter:drop-shadow(0 0 4px currentColor)}50%{filter:drop-shadow(0 0 12px currentColor)}}
 @keyframes cutMarch{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-24}}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0d0d1a}::-webkit-scrollbar-thumb{background:#FF206044;border-radius:2px} @keyframes ringOrbit{from{stroke-dashoffset:0}to{stroke-dashoffset:-80}} @keyframes missionIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0d0d1a}::-webkit-scrollbar-thumb{background:#FF206044;border-radius:2px} @keyframes ringOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} @keyframes missionIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
 @keyframes bootGlow{0%,100%{text-shadow:0 0 30px #FF206066,0 0 60px #FF206022}50%{text-shadow:0 0 80px #FF2060cc,0 0 160px #FF206055}}
 @keyframes scanmove{0%{background-position:0 0}100%{background-position:0 4px}}
 @keyframes bootGlow{0%{opacity:0;filter:brightness(3)}100%{opacity:1;filter:brightness(1)}}
@@ -874,7 +874,7 @@ function MissionPanel(props){
   var rp=RING_PHASES.find(function(r){return r.id===phase;})||RING_PHASES[0];
   var ac=rp.c;
   var ship=gs.ship||mkS();
-  var shipEntry=Object.entries(gs.hexMap||{}).find(function(e){return e[1]&&e[1].ship;});
+  var shipEntry=Object.entries(gs.hexMap||{}).find(function(e){var d=e[1];return d&&(d.type==="seance"||SHIP_COLORS[d.type]||d.ship);});
   var shipHex=shipEntry?shipEntry[0]:null;
   var shipHexData=shipEntry?shipEntry[1]:null;
   var shipHexLabel=shipHexData&&shipHexData.name?shipHexData.name:(shipHex?"HEX-"+String(shipHex).padStart(3,"0"):"UNKNOWN");
@@ -906,12 +906,8 @@ function MissionPanel(props){
       var active=phase===pid;
       var rc=RING_PHASES[i].c;
       return React.createElement("g",{key:i},
-        React.createElement("circle",{cx:38,cy:38,r:r,fill:"none",stroke:active?rc+"33":"#ffffff08",strokeWidth:active?1.5:1}),
-        active&&React.createElement("circle",{cx:38,cy:38,r:r,fill:"none",stroke:rc,strokeWidth:2,
-          strokeDasharray:Math.round(r*1.1)+" "+Math.round(r*0.55),
-          style:{animation:"ringOrbit "+(5+i*1.5)+"s linear infinite",transformOrigin:"38px 38px",filter:"drop-shadow(0 0 3px "+rc+")"}}),
-        active&&React.createElement("circle",{cx:38+r,cy:38,r:2.5,fill:"#FF2060",
-          style:{animation:"pulse 1.5s ease-in-out infinite",filter:"drop-shadow(0 0 5px #FF2060)"}})
+        React.createElement("circle",{cx:38,cy:38,r:r,fill:"none",stroke:active?rc:rc+"33",strokeWidth:active?2:1,style:active?{filter:"drop-shadow(0 0 6px "+rc+"88)",animation:"pulse 2.5s ease-in-out infinite"}:{opacity:0.35}}),
+        active&&React.createElement("g",{style:{transformOrigin:"38px 38px",animation:"ringOrbit "+(5+i*2)+"s linear infinite"}},React.createElement("circle",{cx:38+r,cy:38,r:2.5,fill:rc,style:{filter:"drop-shadow(0 0 6px "+rc+")"}}))
       );
     }),
     React.createElement("circle",{cx:38,cy:38,r:5,fill:"#FF4070",opacity:0.85,filter:"url(#ringGlowF)"}),
@@ -1232,7 +1228,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
            React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#556"}},presetsOpen?"▲":"▼")
     ),
     presetsOpen&&React.createElement("div",{style:{padding:"10px 12px",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:6,background:"#07071299"}},
-      CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("div",{key:cm.id,style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("button",{onClick:function(){upHex(savedPresets[cm.id]||MAP_PRESETS[cm.id]);setPresetsOpen(false);},style:{flex:1,padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name),React.createElement("button",{onClick:function(){var updated=Object.assign({},savedPresets);updated[cm.id]=gs.hexMap;setSavedPresets(updated);try{localStorage.setItem("gs_saved_presets",JSON.stringify(updated));}catch(e){}},style:{padding:"5px 8px",background:"#00FFD011",border:"1px solid #00FFD033",color:"#00FFD0",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1,flexShrink:0}},"OVERWRITE"));})
+      CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("div",{key:cm.id,style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("button",{onClick:function(){setGs(function(p){return Object.assign({},p,{hexMap:savedPresets[cm.id]||MAP_PRESETS[cm.id],campaignMap:cm});});setPresetsOpen(false);},style:{flex:1,padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name),React.createElement("button",{onClick:function(){var updated=Object.assign({},savedPresets);updated[cm.id]=gs.hexMap;setSavedPresets(updated);try{localStorage.setItem("gs_saved_presets",JSON.stringify(updated));}catch(e){}},style:{padding:"5px 8px",background:"#00FFD011",border:"1px solid #00FFD033",color:"#00FFD0",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1,flexShrink:0}},"OVERWRITE"));})
     )
   ),
   React.createElement(HexMap,{hexMap:gs.hexMap,phase:ringPhase,setPhase:setRingPhase,gameState:gs,onUpdate:upHex,shipName:gs.ship.name})
