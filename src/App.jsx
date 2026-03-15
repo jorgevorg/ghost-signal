@@ -994,7 +994,6 @@ function HexMap(props){
   var formS=useState({name:"",type:"",notes:"",ships:[]}),setForm=formS[1];var form=formS[0];
   var showIdsS=useState(false),setShowIds=showIdsS[1];var showIds=showIdsS[0];
   var confirmClearS=useState(false),setConfirmClear=confirmClearS[1];var confirmClear=confirmClearS[0];
-var ringPhaseS=useState((function(){try{return localStorage.getItem("gs_ring_phase")||"outer";}catch(e){return "outer";}})()),setRingPhase=ringPhaseS[1];var ringPhase=ringPhaseS[0];
   var cbS=useState(null),setCb=cbS[1];var cb=cbS[0];
   var selS=useState([]),setSel=selS[1];var sel=selS[0];
   var toastS=useState([]),setToast=toastS[1];var toast=toastS[0];
@@ -1148,6 +1147,7 @@ function App(){
  var commsLoadingS=useState(false),setCommsLoading=commsLoadingS[1];var commsLoading=commsLoadingS[0];
  var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
  var histLoadedS=useState(false),setHistLoaded=histLoadedS[1];
+var ringPhaseS=useState((function(){try{return localStorage.getItem("gs_ring_phase")||"outer";}catch(e){return "outer";}})()),setRingPhase=ringPhaseS[1];var ringPhase=ringPhaseS[0];
 
  useEffect(function(){try{localStorage.setItem("gs_ring_phase",ringPhase);}catch(e){};},[ringPhase]);
 useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}catch(e){}setSaved(true);setTimeout(function(){setSaved(false);},1200);},[gs]);
