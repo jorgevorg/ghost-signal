@@ -16,7 +16,7 @@ html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1
 @keyframes shipPulse{0%,100%{filter:drop-shadow(0 0 4px currentColor)}50%{filter:drop-shadow(0 0 12px currentColor)}}
 @keyframes cutMarch{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-24}}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0d0d1a}::-webkit-scrollbar-thumb{background:#FF206044;border-radius:2px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0d0d1a}::-webkit-scrollbar-thumb{background:#FF206044;border-radius:2px} @keyframes ringOrbit{from{stroke-dashoffset:0}to{stroke-dashoffset:-80}} @keyframes missionIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
 @keyframes bootGlow{0%,100%{text-shadow:0 0 30px #FF206066,0 0 60px #FF206022}50%{text-shadow:0 0 80px #FF2060cc,0 0 160px #FF206055}}
 @keyframes scanmove{0%{background-position:0 0}100%{background-position:0 4px}}
 @keyframes bootGlow{0%{opacity:0;filter:brightness(3)}100%{opacity:1;filter:brightness(1)}}
@@ -48,6 +48,11 @@ const CAMPAIGN_MAPS=[
 
 // Ring reference: Ring1=IDs 1-6(1=lower-left CW), Ring2=IDs 7-18, Ring3=IDs 19-36
 const MAP_PRESETS={"01":{"8":{type:"barrier"},"9":{type:"barrier"},"11":{type:"barrier"},"12":{type:"barrier"},"14":{type:"barrier"},"15":{type:"barrier"},"17":{type:"barrier"},"18":{type:"barrier"},"19":{type:"base"},"28":{type:"base"}},"02":{"3":{type:"barrier"},"6":{type:"barrier"},"8":{type:"base"},"11":{type:"barrier"},"14":{type:"base"},"17":{type:"barrier"},"25":{type:"barrier"},"34":{type:"barrier"}},"03":{"11":{type:"base"},"17":{type:"base"},"20":{type:"barrier",name:"Gas Cluster"},"21":{type:"barrier",name:"Ice Particles"},"23":{type:"barrier",name:"Gas Cluster"},"24":{type:"barrier",name:"Gas Cluster"},"26":{type:"barrier",name:"Ice Particles"},"27":{type:"barrier",name:"Gas Cluster"},"29":{type:"barrier",name:"Ice Particles"},"30":{type:"barrier",name:"Ice Particles"},"32":{type:"barrier",name:"Gas Cluster"},"33":{type:"barrier",name:"Ice Particles"},"35":{type:"barrier",name:"Gas Cluster"},"36":{type:"barrier",name:"Gas Cluster"}},"04":{"8":{type:"barrier"},"10":{type:"barrier"},"12":{type:"base"},"14":{type:"barrier"},"16":{type:"barrier"},"18":{type:"base"},"19":{type:"barrier"},"20":{type:"barrier"},"24":{type:"barrier"},"25":{type:"barrier"},"28":{type:"barrier"},"29":{type:"barrier"},"33":{type:"barrier"},"34":{type:"barrier"}},"05":{"7":{type:"barrier"},"9":{type:"barrier"},"10":{type:"barrier"},"12":{type:"barrier"},"13":{type:"barrier"},"15":{type:"barrier"},"16":{type:"barrier"},"18":{type:"barrier"},"23":{type:"barrier"},"25":{type:"base"},"27":{type:"barrier"},"32":{type:"barrier"},"34":{type:"base"},"36":{type:"barrier"}},"06":{"7":{type:"barrier"},"11":{type:"barrier"},"12":{type:"barrier"},"13":{type:"barrier"},"17":{type:"barrier"},"18":{type:"barrier"},"19":{type:"barrier"},"22":{type:"base"},"25":{type:"barrier"},"26":{type:"barrier"},"27":{type:"barrier"},"28":{type:"barrier"},"31":{type:"base"},"34":{type:"barrier"},"35":{type:"barrier"},"36":{type:"barrier"}},"07":{"8":{type:"barrier"},"10":{type:"barrier"},"12":{type:"barrier"},"14":{type:"barrier"},"16":{type:"barrier"},"18":{type:"barrier"},"22":{type:"base"},"28":{type:"base"},"34":{type:"base"}},"08":{"7":{type:"barrier"},"9":{type:"barrier"},"10":{type:"base"},"11":{type:"barrier"},"13":{type:"barrier"},"14":{type:"base"},"15":{type:"barrier"},"17":{type:"barrier"},"18":{type:"base"},"23":{type:"barrier"},"24":{type:"barrier"},"29":{type:"barrier"},"30":{type:"barrier"},"35":{type:"barrier"},"36":{type:"barrier"}},"09":{"1":{type:"barrier"},"3":{type:"barrier"},"5":{type:"barrier"},"7":{type:"barrier"},"9":{type:"base"},"11":{type:"barrier"},"13":{type:"base"},"15":{type:"barrier"},"17":{type:"base"},"19":{type:"barrier"},"25":{type:"barrier"},"31":{type:"barrier"}},"10":{"1":{type:"barrier"},"2":{type:"base"},"3":{type:"barrier"},"4":{type:"base"},"5":{type:"barrier"},"6":{type:"base"},"7":{type:"barrier"},"9":{type:"barrier"},"11":{type:"barrier"},"13":{type:"barrier"},"15":{type:"barrier"},"17":{type:"barrier"}},"11":{"1":{type:"base"},"2":{type:"barrier"},"3":{type:"base"},"4":{type:"barrier"},"5":{type:"base"},"6":{type:"barrier"}},"12":{"3":{name:"Ring Settlement Beta",notes:"Hollow carbon ring torus"},"7":{type:"barrier"},"8":{type:"barrier",name:"Ring Torus"},"9":{type:"base"},"10":{type:"barrier",name:"Ring Torus"},"11":{type:"barrier",name:"Ring Torus"},"12":{type:"barrier",name:"Ring Torus"},"13":{type:"base"},"14":{type:"barrier"},"15":{type:"barrier"},"16":{type:"barrier"},"17":{type:"base"},"18":{type:"barrier"}}};
+const RING_PHASES=[
+  {id:"outer",label:"OUTER RING",c:"#00FFD0",die:6,desc:"Outer reaches — pirates, outlaws, asteroid fields. Dangerous but traversable."},
+  {id:"mid",  label:"MID RING",  c:"#FFD166",die:8,desc:"Mid zone — former settlements, research posts, water worlds. Escalating stakes."},
+  {id:"inner",label:"INNER RING",c:"#FF6B35",die:12,desc:"Inner core — solar flares, Helios Farms, extreme heat. This is the end game."},
+];
 const BARRIER_C="#FF8C00",BASE_C="#cc88ff";const IC={settlement:"#FFD166",research:"#aaaaff",flare:"#FF6B35",helios:"#FFE566",asteroid:"#998877",starcruiser:"#cc88ff",pirate:"#FF2060",barrier:BARRIER_C,base:BASE_C};
 const SHIP_COLORS={seance:"#FF2060",twinrotor:"#FFB84D",snowstorm:"#00E5FF",epsilon:"#7EC8E3",voyager:"#FF8C42",orionmoth:"#80DD44",eclipsewarden:"#CC88FF"};
 const HEX_SYMBOLS={small:"◉",medium:"◉",giant:"◉",medium_moon1:"◉",medium_moon2:"◉",ring:"◎",void:"○",settlement:"⏣",research:"⌖",flare:"☢",asteroid:"✸",helios:"⍟",starcruiser:"⯅",pirate:"☠",twinrotor:"⯅",snowstorm:"⯅",epsilon:"⯅",voyager:"⯅",orionmoth:"⯅",eclipsewarden:"⯅",barrier:"⬡",base:"⬡"};
@@ -863,8 +868,122 @@ function CommsTab(props){
 }
 
 // ── APP ────────────────────────────────────────────────────────────────────
+function MissionPanel(props){
+  var gs=props.gameState||INIT,phase=props.phase||"outer",setPhase=props.setPhase||function(){};
+  var colS=useState(false),setCol=colS[1];var col=colS[0];
+  var rp=RING_PHASES.find(function(r){return r.id===phase;})||RING_PHASES[0];
+  var ac=rp.c;
+  var ship=gs.ship||mkS();
+  var shipEntry=Object.entries(gs.hexMap||{}).find(function(e){return e[1]&&e[1].ship;});
+  var shipHex=shipEntry?shipEntry[0]:null;
+  var shipHexData=shipEntry?shipEntry[1]:null;
+  var shipHexLabel=shipHexData&&shipHexData.name?shipHexData.name:(shipHex?"HEX-"+String(shipHex).padStart(3,"0"):"UNKNOWN");
+  var shipHexType=shipHexData&&shipHexData.type?(TYPE_LABELS[shipHexData.type]||shipHexData.type.toUpperCase()):"";
+  var cm=gs.campaignMap;
+  var hullC=ship.hull/ship.hullMax>0.5?"#00FFD0":ship.hull/ship.hullMax>0.25?"#FFD166":"#FF2060";
+  var fuelC=ship.fuel/ship.fuelMax>0.5?"#aaaaff":ship.fuel/ship.fuelMax>0.25?"#FFD166":"#FF2060";
+  var StatBar=function(label,val,max,c){
+    return React.createElement("div",{style:{marginBottom:8}},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#aaa",letterSpacing:2}},label),
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:c}},val+"/"+max)
+      ),
+      React.createElement("div",{style:{height:4,background:"#1a1a2e",borderRadius:2,overflow:"hidden"}},
+        React.createElement("div",{style:{width:Math.max(0,Math.min(100,(val/max)*100))+"%",height:"100%",background:c,borderRadius:2,transition:"width .4s",boxShadow:"0 0 5px "+c+"66"}})
+      )
+    );
+  };
+  var RADII=[34,22,10];
+  var RingSVG=React.createElement("svg",{width:76,height:76,viewBox:"0 0 76 76",style:{flexShrink:0}},
+    React.createElement("defs",null,
+      React.createElement("filter",{id:"ringGlowF",x:"-40%",y:"-40%",width:"180%",height:"180%"},
+        React.createElement("feGaussianBlur",{stdDeviation:"2.5",result:"blur"}),
+        React.createElement("feMerge",null,React.createElement("feMergeNode",{in:"blur"}),React.createElement("feMergeNode",{in:"SourceGraphic"}))
+      )
+    ),
+    RADII.map(function(r,i){
+      var pid=["outer","mid","inner"][i];
+      var active=phase===pid;
+      var rc=RING_PHASES[i].c;
+      return React.createElement("g",{key:i},
+        React.createElement("circle",{cx:38,cy:38,r:r,fill:"none",stroke:active?rc+"33":"#ffffff08",strokeWidth:active?1.5:1}),
+        active&&React.createElement("circle",{cx:38,cy:38,r:r,fill:"none",stroke:rc,strokeWidth:2,
+          strokeDasharray:Math.round(r*1.1)+" "+Math.round(r*0.55),
+          style:{animation:"ringOrbit "+(5+i*1.5)+"s linear infinite",transformOrigin:"38px 38px",filter:"drop-shadow(0 0 3px "+rc+")"}}),
+        active&&React.createElement("circle",{cx:38+r,cy:38,r:2.5,fill:"#FF2060",
+          style:{animation:"pulse 1.5s ease-in-out infinite",filter:"drop-shadow(0 0 5px #FF2060)"}})
+      );
+    }),
+    React.createElement("circle",{cx:38,cy:38,r:5,fill:"#FF4070",opacity:0.85,filter:"url(#ringGlowF)"}),
+    React.createElement("circle",{cx:38,cy:38,r:2.5,fill:"#ff9090"})
+  );
+  return React.createElement("div",{style:{position:"absolute",left:12,top:12,width:col?34:252,zIndex:20,
+      background:"rgba(7,7,18,0.96)",border:"1px solid "+ac+"44",borderRadius:8,
+      boxShadow:"0 0 28px "+ac+"0c",transition:"width 0.25s",overflow:"hidden",animation:"missionIn 0.35s ease"}},
+    React.createElement("div",{onClick:function(){setCol(!col);},
+      style:{padding:"9px 11px",display:"flex",justifyContent:col?"center":"space-between",alignItems:"center",
+        cursor:"pointer",borderBottom:col?"none":"1px solid "+B2,background:ac+"07",gap:6}},
+      !col&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:7}},
+        React.createElement("div",{style:{width:6,height:6,borderRadius:"50%",background:ac,
+          boxShadow:"0 0 6px "+ac,animation:"pulse 2s infinite",flexShrink:0}}),
+        React.createElement("span",{style:{fontFamily:ORB,fontSize:8,color:ac,letterSpacing:3,whiteSpace:"nowrap"}},"MISSION STATUS")
+      ),
+      React.createElement("span",{style:{color:ac+"99",fontSize:9,fontFamily:MONO,flexShrink:0}},col?"▶":"◀")
+    ),
+    !col&&React.createElement("div",{style:{padding:"12px 13px"}},
+      React.createElement("div",{style:{display:"flex",gap:10,alignItems:"center",marginBottom:10}},
+        RingSVG,
+        React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",gap:2}},
+          RING_PHASES.map(function(r){
+            var a=r.id===phase;
+            return React.createElement("div",{key:r.id,onClick:function(){setPhase(r.id);},
+              style:{display:"flex",alignItems:"center",gap:5,padding:"3px 6px",borderRadius:3,cursor:"pointer",
+                background:a?r.c+"18":"transparent",border:"1px solid "+(a?r.c+"40":"transparent"),transition:"all 0.15s"}},
+              React.createElement("div",{style:{width:5,height:5,borderRadius:"50%",background:a?r.c:"#2a2a3a",
+                boxShadow:a?"0 0 5px "+r.c:"none",flexShrink:0,transition:"all 0.15s"}}),
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:7.5,color:a?r.c:"#556",letterSpacing:1.2,flex:1}},r.label),
+              a&&React.createElement("span",{style:{fontFamily:MONO,fontSize:7,color:r.c+"77",letterSpacing:1}},"d"+r.die)
+            );
+          })
+        )
+      ),
+      React.createElement("div",{style:{fontFamily:RAJ,fontSize:11.5,color:"#778",lineHeight:1.55,
+          marginBottom:10,paddingLeft:8,borderLeft:"2px solid "+ac+"33",fontStyle:"italic"}},rp.desc),
+      cm?React.createElement("div",{style:{background:ac+"09",border:"1px solid "+ac+"28",borderRadius:5,
+          padding:"9px 11px",marginBottom:10}},
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:ac+"77",letterSpacing:2.5,marginBottom:4}},"MAP CONFIG"),
+        React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:ac,letterSpacing:2.5,marginBottom:5}},cm.name),
+        React.createElement("div",{style:{fontFamily:RAJ,fontSize:11.5,color:"#999",lineHeight:1.55}},cm.desc)
+      ):React.createElement("div",{style:{background:"#ffffff03",border:"1px solid "+B1,borderRadius:5,
+          padding:"9px 11px",marginBottom:10,fontFamily:MONO,fontSize:9,color:"#445",textAlign:"center",letterSpacing:1.5}},
+        "// NO MAP LOADED"),
+      React.createElement("div",{style:{borderTop:"1px solid "+B2,marginBottom:10}}),
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:9}},
+        React.createElement("div",{style:{width:5,height:5,borderRadius:"50%",background:"#FF2060",
+          boxShadow:"0 0 5px #FF2060",animation:"pulse 2.5s infinite"}}),
+        React.createElement("span",{style:{fontFamily:ORB,fontSize:9,color:"#FF2060",letterSpacing:1.5,
+          overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},(ship.name||"THE INDESTRUCTIBLE II"))
+      ),
+      StatBar("HULL",ship.hull,ship.hullMax,hullC),
+      StatBar("FUEL",ship.fuel,ship.fuelMax,fuelC),
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",
+          padding:"5px 8px",background:"#FFD16607",border:"1px solid #FFD16620",borderRadius:4,marginBottom:10}},
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#aaa",letterSpacing:2}},"SCRAPS"),
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:"#FFD166"}},(ship.scraps||0)+"\u223f")
+      ),
+      React.createElement("div",{style:{padding:"7px 9px",background:shipHex?"#FF206007":"#ffffff03",
+          border:"1px solid "+(shipHex?"#FF206028":B1),borderRadius:4}},
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:shipHex?"#FF206077":"#445",letterSpacing:2.5,marginBottom:shipHex?3:0}},"CURRENT POSITION"),
+        shipHex?React.createElement("div",null,
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#FF2060"}},shipHexLabel),
+          shipHexType&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#888",marginTop:1}},shipHexType)
+        ):React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#445",letterSpacing:1}},"// UNKNOWN")
+      )
+    )
+  );
+}
 function HexMap(props){
-  var hexMap=props.hexMap,onUpdate=props.onUpdate,shipName=props.shipName||"THE INDESTRUCTIBLE II";
+  var hexMap=props.hexMap,onUpdate=props.onUpdate,shipName=props.shipName||"THE INDESTRUCTIBLE II",phase=props.phase||"outer",setPhase=props.setPhase||function(){},gsForPanel=props.gameState||INIT;
   var mapZoomS=useState(1),setMapZoom=mapZoomS[1];var mapZoom=mapZoomS[0];
   var handleWheel=function(e){e.preventDefault();setMapZoom(function(z){var next=z-(e.deltaY*0.001);return Math.min(Math.max(next,0.4),3);});};
   var edS=useState(null),setEd=edS[1];var ed=edS[0];
@@ -875,6 +994,7 @@ function HexMap(props){
   var formS=useState({name:"",type:"",notes:"",ships:[]}),setForm=formS[1];var form=formS[0];
   var showIdsS=useState(false),setShowIds=showIdsS[1];var showIds=showIdsS[0];
   var confirmClearS=useState(false),setConfirmClear=confirmClearS[1];var confirmClear=confirmClearS[0];
+var ringPhaseS=useState((function(){try{return localStorage.getItem("gs_ring_phase")||"outer";}catch(e){return "outer";}})()),setRingPhase=ringPhaseS[1];var ringPhase=ringPhaseS[0];
   var cbS=useState(null),setCb=cbS[1];var cb=cbS[0];
   var selS=useState([]),setSel=selS[1];var sel=selS[0];
   var toastS=useState([]),setToast=toastS[1];var toast=toastS[0];
@@ -930,7 +1050,8 @@ function HexMap(props){
   var hovData=hov!==null?(hexMap[hov]||null):null;
   var hovAccent=hovData&&hovData.type&&IC[hovData.type]?IC[hovData.type]:hovData&&SHIP_COLORS[hovData.type]?SHIP_COLORS[hovData.type]:"#99aabb";
   return React.createElement("div",{ref:mapRef,style:{position:"relative",borderRadius:12,border:"1px solid "+B3,overflow:"hidden",background:"transparent",height:"calc(100vh / 1.15 - 300px)"},onClick:function(){setCtx(null);}},
-    React.createElement("div",{style:{position:"absolute",top:10,left:12,zIndex:30,display:"flex",gap:8}},
+    React.createElement(MissionPanel,{gameState:gsForPanel,phase:phase,setPhase:setPhase}),
+React.createElement("div",{style:{position:"absolute",top:10,right:12,zIndex:30,display:"flex",gap:8}},
       React.createElement("button",{onClick:function(){setShowIds(!showIds);},style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:showIds?"#7744cc33":"transparent",border:"1px solid "+(showIds?"#9966cc":B3),color:showIds?"#cc88ff":"#aaa",borderRadius:4,cursor:"pointer",letterSpacing:2}},showIds?"HIDE IDs":"SHOW IDs"),React.createElement("button",{onClick:function(){setConfirmClear(true);},style:{padding:"5px 12px",background:"#FF206018",border:"1px solid #FF206055",color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,animation:"dangerPulse 1.8s ease-in-out infinite"}},"⚠ CLEAR MAP"),
       sel.length>0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:"#cc88ff22",border:"1px solid #cc88ff55",color:"#cc88ff",borderRadius:4,letterSpacing:1}},sel.length+" SELECTED")
     ),
@@ -1028,7 +1149,8 @@ function App(){
  var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
  var histLoadedS=useState(false),setHistLoaded=histLoadedS[1];
 
- useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}catch(e){}setSaved(true);setTimeout(function(){setSaved(false);},1200);},[gs]);
+ useEffect(function(){try{localStorage.setItem("gs_ring_phase",ringPhase);}catch(e){};},[ringPhase]);
+useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}catch(e){}setSaved(true);setTimeout(function(){setSaved(false);},1200);},[gs]);
  useEffect(function(){
   (async function(){
    try{var r=localStorage.getItem("gs_comms");if(r){var sv=JSON.parse(r);if(sv&&sv.length>0)setComms(sv);}}catch(e){}finally{setHistLoaded(true);}
@@ -1113,7 +1235,7 @@ function App(){
       CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("div",{key:cm.id,style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("button",{onClick:function(){upHex(savedPresets[cm.id]||MAP_PRESETS[cm.id]);setPresetsOpen(false);},style:{flex:1,padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name),React.createElement("button",{onClick:function(){var updated=Object.assign({},savedPresets);updated[cm.id]=gs.hexMap;setSavedPresets(updated);try{localStorage.setItem("gs_saved_presets",JSON.stringify(updated));}catch(e){}},style:{padding:"5px 8px",background:"#00FFD011",border:"1px solid #00FFD033",color:"#00FFD0",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1,flexShrink:0}},"OVERWRITE"));})
     )
   ),
-  React.createElement(HexMap,{hexMap:gs.hexMap,onUpdate:upHex,shipName:gs.ship.name})
+  React.createElement(HexMap,{hexMap:gs.hexMap,phase:ringPhase,setPhase:setRingPhase,gameState:gs,onUpdate:upHex,shipName:gs.ship.name})
 ),
      tab==="CREW"&&React.createElement("div",{style:{overflowY:"auto",maxHeight:"calc(100vh / 1.15 - 120px)",paddingRight:4}},
       React.createElement("div",{style:{display:"flex",gap:16,flexWrap:"wrap",marginBottom:24}},
