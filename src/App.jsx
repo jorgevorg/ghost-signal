@@ -133,145 +133,25 @@ function HexIcon(props){
  React.createElement("rect",{x:-5,y:7,width:4,height:5,rx:1.5,fill:"#FF2060",opacity:.9}),
  React.createElement("rect",{x:1,y:7,width:4,height:5,rx:1.5,fill:"#FF2060",opacity:.9})
 );
-if(SHIP_COLORS[t]){var sc=SHIP_COLORS[t];
- if(t==="twinrotor") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("rect",{x:-7,y:-7,width:14,height:14,rx:2.5,fill:sc,opacity:.88}),
-  React.createElement("polygon",{points:"0,-13 -4.5,-7 4.5,-7",fill:sc,opacity:.9}),
-  React.createElement("ellipse",{cx:-13,cy:3,rx:5,ry:7,fill:sc,opacity:.85}),
-  React.createElement("ellipse",{cx:13,cy:3,rx:5,ry:7,fill:sc,opacity:.85}),
-  React.createElement("ellipse",{cx:-13,cy:8,rx:2.5,ry:1.8,fill:"#ffffff",opacity:.28}),
-  React.createElement("ellipse",{cx:13,cy:8,rx:2.5,ry:1.8,fill:"#ffffff",opacity:.28})
- );
- if(t==="snowstorm") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-15 -19,10 19,10",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,-15 -1.5,5 1.5,5",fill:"#ffffff",opacity:.45}),
-  React.createElement("rect",{x:-14,y:8,width:5,height:4,rx:1,fill:sc,opacity:.85}),
-  React.createElement("rect",{x:-3,y:8,width:6,height:4,rx:1,fill:sc,opacity:.85}),
-  React.createElement("rect",{x:9,y:8,width:5,height:4,rx:1,fill:sc,opacity:.85})
- );
- if(t==="epsilon") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-18 -3.5,12 3.5,12",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"-3.5,1 -14,11 -3.5,11",fill:sc,opacity:.78}),
-  React.createElement("polygon",{points:"3.5,1 14,11 3.5,11",fill:sc,opacity:.78}),
-  React.createElement("ellipse",{cx:0,cy:13,rx:3,ry:2,fill:"#ffffff",opacity:.28})
- );
- if(t==="voyager") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-16 -5,8 5,8",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"-5,-2 -15,8 -5,8",fill:sc,opacity:.84}),
-  React.createElement("polygon",{points:"5,-2 15,8 5,8",fill:sc,opacity:.84}),
-  React.createElement("polygon",{points:"-2,8 -7,15 -2,15",fill:sc,opacity:.78}),
-  React.createElement("polygon",{points:"2,8 7,15 2,15",fill:sc,opacity:.78}),
-  React.createElement("ellipse",{cx:0,cy:-8,rx:2,ry:3.5,fill:"#ffffff",opacity:.32})
- );
- if(t==="orionmoth") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("ellipse",{cx:0,cy:0,rx:3,ry:11,fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,-8 -18,-2 -6,6",fill:sc,opacity:.8}),
-  React.createElement("polygon",{points:"0,-8 18,-2 6,6",fill:sc,opacity:.8}),
-  React.createElement("polygon",{points:"-2,5 -11,13 -3,13",fill:sc,opacity:.72}),
-  React.createElement("polygon",{points:"2,5 11,13 3,13",fill:sc,opacity:.72})
- );
- if(t==="eclipsewarden") return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"bb)"},
-  React.createElement("polygon",{points:"0,-13 -11,0 -9,12 9,12 11,0",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,-13 -3,-3 3,-3",fill:"#ffffff",opacity:.38}),
-  React.createElement("polygon",{points:"-11,0 -22,6 -9,12",fill:sc,opacity:.8}),
-  React.createElement("polygon",{points:"11,0 22,6 9,12",fill:sc,opacity:.8}),
-  React.createElement("rect",{x:-8,y:10,width:5,height:4,rx:1,fill:sc,opacity:.9}),
-  React.createElement("rect",{x:3,y:10,width:5,height:4,rx:1,fill:sc,opacity:.9})
- );
- if(t==="vectorace") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-13 -2,8 2,8",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,-9 -13,7 -2,7",fill:sc,opacity:.85}),
-  React.createElement("polygon",{points:"0,-9 13,7 2,7",fill:sc,opacity:.85}),
-  React.createElement("rect",{x:-4,y:6,width:3,height:4,rx:1,fill:sc,opacity:.9}),
-  React.createElement("rect",{x:1,y:6,width:3,height:4,rx:1,fill:sc,opacity:.9})
- );
- if(t==="duskwing") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 6px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-15 -2.5,10 2.5,10",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,-10 -17,9 -3,9",fill:sc,opacity:.86}),
-  React.createElement("polygon",{points:"0,-10 17,9 3,9",fill:sc,opacity:.86}),
-  React.createElement("rect",{x:-5,y:7,width:4,height:5,rx:1.5,fill:sc,opacity:.9}),
-  React.createElement("rect",{x:1,y:7,width:4,height:5,rx:1.5,fill:sc,opacity:.9})
- );
- if(t==="smuggler") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-10 -17,6 17,6",fill:sc,opacity:.9}),
-  React.createElement("ellipse",{cx:0,cy:-3,rx:3.5,ry:2.5,fill:"#ffffff",opacity:.3}),
-  React.createElement("rect",{x:-15,y:4,width:5,height:5,rx:1.5,fill:sc,opacity:.88}),
-  React.createElement("rect",{x:10,y:4,width:5,height:5,rx:1.5,fill:sc,opacity:.88})
- );
- if(t==="scarab") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("ellipse",{cx:0,cy:2,rx:9,ry:10,fill:sc,opacity:.88}),
-  React.createElement("ellipse",{cx:0,cy:-4,rx:5,ry:4,fill:sc,opacity:.95}),
-  React.createElement("polygon",{points:"0,-12 -3,-8 3,-8",fill:"#ffffff",opacity:.35}),
-  React.createElement("rect",{x:-7,y:9,width:5,height:4,rx:1,fill:sc,opacity:.9}),
-  React.createElement("rect",{x:2,y:9,width:5,height:4,rx:1,fill:sc,opacity:.9})
- );
- if(t==="mantis") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-17 -2.5,12 2.5,12",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,-8 -16,-2 -6,5",fill:sc,opacity:.82}),
-  React.createElement("polygon",{points:"0,-8 16,-2 6,5",fill:sc,opacity:.82}),
-  React.createElement("ellipse",{cx:0,cy:13,rx:3,ry:2,fill:"#ffffff",opacity:.28})
- );
- if(t==="beluga") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("ellipse",{cx:0,cy:2,rx:11,ry:9,fill:sc,opacity:.88}),
-  React.createElement("polygon",{points:"0,-13 -4,-4 4,-4",fill:sc,opacity:.9}),
-  React.createElement("ellipse",{cx:-10,cy:7,rx:4,ry:3,fill:sc,opacity:.85}),
-  React.createElement("ellipse",{cx:10,cy:7,rx:4,ry:3,fill:sc,opacity:.85}),
-  React.createElement("ellipse",{cx:-10,cy:9,rx:2,ry:1.5,fill:"#ffffff",opacity:.25}),
-  React.createElement("ellipse",{cx:10,cy:9,rx:2,ry:1.5,fill:"#ffffff",opacity:.25})
- );
- if(t==="starpredator") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"bb)"},
-  React.createElement("polygon",{points:"0,-18 -3.5,13 3.5,13",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"-3.5,-3 -18,11 -3.5,11",fill:sc,opacity:.84}),
-  React.createElement("polygon",{points:"3.5,-3 18,11 3.5,11",fill:sc,opacity:.84}),
-  React.createElement("polygon",{points:"-2,11 -7,18 -2,18",fill:sc,opacity:.78}),
-  React.createElement("polygon",{points:"2,11 7,18 2,18",fill:sc,opacity:.78}),
-  React.createElement("ellipse",{cx:0,cy:-10,rx:1.8,ry:3.5,fill:"#ffffff",opacity:.35})
- );
- if(t==="shell4") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-13 -13,2 -11,13 11,13 13,2",fill:sc,opacity:.88}),
-  React.createElement("polygon",{points:"0,-13 -3,-4 3,-4",fill:"#ffffff",opacity:.3}),
-  React.createElement("polygon",{points:"-13,2 -21,7 -11,13",fill:sc,opacity:.82}),
-  React.createElement("polygon",{points:"13,2 21,7 11,13",fill:sc,opacity:.82}),
-  React.createElement("rect",{x:-8,y:11,width:6,height:4,rx:1,fill:sc,opacity:.9}),
-  React.createElement("rect",{x:2,y:11,width:6,height:4,rx:1,fill:sc,opacity:.9})
- );
- if(t==="theclaw") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 6px "+sc+"bb)"},
-  React.createElement("rect",{x:-7,y:-4,width:14,height:12,rx:2,fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,-12 -4,-4 4,-4",fill:sc,opacity:.95}),
-  React.createElement("polygon",{points:"-7,0 -20,10 -7,16",fill:sc,opacity:.85}),
-  React.createElement("polygon",{points:"7,0 20,10 7,16",fill:sc,opacity:.85}),
-  React.createElement("polygon",{points:"-20,10 -23,18 -14,18",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"20,10 23,18 14,18",fill:sc,opacity:.9})
- );
- if(t==="stingray") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-13 -21,3 0,13 21,3",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,13 -2,20 2,20",fill:sc,opacity:.8}),
-  React.createElement("ellipse",{cx:0,cy:-2,rx:4,ry:5,fill:"#ffffff",opacity:.28})
- );
- if(t==="edgecharger") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"99)"},
-  React.createElement("rect",{x:-10,y:-5,width:20,height:14,rx:2.5,fill:sc,opacity:.88}),
-  React.createElement("polygon",{points:"0,-12 -5,-5 5,-5",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"-10,-5 -18,-10 -10,-1",fill:sc,opacity:.85}),
-  React.createElement("polygon",{points:"10,-5 18,-10 10,-1",fill:sc,opacity:.85}),
-  React.createElement("ellipse",{cx:-7,cy:11,rx:3,ry:2,fill:"#ffffff",opacity:.28}),
-  React.createElement("ellipse",{cx:0,cy:11,rx:3,ry:2,fill:"#ffffff",opacity:.28}),
-  React.createElement("ellipse",{cx:7,cy:11,rx:3,ry:2,fill:"#ffffff",opacity:.28})
- );
- if(t==="tarrasque") return React.createElement("g",{transform:"translate("+x+","+y+") scale(1.22)",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 7px "+sc+"cc)"},
-  React.createElement("polygon",{points:"0,-14 -15,-3 -13,13 13,13 15,-3",fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"0,-14 -4,-2 4,-2",fill:"#ffffff",opacity:.35}),
-  React.createElement("polygon",{points:"-15,-3 -25,3 -13,13",fill:sc,opacity:.82}),
-  React.createElement("polygon",{points:"15,-3 25,3 13,13",fill:sc,opacity:.82}),
-  React.createElement("rect",{x:-10,y:11,width:7,height:5,rx:1,fill:sc,opacity:.9}),
-  React.createElement("rect",{x:3,y:11,width:7,height:5,rx:1,fill:sc,opacity:.9}),
-  React.createElement("polygon",{points:"-8,14 -12,21 -8,21",fill:sc,opacity:.8}),
-  React.createElement("polygon",{points:"8,14 12,21 8,21",fill:sc,opacity:.8})
- );
- return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},
-  React.createElement("polygon",{points:"0,-12 -8,8 8,8",fill:sc,opacity:.88}),
-  React.createElement("rect",{x:-9,y:6,width:4,height:5,rx:1,fill:sc,opacity:.8}),
-  React.createElement("rect",{x:5,y:6,width:4,height:5,rx:1,fill:sc,opacity:.8})
- );}
+if(t==="twinrotor"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("ellipse",{cx:0,cy:-2,rx:5,ry:11,fill:sc,opacity:.9}),React.createElement("rect",{x:-14,y:-5,width:28,height:2,rx:1,fill:sc,opacity:.75}),React.createElement("circle",{cx:-14,cy:-4,r:4,fill:"none",stroke:sc,strokeWidth:1.5}),React.createElement("circle",{cx:14,cy:-4,r:4,fill:"none",stroke:sc,strokeWidth:1.5}),React.createElement("path",{d:"M-6,7 Q0,13 6,7",fill:sc,opacity:.85,stroke:sc,strokeWidth:1}),React.createElement("rect",{x:-4,y:-14,width:2,height:4,fill:sc}),React.createElement("rect",{x:2,y:-14,width:2,height:4,fill:sc}));}
+if(t==="snowstorm"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("polygon",{points:"0,-15 -13,8 -7,3 7,3 13,8",fill:sc,opacity:.9}),React.createElement("polygon",{points:"0,-15 -2,2 2,2",fill:"#ffffff",opacity:.2}),React.createElement("ellipse",{cx:-8,cy:4,rx:2,ry:3,fill:"#0a0a14",opacity:.7}),React.createElement("ellipse",{cx:8,cy:4,rx:2,ry:3,fill:"#0a0a14",opacity:.7}));}
+if(t==="epsilon"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("rect",{x:-2,y:-15,width:4,height:30,rx:1,fill:sc,opacity:.9}),React.createElement("rect",{x:-14,y:-4,width:28,height:5,rx:1,fill:sc,opacity:.85}),React.createElement("rect",{x:-4,y:-15,width:8,height:9,rx:1,fill:sc}),React.createElement("polygon",{points:"-14,-1 -19,-1 -16,2",fill:sc,opacity:.7}),React.createElement("polygon",{points:"14,-1 19,-1 16,2",fill:sc,opacity:.7}),React.createElement("rect",{x:-1,y:10,width:2,height:5,fill:sc,opacity:.7}));}
+if(t==="voyager"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("rect",{x:-15,y:-7,width:30,height:5,rx:1,fill:sc,opacity:.85}),React.createElement("ellipse",{cx:-15,cy:-4,rx:3,ry:6,fill:sc,opacity:.9}),React.createElement("ellipse",{cx:15,cy:-4,rx:3,ry:6,fill:sc,opacity:.9}),React.createElement("rect",{x:-6,y:-13,width:12,height:8,rx:1,fill:sc}),React.createElement("rect",{x:-2,y:-2,width:4,height:13,rx:1,fill:sc,opacity:.8}),React.createElement("rect",{x:-5,y:9,width:2,height:1,fill:sc,opacity:.5}),React.createElement("rect",{x:3,y:9,width:2,height:1,fill:sc,opacity:.5}));}
+if(t==="orionmoth"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("ellipse",{cx:0,cy:1,rx:13,ry:9,fill:sc,opacity:.9}),React.createElement("circle",{cx:0,cy:1,r:4,fill:"#0a0a14",opacity:.65}),React.createElement("path",{d:"M-6,8 Q0,14 6,8",fill:sc,opacity:.85,stroke:sc,strokeWidth:1.5}),React.createElement("polygon",{points:"-5,-8 -9,-13 -3,-9",fill:sc}),React.createElement("polygon",{points:"5,-8 9,-13 3,-9",fill:sc}));}
+if(t==="eclipsewarden"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("rect",{x:-1,y:-18,width:2,height:13,fill:sc}),React.createElement("circle",{cx:0,cy:-3,r:5,fill:sc,opacity:.95}),React.createElement("path",{d:"M-3,-14 A12,14 0 0,0 -3,10",fill:"none",stroke:sc,strokeWidth:2.5}),React.createElement("path",{d:"M3,-14 A12,14 0 0,1 3,10",fill:"none",stroke:sc,strokeWidth:2.5}),React.createElement("line",{x1:-4,y1:8,x2:-7,y2:13,stroke:sc,strokeWidth:1.5}),React.createElement("line",{x1:4,y1:8,x2:7,y2:13,stroke:sc,strokeWidth:1.5}),React.createElement("line",{x1:-2,y1:10,x2:-4,y2:15,stroke:sc,strokeWidth:1}),React.createElement("line",{x1:2,y1:10,x2:4,y2:15,stroke:sc,strokeWidth:1}));}
+if(t==="vectorace"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("polygon",{points:"0,-14 -3,8 3,8",fill:sc,opacity:.9}),React.createElement("ellipse",{cx:-7,cy:2,rx:2.5,ry:8,fill:sc,opacity:.8}),React.createElement("ellipse",{cx:7,cy:2,rx:2.5,ry:8,fill:sc,opacity:.8}),React.createElement("polygon",{points:"-4,-5 -7,-10 -4,0",fill:sc}),React.createElement("polygon",{points:"4,-5 7,-10 4,0",fill:sc}));}
+if(t==="smuggler"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("polygon",{points:"-13,-12 -8,-12 -8,9 -11,13 -13,8",fill:sc,opacity:.9}),React.createElement("polygon",{points:"8,-12 13,-12 13,8 11,13 8,9",fill:sc,opacity:.9}),React.createElement("rect",{x:-8,y:-5,width:16,height:4,rx:1,fill:sc,opacity:.8}));}
+if(t==="duskwing"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("polygon",{points:"0,-14 -2,6 2,6",fill:sc,opacity:.95}),React.createElement("polygon",{points:"-2,-2 -13,10 -10,10 -8,6 -5,8 -2,4",fill:sc,opacity:.9}),React.createElement("polygon",{points:"2,-2 13,10 10,10 8,6 5,8 2,4",fill:sc,opacity:.9}),React.createElement("line",{x1:-13,y1:10,x2:-13,y2:7,stroke:sc,strokeWidth:1.5}),React.createElement("line",{x1:13,y1:10,x2:13,y2:7,stroke:sc,strokeWidth:1.5}));}
+if(t==="scarab"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("ellipse",{cx:-9,cy:0,rx:5,ry:12,fill:sc,opacity:.6}),React.createElement("ellipse",{cx:9,cy:0,rx:5,ry:12,fill:sc,opacity:.6}),React.createElement("ellipse",{cx:0,cy:0,rx:5,ry:8,fill:sc,opacity:.95}),React.createElement("circle",{cx:0,cy:0,r:2,fill:"#0a0a14",opacity:.55}));}
+if(t==="mantis"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("polygon",{points:"0,-15 -1,-5 1,-5",fill:sc}),React.createElement("polygon",{points:"-3,-13 -5,-5 -1,-6",fill:sc,opacity:.9}),React.createElement("polygon",{points:"3,-13 5,-5 1,-6",fill:sc,opacity:.9}),React.createElement("polygon",{points:"-7,-10 -10,-4 -3,-6",fill:sc,opacity:.8}),React.createElement("polygon",{points:"7,-10 10,-4 3,-6",fill:sc,opacity:.8}),React.createElement("rect",{x:-3,y:-5,width:6,height:12,rx:1,fill:sc,opacity:.9}),React.createElement("rect",{x:-6,y:-2,width:3,height:8,rx:1,fill:sc,opacity:.75}),React.createElement("rect",{x:3,y:-2,width:3,height:8,rx:1,fill:sc,opacity:.75}),React.createElement("polygon",{points:"0,7 -2,14 2,14",fill:sc}));}
+if(t==="beluga"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("rect",{x:-9,y:-15,width:18,height:8,rx:2,fill:sc}),React.createElement("rect",{x:-8,y:-7,width:3,height:2,fill:sc,opacity:.6}),React.createElement("rect",{x:5,y:-7,width:3,height:2,fill:sc,opacity:.6}),React.createElement("rect",{x:-4,y:-7,width:8,height:18,fill:sc,opacity:.85}),React.createElement("rect",{x:-6,y:-4,width:2,height:12,fill:sc,opacity:.4}),React.createElement("rect",{x:4,y:-4,width:2,height:12,fill:sc,opacity:.4}),React.createElement("polygon",{points:"-5,11 -7,16 0,18 7,16 5,11",fill:sc,opacity:.9}));}
+if(t==="starpredator"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("polygon",{points:"0,-16 -2,4 2,4",fill:sc}),React.createElement("rect",{x:-3,y:-4,width:6,height:16,rx:1,fill:sc,opacity:.9}),React.createElement("polygon",{points:"-2,-2 -15,8 -12,13 -2,5",fill:sc,opacity:.85}),React.createElement("polygon",{points:"2,-2 15,8 12,13 2,5",fill:sc,opacity:.85}),React.createElement("ellipse",{cx:-14,cy:9,rx:2.5,ry:4,fill:sc}),React.createElement("ellipse",{cx:14,cy:9,rx:2.5,ry:4,fill:sc}));}
+if(t==="shell4"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("ellipse",{cx:0,cy:-5,rx:8,ry:10,fill:sc,opacity:.9}),React.createElement("rect",{x:-16,y:-9,width:9,height:18,rx:2,fill:sc,opacity:.8}),React.createElement("rect",{x:7,y:-9,width:9,height:18,rx:2,fill:sc,opacity:.8}),React.createElement("rect",{x:-16,y:5,width:4,height:3,fill:sc}),React.createElement("rect",{x:12,y:5,width:4,height:3,fill:sc}),React.createElement("rect",{x:-13,y:-7,width:3,height:2,fill:"#0a0a14",opacity:.5}),React.createElement("rect",{x:10,y:-7,width:3,height:2,fill:"#0a0a14",opacity:.5}));}
+if(t==="theclaw"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("rect",{x:-2,y:-15,width:5,height:30,rx:1,fill:sc,opacity:.9}),React.createElement("polygon",{points:"-2,-8 -14,-5 -17,1 -10,4 -2,1",fill:sc,opacity:.85}),React.createElement("polygon",{points:"-14,-5 -19,-1 -17,1",fill:sc}),React.createElement("rect",{x:3,y:-10,width:7,height:3,fill:sc,opacity:.6}),React.createElement("rect",{x:3,y:-5,width:9,height:2,fill:sc,opacity:.5}),React.createElement("rect",{x:3,y:0,width:7,height:3,fill:sc,opacity:.6}),React.createElement("rect",{x:3,y:5,width:5,height:2,fill:sc,opacity:.4}));}
+if(t==="stingray"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("polygon",{points:"0,-7 -17,6 -10,11 0,4 10,11 17,6",fill:sc,opacity:.9}),React.createElement("rect",{x:-3,y:-7,width:6,height:9,rx:1,fill:sc}),React.createElement("rect",{x:-2,y:4,width:4,height:8,rx:1,fill:sc,opacity:.7}));}
+if(t==="edgecharger"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 5px "+sc+"88)"},React.createElement("rect",{x:-6,y:-12,width:12,height:6,rx:1,fill:sc}),React.createElement("rect",{x:-18,y:-4,width:36,height:6,rx:1,fill:sc,opacity:.85}),React.createElement("rect",{x:-5,y:-8,width:10,height:10,rx:1,fill:sc,opacity:.7}),React.createElement("rect",{x:-19,y:-2,width:4,height:8,rx:1,fill:sc,opacity:.85}),React.createElement("rect",{x:15,y:-2,width:4,height:8,rx:1,fill:sc,opacity:.85}));}
+if(t==="tarrasque"){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 7px "+sc+"99)"},React.createElement("polygon",{points:"0,-10 -9,-5 -9,5 0,10 9,5 9,-5",fill:sc,opacity:.9}),React.createElement("polygon",{points:"0,-7 -6,-3.5 -6,3.5 0,7 6,3.5 6,-3.5",fill:"#0a0a14",opacity:.35}),React.createElement("line",{x1:0,y1:-10,x2:0,y2:-18,stroke:sc,strokeWidth:3.5}),React.createElement("ellipse",{cx:0,cy:-18,rx:3.5,ry:2.5,fill:sc}),React.createElement("line",{x1:-9,y1:-5,x2:-16,y2:-10,stroke:sc,strokeWidth:3.5}),React.createElement("ellipse",{cx:-16,cy:-10,rx:3.5,ry:2.5,fill:sc}),React.createElement("line",{x1:-9,y1:5,x2:-16,y2:10,stroke:sc,strokeWidth:3.5}),React.createElement("ellipse",{cx:-16,cy:10,rx:3.5,ry:2.5,fill:sc}),React.createElement("line",{x1:9,y1:-5,x2:16,y2:-10,stroke:sc,strokeWidth:3.5}),React.createElement("ellipse",{cx:16,cy:-10,rx:3.5,ry:2.5,fill:sc}),React.createElement("line",{x1:9,y1:5,x2:16,y2:10,stroke:sc,strokeWidth:3.5}),React.createElement("ellipse",{cx:16,cy:10,rx:3.5,ry:2.5,fill:sc}));}
+if(SHIP_COLORS[t]){var sc=SHIP_COLORS[t];return React.createElement("g",{transform:"translate("+x+","+y+")",style:{animation:anim?"shipPulse 2.5s ease-in-out infinite":"none"},filter:"drop-shadow(0 0 4px "+sc+"99)"},React.createElement("polygon",{points:"0,-12 -8,8 8,8",fill:sc,opacity:.88}),React.createElement("rect",{x:-9,y:6,width:4,height:5,rx:1,fill:sc,opacity:.8}),React.createElement("rect",{x:5,y:6,width:4,height:5,rx:1,fill:sc,opacity:.8}));}
  // Planets with shimmer overlay
  if(t==="small") return React.createElement("g",null,
   React.createElement("defs",null,
