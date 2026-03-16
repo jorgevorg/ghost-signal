@@ -1219,7 +1219,7 @@ React.createElement("div",{style:{position:"absolute",top:10,right:12,zIndex:30,
     ),
     hov!==null&&hovData&&React.createElement("div",{style:{position:"fixed",left:Math.max(4,Math.min(hovPos.x,window.innerWidth/1.3225-234)),top:Math.max(4,Math.min(hovPos.y,window.innerHeight/1.3225-190)),width:224,background:"rgba(4,4,18,0.97)",border:"1px solid "+hovAccent+"55",borderRadius:8,padding:"10px 13px",zIndex:99998,pointerEvents:"none",boxShadow:"0 0 20px "+hovAccent+"18"}},
       React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:3,marginBottom:3}},"HEX-"+String(hov).padStart(3,"0")),
-      hovData.name&&React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:hovAccent,letterSpacing:2,marginBottom:5}},hovData.name),
+      
       hovData.type&&React.createElement("div",{style:{display:"inline-flex",alignItems:"center",background:hovAccent+"18",border:"1px solid "+hovAccent+"44",borderRadius:3,padding:"3px 8px",marginBottom:6}},React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:hovAccent,letterSpacing:1}},TYPE_LABELS[hovData.type]||hovData.type.toUpperCase())),
       hovData.type&&HEX_FLAVOR[hovData.type]&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:12,color:"#777",lineHeight:1.6,fontStyle:"italic",marginBottom:hovData.notes?6:0}},HEX_FLAVOR[hovData.type]),
       hovData.notes&&hovData.notes.trim()&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:12,color:"#bbb",lineHeight:1.6,borderTop:"1px solid "+B2,paddingTop:6,marginTop:2}},hovData.notes),
