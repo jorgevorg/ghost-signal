@@ -1518,7 +1518,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
        );
       })
      ),
-     tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel})
+     tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel}),
     tab==="CYBER"&&React.createElement(CybersphereTab,{gs:gs,cyberSess:cyberSess,setCyberSess:setCyberSess})
     )
    ),
