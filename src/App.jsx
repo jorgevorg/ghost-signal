@@ -1086,7 +1086,20 @@ function CybersphereTab(props){
           React.createElement("span",{style:{color:CB_NODE,fontFamily:ORB}},
             (gs.vela&&gs.vela.en!==undefined)?gs.vela.en:"?"),
           "/"+String((gs.vela&&gs.vela.enMax)||20)
-        )
+        ),
+        React.createElement("button",{
+          onClick:function(){setCyberSess(null);},
+          style:{
+            background:"transparent",
+            border:"1px solid #FF2060",
+            color:"#FF2060",
+            fontFamily:ORB,fontSize:9,letterSpacing:3,
+            padding:"5px 14px",cursor:"pointer",borderRadius:1,
+            boxShadow:"0 0 10px #FF206055",
+            textShadow:"0 0 6px #FF2060",
+            marginLeft:12
+          }
+        },"⏏ JACK OUT")
       ),
 
       // ── MEMORY CLOCK ──
@@ -1220,16 +1233,31 @@ function CybersphereTab(props){
 
       // ── RESET ──
       React.createElement("div",{style:{textAlign:"center"}},
-        React.createElement("button",{
-          onClick:function(){setCyberSess(null);},
-          style:{
-            background:"transparent",
-            border:"1px solid #FF206033",
-            color:"#FF206044",
-            fontFamily:ORB,fontSize:8,letterSpacing:3,
-            padding:"5px 16px",cursor:"pointer",borderRadius:1
-          }
-        },"◼ DISCONNECT")
+        React.createElement("div",{style:{display:"flex",gap:10,justifyContent:"center",alignItems:"center"}},
+          React.createElement("button",{
+            onClick:function(){
+              var roll=Math.ceil(Math.random()*6);
+              setCyberSess({mapId:roll,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});
+            },
+            style:{
+              background:"transparent",
+              border:"1px solid "+CB_ACC+"55",
+              color:CB_ACC+"88",
+              fontFamily:ORB,fontSize:8,letterSpacing:3,
+              padding:"5px 14px",cursor:"pointer",borderRadius:1
+            }
+          },"↺ REROLL MAP"),
+          React.createElement("button",{
+            onClick:function(){setCyberSess(null);},
+            style:{
+              background:"transparent",
+              border:"1px solid #FF206044",
+              color:"#FF206066",
+              fontFamily:ORB,fontSize:8,letterSpacing:3,
+              padding:"5px 14px",cursor:"pointer",borderRadius:1
+            }
+          },"⏏ JACK OUT")
+        )
       )
     )
   );
