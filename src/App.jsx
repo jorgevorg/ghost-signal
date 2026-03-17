@@ -1064,7 +1064,7 @@ function CyberTerminal(props){
     // log area
     React.createElement("div",{ref:scrollRef,style:{
       flex:1,overflowY:"auto",padding:"8px 12px",
-      fontFamily:MONO,fontSize:9,lineHeight:1.9,letterSpacing:.3,
+      fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,
       minHeight:0
     }},
       logs.length===0&&React.createElement("div",{style:{color:CB_GREEN+"33",marginTop:4}},
@@ -1092,7 +1092,7 @@ function CyberTerminal(props){
         placeholder:cyberSess&&cyberSess.active?"query the network...":"jack in to enable terminal",
         style:{
           flex:1,background:"transparent",border:"none",outline:"none",
-          color:CB_GREEN,fontFamily:MONO,fontSize:9,letterSpacing:1,
+          color:CB_GREEN,fontFamily:MONO,fontSize:13,letterSpacing:1,
           caretColor:CB_GREEN,opacity:(!cyberSess||!cyberSess.active)?0.4:1
         }
       }),
@@ -1171,12 +1171,19 @@ function CybersphereTab(props){
 
   return React.createElement("div",{style:{
     background:"#060a06",
-    // Full height flex column — this is KEY for no overflow
     position:"absolute",inset:0,
     display:"flex",flexDirection:"column",
     fontFamily:MONO,color:CB_NORM,
-    overflow:"hidden"
+    overflow:"hidden",
+    border:"1px solid "+frameColor+(danger?"99":"33"),
+    boxSizing:"border-box",
+    transition:"border-color .4s"
   }},
+    // corner brackets on the outer border
+    React.createElement(CornerBracket,{pos:"tl",color:frameColor}),
+    React.createElement(CornerBracket,{pos:"tr",color:frameColor}),
+    React.createElement(CornerBracket,{pos:"bl",color:frameColor}),
+    React.createElement(CornerBracket,{pos:"br",color:frameColor}),
     React.createElement("style",null,CYBER_CSS),
 
     // bg grid
@@ -1198,31 +1205,7 @@ function CybersphereTab(props){
       zIndex:2
     }}),
 
-    // ── WINDOW FRAME (pointer-events:none overlay) ──
-    React.createElement("div",{style:{
-      pointerEvents:"none",position:"absolute",inset:6,
-      border:"1px solid "+frameColor+(danger?"bb":"44"),
-      transition:"border-color .4s, box-shadow .4s",
-      boxShadow:danger?"inset 0 0 40px #FF206008":"inset 0 0 20px "+CB_GREEN+"04",
-      zIndex:15
-    }},
-      React.createElement(CornerBracket,{pos:"tl",color:frameColor}),
-      React.createElement(CornerBracket,{pos:"tr",color:frameColor}),
-      React.createElement(CornerBracket,{pos:"bl",color:frameColor}),
-      React.createElement(CornerBracket,{pos:"br",color:frameColor}),
-      React.createElement("div",{style:{
-        position:"absolute",top:8,left:32,right:32,height:1,
-        background:"linear-gradient(90deg,transparent,"+frameColor+"33 30%,"+frameColor+"55 50%,"+frameColor+"33 70%,transparent)"
-      }}),
-      React.createElement("div",{style:{
-        position:"absolute",top:4,right:34,
-        fontFamily:MONO,fontSize:7,letterSpacing:1,color:frameColor+"55"
-      }},"NET:"+(mapIdx+1).toString(16).toUpperCase().padStart(2,"0")+" // SYS:FF2A"),
-      React.createElement("div",{style:{
-        position:"absolute",bottom:4,left:34,
-        fontFamily:MONO,fontSize:7,letterSpacing:1,color:frameColor+"44"
-      }},inSession?"CLK:"+String(cyberSess.clock).padStart(2,"0")+"/0C":"CLK:--/0C")
-    ),
+    // corners (positioned relative to outer border div)
 
     // ── TOP SECTION: map (scrollable) ──
     React.createElement("div",{style:{
@@ -1303,7 +1286,7 @@ function CybersphereTab(props){
       }},
         // connector lines — SVG offset at (TW/2, TW/2) so centers land on (tp.px, tp.py)
         React.createElement("svg",{
-          style:{position:"absolute",top:TW/2,left:TW/2,overflow:"visible",pointerEvents:"none"},
+          style:{position:"absolute",top:0,left:0,overflow:"visible",pointerEvents:"none"},
           width:gridW,height:gridH
         },
           CONNECTIONS.map(function(pair){
@@ -1313,8 +1296,8 @@ function CybersphereTab(props){
             var bothExp=exp.indexOf(pair[0])>=0&&exp.indexOf(pair[1])>=0;
             return React.createElement("line",{
               key:pair[0]+"-"+pair[1],
-              x1:a.px,y1:a.py,
-              x2:b.px,y2:b.py,
+              x1:a.px+TW/2,y1:a.py+TW/2,
+              x2:b.px+TW/2,y2:b.py+TW/2,
               stroke:lc,
               strokeWidth:bothExp?1.5:1,
               strokeDasharray:bothExp?"4 4":"3 6",
