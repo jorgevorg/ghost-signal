@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import * as THREE from "three";
 
 const MONO="'Share Tech Mono',monospace",ORB="'Orbitron',sans-serif",RAJ="'Rajdhani',sans-serif",BG="#0a0a14";
-const B1="#5a5a7a",B2="#35354f",B3="#6a6a8a";
+const B1="#7a7aaa",B2="#555578",B3="#9090b8";
 const css=`@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap');
 html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1.15}
 @keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -21,7 +21,7 @@ html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1
 @keyframes scanmove{0%{background-position:0 0}100%{background-position:0 4px}}
 @keyframes bootGlow{0%{opacity:0;filter:brightness(3)}100%{opacity:1;filter:brightness(1)}}
 @keyframes bootGlow{0%{opacity:0;filter:brightness(3)}100%{opacity:1;filter:brightness(1)}}
-.gs-scan{pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,220,180,.016) 2px,rgba(0,220,180,.016) 4px);z-index:997;animation:scanmove .12s linear infinite}
+.gs-scan{pointer-events:none;position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,220,180,.04) 2px,rgba(0,220,180,.04) 4px);z-index:997;animation:scanmove .12s linear infinite}
 @keyframes hexAppear{from{opacity:0;transform:scale(0.4)}to{opacity:1;transform:scale(1)}}
 @keyframes slideLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
 @keyframes slideRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
