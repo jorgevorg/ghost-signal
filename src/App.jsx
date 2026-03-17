@@ -68,7 +68,7 @@ const mkC=()=>({hp:20,hpMax:20,en:20,enMax:20,armor:0,hyp:0,exp:0,serum:0,vigor:
 const mkCole=()=>Object.assign(mkC(),{name:"Cole Remington Vayne",vigor:2,grace:3,mind:0,tech:1,weapons:[{name:"Laser Blaster",mod1:"Reflex Sight",mod2:""},{name:"",mod1:"",mod2:""}],inventory:["Health Pack ×2","Contraband Package ×2","","","","","",""]});
 const mkVela=()=>Object.assign(mkC(),{name:"Vela // Séance",vigor:1,grace:2,mind:4,tech:3,memory:["Ladybug (cyberdefense drone)","HACK_Trojan — Breach the enemy for MIN turns","HACK_Javelin — d10+MIN damage; Breached enemies take ×2 damage","","",""],inventory:["Energy Cell ×2","Health Pack ×2","Starship Parts ×2","Stratogen Hormones ×2","","","",""]});
 const mkS=()=>({name:"THE INCONCEIVABLE",hull:20,hullMax:20,fuel:20,fuelMax:20,scraps:0,control:"Vector Cockpit — Start combat with 1 Shield",engines:"Oxygen Jets — Roll 2d6; +1 die on first turn",modules:["G.R.E. Missiles — Deal 8 damage (5-6)","Particle Cannons — Deal 3 damage, stacks (3-5)","",""],cargo:Array(6).fill("")});
-const INIT={session:0,logs:[],cole:mkCole(),vela:mkVela(),ship:mkS(),hexMap:{},crew:Array(4).fill(null).map(mkCrew),campaignMap:null,chapter:1};
+const INIT={session:0,logs:[],cole:mkCole(),vela:mkVela(),ship:mkS(),hexMap:{},crew:Array(4).fill(null).map(mkCrew),campaignMap:null,chapter:1,cyberSession:null};
 
 const merge=function(sv){
  var ec=function(c,base){
@@ -102,6 +102,18 @@ const PLANET_PALETTE=["#4488FF","#3BAADD","#FF6644","#FF4488","#44CC88","#A855F7
 const MOON_PALETTE=["#aaaacc","#bbaadd","#ccbbaa","#aabbcc","#bbccaa"];
 const getPlanetColor=function(hexId,offset){if(offset==null)offset=0;return PLANET_PALETTE[(hexId*7+offset*3)%PLANET_PALETTE.length];};
 const getMoonColor=function(hexId){return MOON_PALETTE[hexId%MOON_PALETTE.length];};
+
+const CB_NODE="#FF2060",CB_NORM="#00FFD0",CB_ACC="#c8d0ff";
+const CYBER_MAPS=[
+  ["N","X","A","X","N","X","A","X","N"],
+  ["X","N","X","N","A","N","X","N","X"],
+  ["N","X","A","N","X","N","A","X","N"],
+  ["A","X","A","X","X","X","A","X","A"],
+  ["X","N","X","N","A","N","X","A","X"],
+  ["A","X","A","A","X","A","A","X","A"],
+];
+const CYBER_ADJ={1:[2,3],2:[1,4,5],3:[1,5,6],4:[2,7],5:[2,3,7,8],6:[3,8],7:[4,5,9],8:[5,6,9],9:[7,8]};
+
 
 // ── TOAST ──────────────────────────────────────────────────────────────────
 function Toast(props){
@@ -901,6 +913,162 @@ function CommsTab(props){
   )
  );
 }
+// ── CYBERSPHERE ─────────────────────────────────────────────────────────────
+function CybersphereTab(props){
+  var gs=props.gs,cyberSess=props.cyberSess,setCyberSess=props.setCyberSess;
+  var TW=52,ST=56,cx=2*ST;
+  var TPOS=[null,
+    {id:1,px:cx,      py:0      },
+    {id:2,px:cx-ST,   py:ST     },
+    {id:3,px:cx+ST,   py:ST     },
+    {id:4,px:cx-2*ST, py:2*ST   },
+    {id:5,px:cx,      py:2*ST   },
+    {id:6,px:cx+2*ST, py:2*ST   },
+    {id:7,px:cx-ST,   py:3*ST   },
+    {id:8,px:cx+ST,   py:3*ST   },
+    {id:9,px:cx,      py:4*ST   },
+  ];
+  var tcol=function(t){return t==="X"?CB_NODE:t==="A"?CB_ACC:CB_NORM;};
+  var tlbl=function(t){return t==="X"?"NODE":t==="A"?"PORT":"TILE";};
+  var map=cyberSess?CYBER_MAPS[cyberSess.mapId-1]:null;
+
+  if(!cyberSess){
+    return React.createElement("div",{style:{fontFamily:MONO,color:CB_NORM,padding:"28px 20px",maxWidth:420}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:20}},
+        React.createElement("span",{style:{fontFamily:"serif",fontSize:30,color:CB_NODE,opacity:.85,lineHeight:1}},"網"),
+        React.createElement("span",{style:{fontFamily:ORB,fontSize:18,letterSpacing:4}},"CYBERSPHERE")
+      ),
+      React.createElement("div",{style:{fontSize:10,color:CB_ACC,letterSpacing:2,marginBottom:28}},
+        "HACKER INTERFACE — SESSION INACTIVE"),
+      React.createElement("div",{style:{fontSize:11,color:"#aaaacc",letterSpacing:2,marginBottom:36}},
+        "VELA ENERGY: ",
+        React.createElement("span",{style:{color:CB_NODE,fontFamily:ORB,fontSize:13}},
+          (gs.vela&&gs.vela.en!==undefined)?gs.vela.en:"?"),
+        " / "+String((gs.vela&&gs.vela.enMax)||20)
+      ),
+      React.createElement("div",{style:{textAlign:"center"}},
+        React.createElement("div",{style:{color:"#444",fontSize:9,letterSpacing:3,marginBottom:14}},
+          "ROLL d6 TO DETERMINE MAP LAYOUT"),
+        React.createElement("button",{
+          onClick:function(){
+            var roll=Math.ceil(Math.random()*6);
+            setCyberSess({mapId:roll,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});
+          },
+          style:{background:"transparent",border:"1px solid "+CB_ACC,color:CB_ACC,
+            fontFamily:ORB,fontSize:11,letterSpacing:4,padding:"10px 32px",
+            cursor:"pointer",borderRadius:2,boxShadow:"0 0 12px "+CB_ACC+"33"}
+        },"▶ JACK IN")
+      )
+    );
+  }
+
+  var handleClick=function(idx){
+    var t=map[idx-1];
+    if(!cyberSess.active){
+      if(t!=="A")return;
+      setCyberSess(Object.assign({},cyberSess,{active:true,hackerPos:idx,entryPort:idx,explored:[idx]}));
+      return;
+    }
+    var adj=CYBER_ADJ[cyberSess.hackerPos]||[];
+    if(adj.indexOf(idx)<0)return;
+    var nc=cyberSess.clock+(t==="X"?2:1);
+    var ne=cyberSess.explored.indexOf(idx)<0?cyberSess.explored.concat([idx]):cyberSess.explored;
+    setCyberSess(Object.assign({},cyberSess,{hackerPos:idx,clock:nc,explored:ne}));
+  };
+
+  var cw=4*ST+TW+20,ch=4*ST+TW+20;
+
+  return React.createElement("div",{style:{fontFamily:MONO,color:CB_NORM,padding:"18px 16px",userSelect:"none"}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+        React.createElement("span",{style:{fontFamily:"serif",fontSize:24,color:CB_NODE,opacity:.85,lineHeight:1}},"網"),
+        React.createElement("span",{style:{fontFamily:ORB,fontSize:15,letterSpacing:4}},"CYBERSPHERE"),
+        React.createElement("span",{style:{fontSize:9,color:"#555",letterSpacing:3,marginLeft:6}},
+          "MAP-0"+cyberSess.mapId)
+      ),
+      React.createElement("div",{style:{fontSize:10,color:"#aaaacc",letterSpacing:2}},
+        "EN ",
+        React.createElement("span",{style:{color:CB_NODE,fontFamily:ORB}},
+          (gs.vela&&gs.vela.en!==undefined)?gs.vela.en:"?"),
+        "/"+String((gs.vela&&gs.vela.enMax)||20)
+      )
+    ),
+    React.createElement("div",{style:{marginBottom:14}},
+      React.createElement("div",{style:{fontSize:9,color:"#555",letterSpacing:3,marginBottom:5}},
+        "MEMORY CLOCK"),
+      React.createElement("div",{style:{display:"flex",gap:2,flexWrap:"wrap",maxWidth:208}},
+        Array.from({length:12},function(_,i){
+          var filled=i<cyberSess.clock,danger=i>=9;
+          return React.createElement("div",{key:i,style:{
+            width:13,height:13,borderRadius:1,
+            background:filled?(danger?"#FF2060":CB_NORM):(danger?"#1a0505":"#0d0d1a"),
+            border:"1px solid "+(danger?"#FF206044":"#00FFD022"),
+            boxShadow:filled?(danger?"0 0 6px #FF206099":"0 0 4px #00FFD055"):undefined
+          }});
+        })
+      ),
+      React.createElement("span",{style:{fontSize:9,letterSpacing:2,
+        color:cyberSess.clock>=9?"#FF2060":"#555"}},
+        " "+cyberSess.clock+"/12"+(cyberSess.clock>=12?" ⚠":""))
+    ),
+    React.createElement("div",{style:{fontSize:10,letterSpacing:2,marginBottom:14,minHeight:16}},
+      cyberSess.active
+        ?React.createElement("span",{style:{color:CB_NORM}},
+            "HACKER @ TILE "+cyberSess.hackerPos+" — "+tlbl(map[cyberSess.hackerPos-1]))
+        :React.createElement("span",{style:{color:CB_ACC}},
+            "◇ INACTIVE — CLICK AN ACCESS PORT TO JACK IN")
+    ),
+    React.createElement("div",{style:{position:"relative",width:cw,height:ch,margin:"0 auto 18px"}},
+      TPOS.slice(1).map(function(tp){
+        var idx=tp.id,t=map[idx-1];
+        var col=tcol(t);
+        var isHere=cyberSess.hackerPos===idx;
+        var adj=CYBER_ADJ[cyberSess.hackerPos]||[];
+        var isAdj=cyberSess.active&&adj.indexOf(idx)>=0;
+        var isExp=cyberSess.explored.indexOf(idx)>=0;
+        var canClick=(!cyberSess.active&&t==="A")||(cyberSess.active&&isAdj);
+        var icon=isHere?"◈":(t==="X"?"●":(t==="A"?"◇":"·"));
+        return React.createElement("div",{key:idx,onClick:function(){handleClick(idx);},style:{
+          position:"absolute",left:tp.px,top:tp.py,
+          width:TW,height:TW,
+          transform:"rotate(45deg)",
+          background:isHere?(col+"55"):isExp?(col+"22"):(canClick?"#c8d0ff0a":"#07070e"),
+          border:"1.5px solid "+(isHere?col:isAdj?(col+"99"):isExp?(col+"44"):(canClick?CB_ACC+"66":"#141428")),
+          boxShadow:isHere?("0 0 18px "+col+",0 0 36px "+col+"44"):isAdj?("0 0 8px "+col+"55"):undefined,
+          cursor:canClick?"pointer":"default",
+          transition:"all .18s"
+        }},
+          React.createElement("div",{style:{
+            transform:"rotate(-45deg)",width:"100%",height:"100%",
+            display:"flex",alignItems:"center",justifyContent:"center",
+            fontSize:isHere?15:10,fontFamily:ORB,
+            color:isHere?col:isExp?col:canClick?(col+"bb"):"#1a1a33",
+            pointerEvents:"none"
+          }},icon)
+        );
+      })
+    ),
+    React.createElement("div",{style:{display:"flex",gap:14,justifyContent:"center",marginBottom:18}},
+      [["X",CB_NODE,"MATRIX NODE"],["A",CB_ACC,"ACCESS PORT"],["N",CB_NORM,"NORMAL TILE"]].map(function(e){
+        return React.createElement("div",{key:e[0],style:{display:"flex",alignItems:"center",gap:5,
+          fontSize:9,letterSpacing:1,color:"#666"}},
+          React.createElement("div",{style:{width:9,height:9,transform:"rotate(45deg)",
+            background:e[1]+"33",border:"1px solid "+e[1]}}),
+          e[2]);
+      })
+    ),
+    React.createElement("div",{style:{textAlign:"center"}},
+      React.createElement("button",{
+        onClick:function(){setCyberSess(null);},
+        style:{background:"transparent",border:"1px solid #FF206033",color:"#FF206055",
+          fontFamily:ORB,fontSize:9,letterSpacing:3,padding:"5px 14px",
+          cursor:"pointer",borderRadius:1}
+      },"RESET SESSION")
+    )
+  );
+}
+
+
 
 // ── APP ────────────────────────────────────────────────────────────────────
 function MapLegend(props){
@@ -1196,6 +1364,7 @@ function App(){
  var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
  var histLoadedS=useState(false),setHistLoaded=histLoadedS[1];
 var ringPhaseS=useState((function(){try{return localStorage.getItem("gs_ring_phase")||"outer";}catch(e){return "outer";}})()),setRingPhase=ringPhaseS[1];var ringPhase=ringPhaseS[0];
+var cyberSessS=useState(null),setCyberSess=cyberSessS[1];var cyberSess=cyberSessS[0];
 
  useEffect(function(){try{localStorage.setItem("gs_ring_phase",ringPhase);}catch(e){};},[ringPhase]);
 useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}catch(e){}setSaved(true);setTimeout(function(){setSaved(false);},1200);},[gs]);
