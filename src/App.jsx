@@ -1249,8 +1249,8 @@ function CybersphereTab(props){
             onClick:function(){if(!inSession)setSelectedMap(i);},
             style:{
               background:active?CB_NORM+"22":"transparent",
-              border:"1px solid "+(active?CB_NORM:CB_NORM+"33"),
-              color:active?CB_NORM:CB_NORM+"55",
+              border:"1px solid "+(active?CB_NORM:CB_NORM+"66"),
+              color:active?CB_NORM:CB_NORM+"99",
               fontFamily:ORB,fontSize:9,letterSpacing:2,padding:"5px 10px",
               cursor:inSession?"default":"pointer",borderRadius:1,
               boxShadow:active?"0 0 8px "+CB_NORM+"33":undefined
@@ -1261,7 +1261,7 @@ function CybersphereTab(props){
           onClick:function(){if(!inSession)setSelectedMap(Math.floor(Math.random()*6));},
           style:{
             marginLeft:"auto",background:"transparent",
-            border:"1px solid "+CB_NORM+"33",color:CB_NORM+"55",
+            border:"1px solid "+CB_NORM+"55",color:CB_NORM+"99",
             fontFamily:ORB,fontSize:9,letterSpacing:2,padding:"5px 10px",
             cursor:inSession?"default":"pointer",borderRadius:1
           }
@@ -1271,7 +1271,7 @@ function CybersphereTab(props){
       // status line
       React.createElement("div",{style:{
         fontSize:9,letterSpacing:2,marginBottom:10,
-        color:inSession?(danger?"#FF2060":warn?"#FFD166":CB_NORM):CB_NORM+"66",
+        color:inSession?(danger?"#FF2060":warn?"#FFD166":CB_NORM):CB_NORM+"cc",
         animation:inSession&&glitch?"cyberGlitch .3s ease":undefined
       }},
         inSession
@@ -1377,8 +1377,8 @@ function CybersphereTab(props){
               var filled=inSession&&i<cyberSess.clock,d=i>=9,w=i>=6&&i<9;
               return React.createElement("div",{key:i,style:{
                 flex:1,height:10,borderRadius:1,
-                background:filled?(d?"#FF2060":w?"#FFD166":CB_NORM):(d?"#1a0404":w?"#141008":"#061006"),
-                border:"1px solid "+(filled?(d?"#FF2060":w?"#FFD166":CB_NORM):(d?"#FF206033":w?"#FFD16633":CB_NORM+"2a")),
+                background:filled?(d?"#FF2060":w?"#FFD166":CB_NORM):(d?"#2a0a0a":w?"#1e1808":"#0d1f0d"),
+                border:"1px solid "+(filled?(d?"#FF2060":w?"#FFD166":CB_NORM):(d?"#FF206066":w?"#FFD16655":CB_NORM+"55")),
                 boxShadow:filled?(d?"0 0 5px #FF2060aa":w?"0 0 4px #FFD16699":"0 0 4px "+CB_NORM+"77"):undefined,
                 transition:"all .3s"
               }});
