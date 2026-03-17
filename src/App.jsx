@@ -926,17 +926,18 @@ var CYBER_CSS=`
 
 function RunningMan(props){
   var c=props.color||"#FF2060",s=props.size||20,glitch=props.glitch;
-  return React.createElement("svg",{width:s,height:s,viewBox:"0 0 40 40",style:{
-    filter:"drop-shadow(0 0 4px "+c+")",
+  return React.createElement("svg",{width:s,height:s,viewBox:"0 0 100 100",style:{
+    filter:"drop-shadow(0 0 5px "+c+")",
     animation:glitch?"runnerGlitch .4s ease":"none",
-    display:"block"
+    display:"block",overflow:"visible"
   }},
-    React.createElement("circle",{cx:"24",cy:"7",r:"4.5",fill:c}),
-    React.createElement("line",{x1:"22",y1:"11",x2:"14",y2:"22",stroke:c,strokeWidth:"3.2",strokeLinecap:"round"}),
-    React.createElement("line",{x1:"14",y1:"22",x2:"8",y2:"33",stroke:c,strokeWidth:"3.2",strokeLinecap:"round"}),
-    React.createElement("line",{x1:"14",y1:"22",x2:"22",y2:"32",stroke:c,strokeWidth:"3.2",strokeLinecap:"round"}),
-    React.createElement("line",{x1:"22",y1:"11",x2:"30",y2:"16",stroke:c,strokeWidth:"3.2",strokeLinecap:"round"}),
-    React.createElement("line",{x1:"22",y1:"11",x2:"15",y2:"17",stroke:c,strokeWidth:"2.5",strokeLinecap:"round"})
+    React.createElement("path",{
+      d:"m 74.375,7.96875 c -5.283702,0 -9.5625,4.278798 -9.5625,9.5625 0,5.283702 4.278798,9.5625 9.5625,9.5625 5.283702,0 9.5625,-4.278798 9.5625,-9.5625 0,-5.283702 -4.278798,-9.5625 -9.5625,-9.5625 z m -29.71875,10.625 c -1.643157,-0.02482 -3.085286,0.979175 -4.0625,1.78125 l -13.125,10.78125 c -1.784537,1.465229 -2.027819,4.090418 -0.5625,5.875 1.465095,1.784559 4.059213,2.058979 5.84375,0.59375 L 44.0625,28.3125 52.78125,30.125 39.125,51.21875 29.5,63.40625 c -6.811329,-0.270955 -13.095582,-1.082038 -19,-1.625 -2.7777349,-0.256157 -5.2127943,1.753203 -5.46875,4.53125 -0.2557322,2.777981 1.7477032,5.312761 4.53125,5.5 6.923324,0.465706 13.85815,0.909294 20.78125,1.375 1.783419,0.119952 3.095267,0.08945 4.34375,-0.875 0.546114,-0.42198 0.943116,-0.953685 1.375,-1.5 2.532509,-3.203135 7.59375,-9.625 7.59375,-9.625 L 57.4375,70.90625 50.15625,84.9375 c -1.243118,2.389844 -0.327165,5.319494 2.0625,6.5625 2.389666,1.243162 5.319829,0.327143 6.5625,-2.0625 l 9.03125,-17.375 c 0.320112,-0.615814 0.437809,-1.294101 0.53125,-1.9375 0.259756,-1.786393 -0.366446,-3.624711 -1.9375,-4.75 l -13,-9.3125 10.71875,-16.40625 4.78125,8.5 c 0.708405,1.254138 2.013576,2.148761 3.5625,2.1875 6.087499,0.151786 18.25,0.4375 18.25,0.4375 2.308072,0.05767 4.223576,-1.754248 4.28125,-4.0625 0.05767,-2.308251 -1.754427,-4.223599 -4.0625,-4.28125 l -14.28125,-0.34375 -7.25,-12.875 c -1.191703,-2.11795 -4.724265,-6.546135 -7.8125,-7.1875 L 45.375,18.65625 c -0.241481,-0.05019 -0.484013,-0.05896 -0.71875,-0.0625 z",
+      fill:c,
+      fillOpacity:"1",
+      fillRule:"nonzero",
+      stroke:"none"
+    })
   );
 }
 
@@ -981,7 +982,7 @@ function CybersphereTab(props){
 
   var bgStyle={
     position:"relative",
-    background:"#050510",
+    background:"#0c0c22",
     minHeight:"100vh",
     overflow:"hidden",
     fontFamily:MONO,
@@ -1104,22 +1105,22 @@ function CybersphereTab(props){
 
       // ── MEMORY CLOCK ──
       React.createElement("div",{style:{marginBottom:12}},
-        React.createElement("div",{style:{fontSize:8,color:"#444",letterSpacing:3,marginBottom:5}},
+        React.createElement("div",{style:{fontSize:8,color:"#778",letterSpacing:3,marginBottom:5}},
           "MEMORY CLOCK"),
         React.createElement("div",{style:{display:"flex",gap:3,alignItems:"center"}},
           Array.from({length:12},function(_,i){
             var filled=i<cyberSess.clock, danger=i>=9;
             return React.createElement("div",{key:i,style:{
               width:14,height:14,borderRadius:1,
-              background:filled?(danger?"#FF2060":CB_NORM):(danger?"#1a0505":"#07070e"),
-              border:"1px solid "+(danger?"#FF206055":"#00FFD018"),
+              background:filled?(danger?"#FF2060":CB_NORM):(danger?"#2a0808":"#111128"),
+              border:"1px solid "+(danger?"#FF206088":"#00FFD044"),
               boxShadow:filled?(danger?"0 0 8px #FF2060aa,0 0 2px #FF2060":"0 0 6px #00FFD077"):undefined,
               transition:"all .3s"
             }});
           }),
           React.createElement("span",{style:{
             fontSize:9,letterSpacing:2,marginLeft:6,
-            color:cyberSess.clock>=9?"#FF2060":cyberSess.clock>=6?"#FFD166":"#444"
+            color:cyberSess.clock>=9?"#FF2060":cyberSess.clock>=6?"#FFD166":"#888"
           }},cyberSess.clock+"/12"+(cyberSess.clock>=12?" ⚠":""))
         )
       ),
@@ -1179,13 +1180,13 @@ function CybersphereTab(props){
               width:TW,
               height:TW,
               transform:"rotate(45deg)",
-              background:isHere?(col+"44"):isExp?(col+"18"):(canClick?col+"0a":"#050510"),
+              background:isHere?(col+"44"):isExp?(col+"18"):(canClick?col+"0a":"#0c0c22"),
               border:"1.5px solid "+(
                 isHere?col:
                 isAdj?(col+"cc"):
                 isExp?(col+"55"):
                 canClick?(col+"77"):
-                "#0d0d22"
+                "#1e1e3a"
               ),
               boxShadow:isHere?("0 0 20px "+col+",0 0 40px "+col+"55"):
                          isAdj?("0 0 10px "+col+"88"):undefined,
