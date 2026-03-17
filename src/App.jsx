@@ -1418,8 +1418,8 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
  var upSession=function(n){setGs(function(p){return Object.assign({},p,{session:n});});};
  var upCampaign=function(cm){console.log("upCampaign called",cm);setGs(function(p){return Object.assign({},p,{campaignMap:cm,chapter:p.campaignMap?Math.min((p.chapter||1)+1,3):1});});};
 
- var TABS=["MAP","CREW","SHIP","LOGS","COMMS"];
- var TAB_C={MAP:"#cc88ff",CREW:"#FFD166",SHIP:"#00FFD0",LOGS:"#FF6EC7",COMMS:"#88BBFF"};
+ var TABS=["MAP","CREW","SHIP","LOGS","COMMS","CYBER"];
+ var TAB_C={MAP:"#cc88ff",CREW:"#FFD166",SHIP:"#00FFD0",LOGS:"#FF6EC7",COMMS:"#88BBFF",CYBER:"#FF2060"};
 
  return React.createElement("div",{style:{height:"100vh",overflow:"hidden",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
@@ -1519,6 +1519,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
       })
      ),
      tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel})
+    tab==="CYBER"&&React.createElement(CybersphereTab,{gs:gs,cyberSess:cyberSess,setCyberSess:setCyberSess})
     )
    ),
    !boot&&React.createElement(DiceRoller,{gameState:gs})
