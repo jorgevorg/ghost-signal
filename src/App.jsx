@@ -914,14 +914,16 @@ function CommsTab(props){
  );
 }
 
+
 // ── CYBERSPHERE ──────────────────────────────────────────────────────────────
+var CB_GREEN="#39ff14",CB_GREEN2="#00cc44";
 var CYBER_CSS=`
 @keyframes cyberGlitch{0%,92%,100%{transform:translateX(0) skewX(0)}93%{transform:translateX(-4px) skewX(-2deg)}95%{transform:translateX(4px) skewX(2deg)}97%{transform:translateX(-2px) skewX(1deg)}}
-@keyframes cyberPulse{0%,100%{opacity:.5;transform:rotate(45deg) scale(1)}50%{opacity:1;transform:rotate(45deg) scale(1.08)}}
-@keyframes cyberScan{0%{background-position:0 0}100%{background-position:0 8px}}
-@keyframes tileAdj{0%,100%{box-shadow:0 0 6px var(--tc),0 0 12px var(--tc)33}50%{box-shadow:0 0 14px var(--tc),0 0 28px var(--tc)66}}
+@keyframes tileAdj{0%,100%{opacity:.7}50%{opacity:1}}
 @keyframes runnerGlitch{0%,88%,100%{transform:translateX(0)}90%{transform:translateX(-5px)}93%{transform:translateX(5px)}96%{transform:translateX(-2px)}}
-@keyframes gridPulse{0%,100%{opacity:.04}50%{opacity:.09}}
+@keyframes gridPulse{0%,100%{opacity:.03}50%{opacity:.07}}
+@keyframes cyberScan{0%{background-position:0 0}100%{background-position:0 8px}}
+@keyframes mapTabIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 `;
 
 function RunningMan(props){
@@ -933,10 +935,7 @@ function RunningMan(props){
   }},
     React.createElement("path",{
       d:"m 74.375,7.96875 c -5.283702,0 -9.5625,4.278798 -9.5625,9.5625 0,5.283702 4.278798,9.5625 9.5625,9.5625 5.283702,0 9.5625,-4.278798 9.5625,-9.5625 0,-5.283702 -4.278798,-9.5625 -9.5625,-9.5625 z m -29.71875,10.625 c -1.643157,-0.02482 -3.085286,0.979175 -4.0625,1.78125 l -13.125,10.78125 c -1.784537,1.465229 -2.027819,4.090418 -0.5625,5.875 1.465095,1.784559 4.059213,2.058979 5.84375,0.59375 L 44.0625,28.3125 52.78125,30.125 39.125,51.21875 29.5,63.40625 c -6.811329,-0.270955 -13.095582,-1.082038 -19,-1.625 -2.7777349,-0.256157 -5.2127943,1.753203 -5.46875,4.53125 -0.2557322,2.777981 1.7477032,5.312761 4.53125,5.5 6.923324,0.465706 13.85815,0.909294 20.78125,1.375 1.783419,0.119952 3.095267,0.08945 4.34375,-0.875 0.546114,-0.42198 0.943116,-0.953685 1.375,-1.5 2.532509,-3.203135 7.59375,-9.625 7.59375,-9.625 L 57.4375,70.90625 50.15625,84.9375 c -1.243118,2.389844 -0.327165,5.319494 2.0625,6.5625 2.389666,1.243162 5.319829,0.327143 6.5625,-2.0625 l 9.03125,-17.375 c 0.320112,-0.615814 0.437809,-1.294101 0.53125,-1.9375 0.259756,-1.786393 -0.366446,-3.624711 -1.9375,-4.75 l -13,-9.3125 10.71875,-16.40625 4.78125,8.5 c 0.708405,1.254138 2.013576,2.148761 3.5625,2.1875 6.087499,0.151786 18.25,0.4375 18.25,0.4375 2.308072,0.05767 4.223576,-1.754248 4.28125,-4.0625 0.05767,-2.308251 -1.754427,-4.223599 -4.0625,-4.28125 l -14.28125,-0.34375 -7.25,-12.875 c -1.191703,-2.11795 -4.724265,-6.546135 -7.8125,-7.1875 L 45.375,18.65625 c -0.241481,-0.05019 -0.484013,-0.05896 -0.71875,-0.0625 z",
-      fill:c,
-      fillOpacity:"1",
-      fillRule:"nonzero",
-      stroke:"none"
+      fill:c,fillOpacity:"1",fillRule:"nonzero",stroke:"none"
     })
   );
 }
@@ -944,321 +943,308 @@ function RunningMan(props){
 function CybersphereTab(props){
   var gs=props.gs,cyberSess=props.cyberSess,setCyberSess=props.setCyberSess;
   var glitchS=React.useState(false),setGlitch=glitchS[1];var glitch=glitchS[0];
-  var TW=50,ST=54,cx=2*ST+TW/2;
-  var TPOS=[null,
-    {id:1,px:cx,       py:0       },
-    {id:2,px:cx-ST,    py:ST      },
-    {id:3,px:cx+ST,    py:ST      },
-    {id:4,px:cx-2*ST,  py:2*ST    },
-    {id:5,px:cx,       py:2*ST    },
-    {id:6,px:cx+2*ST,  py:2*ST    },
-    {id:7,px:cx-ST,    py:3*ST    },
-    {id:8,px:cx+ST,    py:3*ST    },
-    {id:9,px:cx,       py:4*ST    },
-  ];
-  var tcol=function(t){return t==="X"?CB_NODE:t==="A"?CB_ACC:CB_NORM;};
-  var map=cyberSess?CYBER_MAPS[cyberSess.mapId-1]:null;
+  var selectedMapS=React.useState(0),setSelectedMap=selectedMapS[1];var selectedMap=selectedMapS[0];
 
-  // Connector lines between adjacent tiles
+  var TW=48,ST=52,cx=2*ST+TW/2;
+  var TPOS=[null,
+    {id:1,px:cx,      py:0     },
+    {id:2,px:cx-ST,   py:ST    },
+    {id:3,px:cx+ST,   py:ST    },
+    {id:4,px:cx-2*ST, py:2*ST  },
+    {id:5,px:cx,      py:2*ST  },
+    {id:6,px:cx+2*ST, py:2*ST  },
+    {id:7,px:cx-ST,   py:3*ST  },
+    {id:8,px:cx+ST,   py:3*ST  },
+    {id:9,px:cx,      py:4*ST  },
+  ];
   var CONNECTIONS=[[1,2],[1,3],[2,4],[2,5],[3,5],[3,6],[4,7],[5,7],[5,8],[6,8],[7,9],[8,9]];
 
+  var tcol=function(t){return t==="X"?CB_NODE:t==="A"?CB_ACC:CB_GREEN;};
+  var activeMap=cyberSess?CYBER_MAPS[cyberSess.mapId-1]:CYBER_MAPS[selectedMap];
+  var mapIdx=cyberSess?cyberSess.mapId-1:selectedMap;
+
   var handleClick=function(idx){
-    var t=map[idx-1];
-    if(!cyberSess.active){
-      if(t!=="A")return;
-      setCyberSess(Object.assign({},cyberSess,{active:true,hackerPos:idx,entryPort:idx,explored:[idx]}));
+    if(!cyberSess){
+      if(activeMap[idx-1]!=="A")return;
+      setCyberSess({mapId:selectedMap+1,hackerPos:idx,clock:0,explored:[idx],active:true,entryPort:idx});
       setGlitch(true); setTimeout(function(){setGlitch(false);},450);
       return;
     }
     var adj=CYBER_ADJ[cyberSess.hackerPos]||[];
     if(adj.indexOf(idx)<0)return;
+    var t=activeMap[idx-1];
     var nc=cyberSess.clock+(t==="X"?2:1);
     var ne=cyberSess.explored.indexOf(idx)<0?cyberSess.explored.concat([idx]):cyberSess.explored;
     setCyberSess(Object.assign({},cyberSess,{hackerPos:idx,clock:nc,explored:ne}));
     setGlitch(true); setTimeout(function(){setGlitch(false);},450);
   };
 
-  var gridW=4*ST+TW+24, gridH=4*ST+TW+24;
+  var gridW=4*ST+TW+20, gridH=4*ST+TW+20;
+  var inSession=!!(cyberSess&&cyberSess.active);
 
-  var bgStyle={
-    position:"relative",
-    background:"#0c0c22",
+  var enVal=(gs.vela&&gs.vela.en!==undefined)?gs.vela.en:"?";
+  var enMax=(gs.vela&&gs.vela.enMax)||20;
+
+  return React.createElement("div",{style:{
+    background:"#060a06",
     minHeight:"100vh",
-    overflow:"hidden",
     fontFamily:MONO,
-    color:CB_NORM,
-  };
-
-  var scanStyle={
-    pointerEvents:"none",
-    position:"absolute",
-    inset:0,
-    background:"repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(0,255,208,.018) 3px,rgba(0,255,208,.018) 4px)",
-    animation:"cyberScan .18s linear infinite",
-    zIndex:1
-  };
-
-  var vignetteStyle={
-    pointerEvents:"none",
-    position:"absolute",
-    inset:0,
-    background:"radial-gradient(ellipse at center, transparent 55%, #000 100%)",
-    zIndex:2
-  };
-
-  var gridBgStyle={
-    pointerEvents:"none",
-    position:"absolute",
-    inset:0,
-    backgroundImage:"linear-gradient(rgba(0,255,208,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,208,.06) 1px,transparent 1px)",
-    backgroundSize:"32px 32px",
-    animation:"gridPulse 4s ease-in-out infinite",
-    zIndex:0
-  };
-
-  if(!cyberSess){
-    return React.createElement("div",{style:bgStyle},
-      React.createElement("style",null,CYBER_CSS),
-      React.createElement("div",{style:gridBgStyle}),
-      React.createElement("div",{style:scanStyle}),
-      React.createElement("div",{style:vignetteStyle}),
-      React.createElement("div",{style:{position:"relative",zIndex:3,padding:"32px 24px",maxWidth:440}},
-        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:14,marginBottom:8}},
-          React.createElement("span",{style:{fontFamily:"serif",fontSize:34,color:CB_NODE,opacity:.9,lineHeight:1,textShadow:"0 0 20px #FF2060"}},"網"),
-          React.createElement("span",{style:{fontFamily:ORB,fontSize:20,letterSpacing:5,textShadow:"0 0 16px "+CB_NORM}},
-            "CYBERSPHERE")
-        ),
-        React.createElement("div",{style:{fontSize:9,color:CB_ACC,letterSpacing:3,marginBottom:32,opacity:.7}},
-          "HACKER INTERFACE — SESSION INACTIVE"),
-        React.createElement("div",{style:{fontSize:11,color:"#7799aa",letterSpacing:2,marginBottom:8}},
-          "OPERATOR"),
-        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:40}},
-          React.createElement(RunningMan,{color:CB_NODE,size:28}),
-          React.createElement("span",{style:{fontFamily:ORB,fontSize:13,color:CB_NODE,letterSpacing:3}},
-            "VELA // SÉANCE"),
-          React.createElement("span",{style:{fontSize:9,color:"#555",letterSpacing:2}},
-            "EN "+(gs.vela&&gs.vela.en!==undefined?gs.vela.en:"?")+"/"+((gs.vela&&gs.vela.enMax)||20))
-        ),
-        React.createElement("div",{style:{textAlign:"center"}},
-          React.createElement("div",{style:{fontSize:9,color:"#333",letterSpacing:3,marginBottom:16}},
-            "ROLL d6 — DETERMINE NETWORK LAYOUT"),
-          React.createElement("button",{
-            onClick:function(){
-              var roll=Math.ceil(Math.random()*6);
-              setCyberSess({mapId:roll,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});
-            },
-            style:{
-              background:"transparent",
-              border:"1px solid "+CB_NODE,
-              color:CB_NODE,
-              fontFamily:ORB,
-              fontSize:12,
-              letterSpacing:5,
-              padding:"12px 40px",
-              cursor:"pointer",
-              borderRadius:1,
-              boxShadow:"0 0 20px "+CB_NODE+"44, inset 0 0 20px "+CB_NODE+"11",
-              textShadow:"0 0 8px "+CB_NODE
-            }
-          },"▶ JACK IN")
-        )
-      )
-    );
-  }
-
-  return React.createElement("div",{style:bgStyle},
+    color:CB_GREEN,
+    position:"relative",
+    overflow:"hidden"
+  }},
     React.createElement("style",null,CYBER_CSS),
-    React.createElement("div",{style:gridBgStyle}),
-    React.createElement("div",{style:scanStyle}),
-    React.createElement("div",{style:vignetteStyle}),
-    React.createElement("div",{style:{position:"relative",zIndex:3,padding:"14px 16px"}},
+
+    // grid bg
+    React.createElement("div",{style:{
+      pointerEvents:"none",position:"absolute",inset:0,
+      backgroundImage:"linear-gradient("+CB_GREEN+"0a 1px,transparent 1px),linear-gradient(90deg,"+CB_GREEN+"0a 1px,transparent 1px)",
+      backgroundSize:"28px 28px",
+      animation:"gridPulse 4s ease-in-out infinite",zIndex:0
+    }}),
+    // scanlines
+    React.createElement("div",{style:{
+      pointerEvents:"none",position:"absolute",inset:0,
+      background:"repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(57,255,20,.012) 3px,rgba(57,255,20,.012) 4px)",
+      animation:"cyberScan .2s linear infinite",zIndex:1
+    }}),
+    // vignette
+    React.createElement("div",{style:{
+      pointerEvents:"none",position:"absolute",inset:0,
+      background:"radial-gradient(ellipse at center,transparent 50%,#000 100%)",
+      zIndex:2
+    }}),
+
+    React.createElement("div",{style:{position:"relative",zIndex:3,padding:"14px 14px 20px"}},
 
       // ── HEADER ──
-      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}},
+      React.createElement("div",{style:{
+        display:"flex",alignItems:"center",justifyContent:"space-between",
+        borderBottom:"1px solid "+CB_GREEN+"44",paddingBottom:10,marginBottom:12
+      }},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
-          React.createElement("span",{style:{fontFamily:"serif",fontSize:22,color:CB_NODE,opacity:.9,textShadow:"0 0 12px #FF2060"}},"網"),
-          React.createElement("span",{style:{fontFamily:ORB,fontSize:13,letterSpacing:5,textShadow:"0 0 8px "+CB_NORM}},
-            "CYBERSPHERE"),
-          React.createElement("span",{style:{fontSize:8,color:"#444",letterSpacing:3,marginLeft:4}},
-            "MAP-0"+cyberSess.mapId)
+          React.createElement("span",{style:{fontFamily:"serif",fontSize:22,color:CB_GREEN,textShadow:"0 0 14px "+CB_GREEN,lineHeight:1}},"網"),
+          React.createElement("span",{style:{fontFamily:ORB,fontSize:14,letterSpacing:5,color:CB_GREEN,textShadow:"0 0 10px "+CB_GREEN}},
+            "CYBERSPHERE")
         ),
-        React.createElement("div",{style:{fontSize:10,color:"#7799aa",letterSpacing:2}},
-          "EN ",
-          React.createElement("span",{style:{color:CB_NODE,fontFamily:ORB}},
-            (gs.vela&&gs.vela.en!==undefined)?gs.vela.en:"?"),
-          "/"+String((gs.vela&&gs.vela.enMax)||20)
-        ),
-        React.createElement("button",{
-          onClick:function(){setCyberSess(null);},
-          style:{
-            background:"transparent",
-            border:"1px solid #FF2060",
-            color:"#FF2060",
-            fontFamily:ORB,fontSize:9,letterSpacing:3,
-            padding:"5px 14px",cursor:"pointer",borderRadius:1,
-            boxShadow:"0 0 10px #FF206055",
-            textShadow:"0 0 6px #FF2060",
-            marginLeft:12
-          }
-        },"⏏ JACK OUT")
-      ),
-
-      // ── MEMORY CLOCK ──
-      React.createElement("div",{style:{marginBottom:12}},
-        React.createElement("div",{style:{fontSize:8,color:"#778",letterSpacing:3,marginBottom:5}},
-          "MEMORY CLOCK"),
-        React.createElement("div",{style:{display:"flex",gap:3,alignItems:"center"}},
-          Array.from({length:12},function(_,i){
-            var filled=i<cyberSess.clock, danger=i>=9;
-            return React.createElement("div",{key:i,style:{
-              width:14,height:14,borderRadius:1,
-              background:filled?(danger?"#FF2060":CB_NORM):(danger?"#2a0808":"#111128"),
-              border:"1px solid "+(danger?"#FF206088":"#00FFD044"),
-              boxShadow:filled?(danger?"0 0 8px #FF2060aa,0 0 2px #FF2060":"0 0 6px #00FFD077"):undefined,
-              transition:"all .3s"
-            }});
-          }),
-          React.createElement("span",{style:{
-            fontSize:9,letterSpacing:2,marginLeft:6,
-            color:cyberSess.clock>=9?"#FF2060":cyberSess.clock>=6?"#FFD166":"#888"
-          }},cyberSess.clock+"/12"+(cyberSess.clock>=12?" ⚠":""))
+        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+          React.createElement("div",{style:{
+            background:CB_GREEN+"22",border:"1px solid "+CB_GREEN+"88",
+            borderRadius:2,padding:"3px 10px",
+            fontFamily:ORB,fontSize:10,letterSpacing:2,color:CB_GREEN,
+            textShadow:"0 0 6px "+CB_GREEN
+          }},enVal+" ENERGY"),
+          inSession&&React.createElement("button",{
+            onClick:function(){setCyberSess(null);},
+            style:{
+              background:"transparent",border:"1px solid #FF2060",color:"#FF2060",
+              fontFamily:ORB,fontSize:9,letterSpacing:3,padding:"4px 12px",
+              cursor:"pointer",borderRadius:1,
+              boxShadow:"0 0 8px #FF206055",textShadow:"0 0 4px #FF2060"
+            }
+          },"⏏ JACK OUT")
         )
       ),
 
-      // ── STATUS ──
+      // ── MAP TABS ──
       React.createElement("div",{style:{
-        fontSize:9,letterSpacing:2,marginBottom:14,minHeight:14,
-        color:cyberSess.active?CB_NORM:CB_ACC,
-        textShadow:cyberSess.active?"0 0 6px "+CB_NORM:undefined,
-        animation:cyberSess.active&&glitch?"cyberGlitch .3s ease":"none"
+        fontSize:9,color:CB_GREEN+"88",letterSpacing:3,marginBottom:8
       }},
-        cyberSess.active
+        "NETWORK MAP // Before entering the cybersphere, roll a d6 to determine the network's layout."
+      ),
+      React.createElement("div",{style:{display:"flex",gap:4,marginBottom:14,flexWrap:"wrap"}},
+        [0,1,2,3,4,5].map(function(i){
+          var active=mapIdx===i;
+          return React.createElement("button",{key:i,
+            onClick:function(){if(!inSession)setSelectedMap(i);},
+            style:{
+              background:active?CB_GREEN+"22":"transparent",
+              border:"1px solid "+(active?CB_GREEN:CB_GREEN+"44"),
+              color:active?CB_GREEN:CB_GREEN+"66",
+              fontFamily:ORB,fontSize:9,letterSpacing:2,
+              padding:"5px 10px",cursor:inSession?"default":"pointer",
+              borderRadius:1,
+              boxShadow:active?"0 0 8px "+CB_GREEN+"44":undefined,
+              textShadow:active?"0 0 4px "+CB_GREEN:undefined,
+              animation:"mapTabIn .2s ease"
+            }
+          },"MAP0"+(i+1));
+        })
+      ),
+
+      // ── STATUS LINE ──
+      React.createElement("div",{style:{
+        fontSize:9,letterSpacing:2,marginBottom:12,minHeight:14,
+        color:inSession?CB_GREEN:CB_GREEN+"88",
+        animation:inSession&&glitch?"cyberGlitch .3s ease":"none"
+      }},
+        inSession
           ?"HACKER @ NODE-"+String(cyberSess.hackerPos).padStart(2,"0")+" — MOVE: CLICK ADJACENT TILE"
-          :"◇ INACTIVE — CLICK AN ACCESS PORT TO JACK IN"
+          :"◇ PREVIEW MODE — CLICK AN ACCESS PORT TO JACK IN"
       ),
 
       // ── GRID ──
       React.createElement("div",{style:{position:"relative",width:gridW,height:gridH,margin:"0 auto 16px"}},
-
-        // SVG layer — connector lines
+        // connector lines SVG
         React.createElement("svg",{
           style:{position:"absolute",top:TW/2,left:TW/2,pointerEvents:"none",overflow:"visible"},
           width:gridW,height:gridH
         },
           CONNECTIONS.map(function(pair){
             var a=TPOS[pair[0]],b=TPOS[pair[1]];
-            var explored=cyberSess.explored;
+            var explored=cyberSess?cyberSess.explored:[];
             var bothExp=explored.indexOf(pair[0])>=0&&explored.indexOf(pair[1])>=0;
             return React.createElement("line",{
               key:pair[0]+"-"+pair[1],
-              x1:a.px,y1:a.py+TW/2,
-              x2:b.px,y2:b.py+TW/2,
-              stroke:bothExp?CB_NORM+"55":"#ffffff08",
-              strokeWidth:bothExp?1.5:.5,
-              strokeDasharray:bothExp?undefined:"4 4"
+              x1:a.px,y1:a.py+TW/2,x2:b.px,y2:b.py+TW/2,
+              stroke:bothExp?CB_GREEN+"77":CB_GREEN+"1a",
+              strokeWidth:bothExp?1.5:1,
+              strokeDasharray:bothExp?undefined:"3 5"
             });
           })
         ),
 
-        // Tiles
+        // tiles
         TPOS.slice(1).map(function(tp){
-          var idx=tp.id, t=map[idx-1];
+          var idx=tp.id, t=activeMap[idx-1];
           var col=tcol(t);
-          var isHere=cyberSess.hackerPos===idx;
-          var adj=CYBER_ADJ[cyberSess.hackerPos]||[];
-          var isAdj=cyberSess.active&&adj.indexOf(idx)>=0;
-          var isExp=cyberSess.explored.indexOf(idx)>=0;
-          var canClick=(!cyberSess.active&&t==="A")||(cyberSess.active&&isAdj);
+          var isHere=inSession&&cyberSess.hackerPos===idx;
+          var adj=inSession?(CYBER_ADJ[cyberSess.hackerPos]||[]):[];
+          var isAdj=inSession&&adj.indexOf(idx)>=0;
+          var isExp=inSession&&cyberSess.explored.indexOf(idx)>=0;
+          var canClick=(!inSession&&t==="A")||(inSession&&isAdj);
 
           return React.createElement("div",{
-            key:idx,
-            onClick:function(){handleClick(idx);},
+            key:idx,onClick:function(){handleClick(idx);},
             style:{
-              position:"absolute",
-              left:tp.px,
-              top:tp.py,
-              width:TW,
-              height:TW,
+              position:"absolute",left:tp.px,top:tp.py,
+              width:TW,height:TW,
               transform:"rotate(45deg)",
-              background:isHere?(col+"44"):isExp?(col+"18"):(canClick?col+"0a":"#0c0c22"),
+              background:isHere?(col+"33"):isExp?(col+"18"):t==="X"?(CB_NODE+"22"):t==="A"?(CB_ACC+"18"):"#06100600",
               border:"1.5px solid "+(
                 isHere?col:
-                isAdj?(col+"cc"):
-                isExp?(col+"55"):
-                canClick?(col+"77"):
-                "#1e1e3a"
+                isAdj?(col+"ee"):
+                isExp?(col+"88"):
+                col+"55"
               ),
-              boxShadow:isHere?("0 0 20px "+col+",0 0 40px "+col+"55"):
-                         isAdj?("0 0 10px "+col+"88"):undefined,
+              boxShadow:isHere?("0 0 18px "+col+",0 0 36px "+col+"44"):
+                         isAdj?("0 0 10px "+col+"99"):
+                         t!=="N"?("0 0 4px "+col+"33"):undefined,
               cursor:canClick?"pointer":"default",
               transition:"all .2s",
-              animation:isAdj?"tileAdj 1.4s ease-in-out infinite":"none",
-              "--tc":col
+              animation:isAdj?"tileAdj 1.2s ease-in-out infinite":"none"
             }
           },
             React.createElement("div",{style:{
-              transform:"rotate(-45deg)",
-              width:"100%",height:"100%",
+              transform:"rotate(-45deg)",width:"100%",height:"100%",
               display:"flex",alignItems:"center",justifyContent:"center",
               pointerEvents:"none"
             }},
               isHere
-                ? React.createElement(RunningMan,{color:col,size:18,glitch:glitch})
-                : React.createElement("div",{style:{
-                    fontSize:isExp?8:7,
-                    fontFamily:ORB,
-                    color:isExp?col:canClick?(col+"99"):"#141428",
-                    letterSpacing:0,
-                    textShadow:isExp?"0 0 4px "+col:undefined
-                  }},
-                    t==="X"?"NODE":t==="A"?"PORT":"·"
-                  )
+                ? React.createElement(RunningMan,{color:col,size:20,glitch:glitch})
+                : t==="X"
+                  ? React.createElement("div",{style:{width:8,height:8,borderRadius:"50%",background:CB_NODE,boxShadow:"0 0 6px "+CB_NODE}})
+                  : t==="A"
+                    ? React.createElement("svg",{width:14,height:14,viewBox:"0 0 14 14"},
+                        React.createElement("rect",{x:1,y:1,width:12,height:12,fill:"none",stroke:CB_ACC,strokeWidth:1.5,transform:"rotate(45,7,7)"}))
+                    : React.createElement("svg",{width:22,height:22,viewBox:"0 0 22 22",opacity:.5},
+                        React.createElement("path",{d:"M 4,11 Q 11,4 18,11",fill:"none",stroke:CB_GREEN,strokeWidth:1,strokeLinecap:"round"}))
             )
           );
         })
       ),
 
       // ── LEGEND ──
-      React.createElement("div",{style:{display:"flex",gap:16,justifyContent:"center",marginBottom:16}},
-        [["X",CB_NODE,"MATRIX NODE"],["A",CB_ACC,"ACCESS PORT"],["N",CB_NORM,"NORMAL TILE"]].map(function(e){
-          return React.createElement("div",{key:e[0],style:{display:"flex",alignItems:"center",gap:5,fontSize:8,letterSpacing:1,color:"#555"}},
-            React.createElement("div",{style:{
-              width:8,height:8,transform:"rotate(45deg)",
-              background:e[1]+"22",border:"1px solid "+e[1],
-              boxShadow:"0 0 4px "+e[1]+"55"
-            }}),
-            e[2]
+      React.createElement("div",{style:{marginBottom:14}},
+        [
+          [CB_NODE,"◆","Matrix Nodes — Roll d66 on the Matrix Node rewards table"],
+          [CB_GREEN,"◇","Normal Tiles — Roll d66 on the Cybersphere Encounters table"],
+          [CB_ACC,"◈","Access Ports — Log in and out of the circuit. Can't exit through entry port."]
+        ].map(function(e){
+          return React.createElement("div",{key:e[0],style:{
+            display:"flex",alignItems:"flex-start",gap:8,
+            fontSize:9,letterSpacing:1,color:CB_GREEN+"cc",marginBottom:5,lineHeight:1.5
+          }},
+            React.createElement("span",{style:{color:e[0],textShadow:"0 0 4px "+e[0],flexShrink:0,marginTop:1}},e[1]),
+            React.createElement("span",null,e[2])
           );
         })
       ),
 
-      // ── RESET ──
-      React.createElement("div",{style:{textAlign:"center"}},
-        React.createElement("div",{style:{display:"flex",gap:10,justifyContent:"center",alignItems:"center"}},
-          React.createElement("button",{
-            onClick:function(){
-              var roll=Math.ceil(Math.random()*6);
-              setCyberSess({mapId:roll,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});
-            },
-            style:{
-              background:"transparent",
-              border:"1px solid "+CB_ACC+"55",
-              color:CB_ACC+"88",
-              fontFamily:ORB,fontSize:8,letterSpacing:3,
-              padding:"5px 14px",cursor:"pointer",borderRadius:1
-            }
-          },"↺ REROLL MAP"),
-          React.createElement("button",{
-            onClick:function(){setCyberSess(null);},
-            style:{
-              background:"transparent",
-              border:"1px solid #FF206044",
-              color:"#FF206066",
-              fontFamily:ORB,fontSize:8,letterSpacing:3,
-              padding:"5px 14px",cursor:"pointer",borderRadius:1
-            }
-          },"⏏ JACK OUT")
+      // ── MEMORY CLOCK ──
+      React.createElement("div",{style:{marginBottom:14,borderTop:"1px solid "+CB_GREEN+"22",paddingTop:12}},
+        React.createElement("div",{style:{
+          fontFamily:ORB,fontSize:9,color:CB_GREEN,letterSpacing:3,
+          textShadow:"0 0 6px "+CB_GREEN,marginBottom:7,
+          display:"flex",justifyContent:"space-between"
+        }},
+          React.createElement("span",null,"MEMORY CLOCK"),
+          React.createElement("span",{style:{color:inSession?(cyberSess.clock>=9?"#FF2060":cyberSess.clock>=6?"#FFD166":CB_GREEN):"#555"}},
+            (inSession?cyberSess.clock:0)+" / 12 MOVES"+(inSession&&cyberSess.clock>=12?" ⚠":""))
+        ),
+        React.createElement("div",{style:{display:"flex",gap:3}},
+          Array.from({length:12},function(_,i){
+            var filled=inSession&&i<cyberSess.clock, danger=i>=9;
+            return React.createElement("div",{key:i,style:{
+              flex:1,height:12,borderRadius:1,
+              background:filled?(danger?"#FF2060":CB_GREEN):(danger?"#1a0505":"#0a160a"),
+              border:"1px solid "+(danger?(filled?"#FF2060":"#FF206055"):(filled?CB_GREEN:CB_GREEN+"44")),
+              boxShadow:filled?(danger?"0 0 6px #FF2060aa":"0 0 4px "+CB_GREEN+"88"):undefined,
+              transition:"all .3s"
+            }});
+          })
         )
+      ),
+
+      // ── RULES TEXT ──
+      React.createElement("div",{style:{borderTop:"1px solid "+CB_GREEN+"22",paddingTop:12,fontSize:9,lineHeight:1.7,letterSpacing:.5}},
+        React.createElement("div",{style:{marginBottom:6}},
+          React.createElement("span",{style:{color:CB_GREEN,fontFamily:ORB,letterSpacing:2}},"EXPLORATION"),
+          React.createElement("span",{style:{color:CB_GREEN+"99"}},
+            " // Move through the network map one tile at a time. You can only move to diagonally adjacent tiles. When you enter an unexplored ",
+            React.createElement("span",{style:{color:CB_GREEN,fontWeight:"bold"}},"Normal Tile"),
+            ", roll for a ",
+            React.createElement("span",{style:{color:CB_GREEN,fontWeight:"bold"}},"Cybersphere Encounter"),
+            " and draw the outcome.")
+        ),
+        React.createElement("div",{style:{marginBottom:6}},
+          React.createElement("span",{style:{color:"#FF2060",fontFamily:ORB,letterSpacing:2}},"DEFEAT"),
+          React.createElement("span",{style:{color:CB_GREEN+"99"}},
+            " // If you are defeated during combat, you don't die. You are logged out of the network and lose 10⚡ instead.")
+        )
+      ),
+
+      // ── BOTTOM BUTTONS ──
+      React.createElement("div",{style:{display:"flex",gap:8,justifyContent:"center",marginTop:14}},
+        !inSession&&React.createElement("button",{
+          onClick:function(){
+            var roll=Math.ceil(Math.random()*6);
+            setSelectedMap(roll-1);
+          },
+          style:{
+            background:"transparent",border:"1px solid "+CB_GREEN+"55",
+            color:CB_GREEN+"88",fontFamily:ORB,fontSize:8,letterSpacing:3,
+            padding:"5px 14px",cursor:"pointer",borderRadius:1
+          }
+        },"↺ RANDOM MAP"),
+        inSession&&React.createElement("button",{
+          onClick:function(){
+            setCyberSess({mapId:cyberSess.mapId,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});
+          },
+          style:{
+            background:"transparent",border:"1px solid "+CB_GREEN+"44",
+            color:CB_GREEN+"66",fontFamily:ORB,fontSize:8,letterSpacing:3,
+            padding:"5px 14px",cursor:"pointer",borderRadius:1
+          }
+        },"↺ RESET SESSION"),
+        inSession&&React.createElement("button",{
+          onClick:function(){setCyberSess(null);},
+          style:{
+            background:"transparent",border:"1px solid #FF206044",
+            color:"#FF206066",fontFamily:ORB,fontSize:8,letterSpacing:3,
+            padding:"5px 14px",cursor:"pointer",borderRadius:1
+          }
+        },"⏏ JACK OUT")
       )
     )
   );
