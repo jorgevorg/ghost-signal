@@ -1225,10 +1225,24 @@ function CybersphereTab(props){
           React.createElement("span",{style:{fontFamily:ORB,fontSize:15,letterSpacing:5,color:CB_NORM,textShadow:"0 0 10px "+CB_NORM}},"CYBERSPHERE")
         ),
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
-          React.createElement("div",{style:{
-            background:CB_NORM+"1a",border:"1px solid "+CB_NORM+"66",borderRadius:2,
-            padding:"3px 10px",fontFamily:ORB,fontSize:10,letterSpacing:2,color:CB_NORM
-          }},enVal+" ENERGY"),
+          // Hacker selector pills
+        React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center"}},
+          ["vela","cole"].map(function(key){
+            var hd=hackerData[key], active=hackerSel===key;
+            return React.createElement("button",{key:key,
+              onClick:function(){if(!inSession)setHackerSel(key);},
+              style:{
+                background:active?hd.color+"22":"transparent",
+                border:"1px solid "+(active?hd.color:hd.color+"44"),
+                color:active?hd.color:hd.color+"77",
+                fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"3px 9px",
+                cursor:inSession?"default":"pointer",borderRadius:1,
+                boxShadow:active?"0 0 8px "+hd.color+"33":undefined,
+                transition:"all .2s"
+              }
+            },hd.name);
+          })
+        ),
           inSession&&React.createElement("button",{
             onClick:function(){setCyberSess(null);},
             style:{
@@ -1238,6 +1252,64 @@ function CybersphereTab(props){
               textShadow:"0 0 4px #FF2060"
             }
           },"⏏ JACK OUT")
+        )
+      ),
+
+      // ── HACKER STATS BAR ──
+      React.createElement("div",{style:{
+        display:"flex",alignItems:"center",gap:14,
+        background:hacker.color+"0d",
+        border:"1px solid "+hacker.color+"33",
+        borderRadius:2,padding:"7px 12px",marginBottom:10,
+        transition:"background .3s, border-color .3s"
+      }},
+        React.createElement("div",{style:{
+          fontFamily:ORB,fontSize:9,letterSpacing:3,
+          color:hacker.color,textShadow:"0 0 6px "+hacker.color+"88",
+          flexShrink:0
+        }},hacker.label),
+        React.createElement("div",{style:{width:1,height:16,background:hacker.color+"33",flexShrink:0}}),
+        // EN bar
+        React.createElement("div",{style:{flex:1}},
+          React.createElement("div",{style:{
+            display:"flex",justifyContent:"space-between",
+            fontFamily:MONO,fontSize:8,color:hacker.color+"99",marginBottom:3,letterSpacing:1
+          }},
+            React.createElement("span",null,"EN"),
+            React.createElement("span",null,hacker.en+"/"+hacker.enMax)
+          ),
+          React.createElement("div",{style:{
+            height:4,background:hacker.color+"1a",borderRadius:2,overflow:"hidden"
+          }},
+            React.createElement("div",{style:{
+              height:"100%",borderRadius:2,
+              width:(hacker.en==="?"?"50":Math.round(100*hacker.en/hacker.enMax))+"%",
+              background:hacker.color,
+              boxShadow:"0 0 4px "+hacker.color,
+              transition:"width .4s"
+            }})
+          )
+        ),
+        // HP bar
+        React.createElement("div",{style:{flex:1}},
+          React.createElement("div",{style:{
+            display:"flex",justifyContent:"space-between",
+            fontFamily:MONO,fontSize:8,color:hacker.color+"99",marginBottom:3,letterSpacing:1
+          }},
+            React.createElement("span",null,"HP"),
+            React.createElement("span",null,hacker.hp+"/"+hacker.hpMax)
+          ),
+          React.createElement("div",{style:{
+            height:4,background:hacker.color+"1a",borderRadius:2,overflow:"hidden"
+          }},
+            React.createElement("div",{style:{
+              height:"100%",borderRadius:2,
+              width:(hacker.hp==="?"?"50":Math.round(100*hacker.hp/hacker.hpMax))+"%",
+              background:hacker.color,
+              boxShadow:"0 0 4px "+hacker.color,
+              transition:"width .4s"
+            }})
+          )
         )
       ),
 
@@ -1320,9 +1392,9 @@ function CybersphereTab(props){
               position:"absolute",left:tp.px,top:tp.py,
               width:TW,height:TW,
               transform:"rotate(45deg)",
-              background:isHere?(col+"2e"):isExp?(col+"14"):"transparent",
+              background:isHere?(col+"2e"):isExp?(col+"14"):(t==="X"?col+"0c":"transparent"),
               border:(isHere?"2.5px":"1.5px")+" solid "+(
-                isHere?col:isAdj?(col+"cc"):isExp?(col+"66"):col+"33"),
+                isHere?col:isAdj?(col+"cc"):isExp?(col+"66"):(t==="X"?col+"77":col+"44")),
               boxShadow:isHere?("0 0 16px "+col+",0 0 32px "+col+"44"):
                          isAdj?("0 0 10px "+col+"77"):undefined,
               cursor:canClick?"pointer":"default",
@@ -1335,7 +1407,7 @@ function CybersphereTab(props){
               display:"flex",alignItems:"center",justifyContent:"center",
               pointerEvents:"none"
             }},
-              isHere?React.createElement(RunningMan,{color:col,size:22,glitch:glitch}):
+              isHere?React.createElement(RunningMan,{color:hacker.color,size:22,glitch:glitch}):
               t==="X"?React.createElement("div",{style:{
                 width:9,height:9,borderRadius:"50%",
                 background:CB_NODE,boxShadow:"0 0 8px "+CB_NODE+",0 0 16px "+CB_NODE+"44"
