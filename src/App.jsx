@@ -1630,19 +1630,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
        ),
        React.createElement("button",{onClick:function(){addLog({type:"note",text:"",session:gs.session,ts:new Date().toISOString()});},style:{padding:"6px 16px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"+NEW ENTRY")
       ),
-      React.createElement("div",{style:{marginBottom:18}},
-       React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2,marginBottom:8}},"CAMPAIGN MAP"),
-       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:6}},
-        [{id:null,name:"— NONE —",level:0,desc:""}].concat(CAMPAIGN_MAPS).map(function(cm){
-         var a=gs.campaignMap&&gs.campaignMap.id===cm.id;
-         return React.createElement("div",{key:cm.id||"none",onClick:function(){upCampaign(cm.id?cm:null);},style:{padding:"8px 10px",background:a?"#cc88ff14":"#0d0d1e",border:"1px solid "+(a?"#cc88ff55":"#222230"),borderRadius:4,cursor:"pointer"}},
-          React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:a?"#cc88ff":"#778",letterSpacing:1}},(cm.id?"#"+cm.id+" ":"")+cm.name),
-          cm.desc&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#556",marginTop:3,lineHeight:1.4}},cm.desc.slice(0,60)+(cm.desc.length>60?"...":""))
-         );
-        })
-       )
-      ),
-      gs.logs.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#334",textAlign:"center",padding:"32px 0"}},"// NO LOG ENTRIES"):
+            gs.logs.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#334",textAlign:"center",padding:"32px 0"}},"// NO LOG ENTRIES"):
       gs.logs.slice().reverse().map(function(log){
        return React.createElement("div",{key:log.id,style:{background:"#06060f",border:"1px solid "+B2,borderRadius:6,padding:"12px 14px",marginBottom:8}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
