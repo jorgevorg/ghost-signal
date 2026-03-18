@@ -1488,6 +1488,7 @@ function CybersphereTab(props){
               "Entry — exit points. Jack in here."
             )
           ),
+          React.createElement("div",{style:{flex:1,display:"flex",justifyContent:"center",alignItems:"flex-start"}},
       React.createElement("div",{style:{position:"relative",width:gridW,height:gridH,flexShrink:0}},
         React.createElement("svg",{style:{position:"absolute",top:0,left:0,overflow:"visible",pointerEvents:"none"},width:gridW,height:gridH},
           CONNECTIONS.map(function(pair){
@@ -1512,6 +1513,7 @@ function CybersphereTab(props){
           );
         })
       ),
+          ),
         ),
       React.createElement("div",{style:{display:"flex",gap:12,alignItems:"flex-start",marginBottom:4}},
         React.createElement("div",{style:{flex:1}},
