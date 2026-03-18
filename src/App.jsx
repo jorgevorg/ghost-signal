@@ -47,6 +47,8 @@ const CAMPAIGN_MAPS=[
  {id:"12",name:"RINGWORLD",level:3,desc:"Three Settlements connected by a hollow carbon ring torus. The monumental structure once housed billions of human lives."},
 ];
 
+
+
 // Ring reference: Ring1=IDs 1-6(1=lower-left CW), Ring2=IDs 7-18, Ring3=IDs 19-36
 const HEX_RB=[0,5,4,3,2,1,6,16,15,14,13,12,11,10,9,8,7,18,17,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,36,35,34];
 const MAP_PRESETS={"01":{"8":{type:"barrier"},"9":{type:"barrier"},"11":{type:"barrier"},"12":{type:"barrier"},"14":{type:"barrier"},"15":{type:"barrier"},"17":{type:"barrier"},"18":{type:"barrier"},"19":{type:"base"},"28":{type:"base"}},"02":{"3":{type:"barrier"},"6":{type:"barrier"},"8":{type:"base"},"11":{type:"barrier"},"14":{type:"base"},"17":{type:"barrier"},"25":{type:"barrier"},"34":{type:"barrier"}},"03":{"11":{type:"base"},"17":{type:"base"},"20":{type:"barrier",name:"Gas Cluster"},"21":{type:"barrier",name:"Ice Particles"},"23":{type:"barrier",name:"Gas Cluster"},"24":{type:"barrier",name:"Gas Cluster"},"26":{type:"barrier",name:"Ice Particles"},"27":{type:"barrier",name:"Gas Cluster"},"29":{type:"barrier",name:"Ice Particles"},"30":{type:"barrier",name:"Ice Particles"},"32":{type:"barrier",name:"Gas Cluster"},"33":{type:"barrier",name:"Ice Particles"},"35":{type:"barrier",name:"Gas Cluster"},"36":{type:"barrier",name:"Gas Cluster"}},"04":{"8":{type:"barrier"},"10":{type:"barrier"},"12":{type:"base"},"14":{type:"barrier"},"16":{type:"barrier"},"18":{type:"base"},"19":{type:"barrier"},"20":{type:"barrier"},"24":{type:"barrier"},"25":{type:"barrier"},"28":{type:"barrier"},"29":{type:"barrier"},"33":{type:"barrier"},"34":{type:"barrier"}},"05":{"7":{type:"barrier"},"9":{type:"barrier"},"10":{type:"barrier"},"12":{type:"barrier"},"13":{type:"barrier"},"15":{type:"barrier"},"16":{type:"barrier"},"18":{type:"barrier"},"23":{type:"barrier"},"25":{type:"base"},"27":{type:"barrier"},"32":{type:"barrier"},"34":{type:"base"},"36":{type:"barrier"}},"06":{"7":{type:"barrier"},"11":{type:"barrier"},"12":{type:"barrier"},"13":{type:"barrier"},"17":{type:"barrier"},"18":{type:"barrier"},"19":{type:"barrier"},"22":{type:"base"},"25":{type:"barrier"},"26":{type:"barrier"},"27":{type:"barrier"},"28":{type:"barrier"},"31":{type:"base"},"34":{type:"barrier"},"35":{type:"barrier"},"36":{type:"barrier"}},"07":{"8":{type:"barrier"},"10":{type:"barrier"},"12":{type:"barrier"},"14":{type:"barrier"},"16":{type:"barrier"},"18":{type:"barrier"},"22":{type:"base"},"28":{type:"base"},"34":{type:"base"}},"08":{"7":{type:"barrier"},"9":{type:"barrier"},"10":{type:"base"},"11":{type:"barrier"},"13":{type:"barrier"},"14":{type:"base"},"15":{type:"barrier"},"17":{type:"barrier"},"18":{type:"base"},"23":{type:"barrier"},"24":{type:"barrier"},"29":{type:"barrier"},"30":{type:"barrier"},"35":{type:"barrier"},"36":{type:"barrier"}},"09":{"1":{type:"barrier"},"3":{type:"barrier"},"5":{type:"barrier"},"7":{type:"barrier"},"9":{type:"base"},"11":{type:"barrier"},"13":{type:"base"},"15":{type:"barrier"},"17":{type:"base"},"19":{type:"barrier"},"25":{type:"barrier"},"31":{type:"barrier"}},"10":{"1":{type:"barrier"},"2":{type:"base"},"3":{type:"barrier"},"4":{type:"base"},"5":{type:"barrier"},"6":{type:"base"},"7":{type:"barrier"},"9":{type:"barrier"},"11":{type:"barrier"},"13":{type:"barrier"},"15":{type:"barrier"},"17":{type:"barrier"}},"11":{"1":{type:"base"},"2":{type:"barrier"},"3":{type:"base"},"4":{type:"barrier"},"5":{type:"base"},"6":{type:"barrier"}},"12":{"3":{name:"Ring Settlement Beta",notes:"Hollow carbon ring torus"},"7":{type:"barrier"},"8":{type:"barrier",name:"Ring Torus"},"9":{type:"base"},"10":{type:"barrier",name:"Ring Torus"},"11":{type:"barrier",name:"Ring Torus"},"12":{type:"barrier",name:"Ring Torus"},"13":{type:"base"},"14":{type:"barrier"},"15":{type:"barrier"},"16":{type:"barrier"},"17":{type:"base"},"18":{type:"barrier"}}};
@@ -115,6 +117,300 @@ const CYBER_MAPS=[
 ];
 const CYBER_ADJ={1:[2,3],2:[1,4,5],3:[1,5,6],4:[2,7],5:[2,3,7,8],6:[3,8],7:[4,5,9],8:[5,6,9],9:[7,8]};
 
+// ══════════════════════════════════════════════════════════════════
+// GHOST SIGNAL — SVG CHROME COMPONENTS
+// Paste this entire block directly above: function Toast(props){
+// Also add the 4 @keyframes lines below into the END of your css const
+// ══════════════════════════════════════════════════════════════════
+
+// ── ADD THESE 4 LINES TO END OF YOUR EXISTING css CONST ───────────
+// @keyframes gyroSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+// @keyframes burstSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+// @keyframes hudPulse{0%,100%{opacity:.55}50%{opacity:.9}}
+// @keyframes dotBlink{0%,49%{opacity:1}50%,100%{opacity:.25}}
+
+function HUDHeaderBar(props){
+  var color=props.color||"#00FFD0",width=props.width||800,opacity=props.opacity||.55,style=props.style||{};
+  return React.createElement("svg",{
+    viewBox:"483 855 3533 136",
+    width:width,height:Math.round(width*136/3533),
+    style:Object.assign({display:"block",overflow:"visible"},style)
+  },
+    React.createElement("path",{
+      fillRule:"evenodd",fill:color,fillOpacity:opacity,
+      d:"M 571.375 900.539062 L 735.449219 900.539062 L 779.609375 855.339844 L 1222.859375 855.339844 L 1267.019531 900.539062 L 2553.671875 900.539062 L 2597.828125 855.339844 L 3427.191406 855.339844 L 3383.039062 900.539062 L 4016.941406 900.539062 L 3972.78125 945.75 L 3677.910156 945.75 L 3633.75 990.941406 L 3190.5 990.941406 L 3146.351562 945.75 L 2788.890625 945.75 L 2744.730469 990.941406 L 2301.488281 990.941406 L 2257.328125 945.75 L 1119.890625 945.75 L 1075.730469 990.941406 L 483.058594 990.941406 L 527.21875 945.75 L 527.222656 945.738281 Z M 3827.339844 855.339844 L 3932.800781 855.339844 L 3900.03125 888.890625 L 3794.570312 888.890625 Z M 3650.921875 855.339844 L 3756.378906 855.339844 L 3723.609375 888.890625 L 3618.148438 888.890625 Z M 3474.5 855.339844 L 3579.960938 855.339844 L 3547.191406 888.890625 L 3441.730469 888.890625 Z M 1812.070312 855.339844 L 1706.609375 855.339844 L 1739.378906 888.890625 L 1844.839844 888.890625 Z M 1673.839844 855.339844 L 1568.378906 855.339844 L 1601.148438 888.890625 L 1706.609375 888.890625 Z M 1535.609375 855.339844 L 1430.148438 855.339844 L 1462.921875 888.890625 L 1568.378906 888.890625 Z M 614.058594 900.539062 L 704.679688 900.539062 L 748.839844 855.339844 L 658.21875 855.339844 Z M 1397.378906 855.339844 L 1291.921875 855.339844 L 1324.691406 888.890625 L 1430.148438 888.890625 L 1397.378906 855.339844"
+    })
+  );
+}
+
+function HUDFooterBar(props){
+  var color=props.color||"#00FFD0",width=props.width||800,opacity=props.opacity||.55,style=props.style||{};
+  return React.createElement("svg",{
+    viewBox:"480 2918 3539 215",
+    width:width,height:Math.round(width*215/3539),
+    style:Object.assign({display:"block",overflow:"visible"},style)
+  },
+    React.createElement("path",{
+      fillRule:"evenodd",fill:color,fillOpacity:opacity,
+      d:"M 3176.789062 2918.960938 L 3076.941406 2918.960938 L 3107.960938 2950.722656 L 3076.941406 2982.480469 L 3176.789062 2982.480469 L 3207.808594 2950.722656 Z M 880.683594 2933.589844 L 864.15625 2943.128906 L 847.628906 2952.671875 L 847.628906 2990.832031 L 864.15625 3000.378906 L 880.683594 3009.914062 L 897.203125 3000.378906 L 913.730469 2990.832031 L 913.730469 2952.671875 L 897.203125 2943.128906 Z M 779.671875 2933.589844 L 763.144531 2943.128906 L 746.621094 2952.671875 L 746.621094 2990.832031 L 763.144531 3000.378906 L 779.671875 3009.914062 L 796.199219 3000.378906 L 812.71875 2990.832031 L 812.71875 2952.671875 L 796.199219 2943.128906 Z M 678.660156 2933.589844 L 662.140625 2943.128906 L 645.613281 2952.671875 L 645.613281 2990.832031 L 662.140625 3000.378906 L 678.660156 3009.914062 L 695.1875 3000.378906 L 711.714844 2990.832031 L 711.714844 2952.671875 L 695.1875 2943.128906 Z M 1061.460938 2982.480469 L 1161.308594 2982.480469 L 1130.28125 2950.722656 L 1161.308594 2918.960938 L 1061.460938 2918.960938 L 1030.429688 2950.722656 Z M 1192.339844 2982.480469 L 1292.191406 2982.480469 L 1261.160156 2950.722656 L 1292.191406 2918.960938 L 1192.339844 2918.960938 L 1161.308594 2950.722656 Z M 1323.210938 2982.480469 L 1423.058594 2982.480469 L 1392.039062 2950.722656 L 1423.058594 2918.960938 L 1323.210938 2918.960938 L 1292.191406 2950.722656 Z M 521.835938 3090.152344 L 757.078125 3090.152344 L 715.269531 3132.949219 L 1153.960938 3132.949219 L 1195.78125 3090.152344 L 1237.589844 3047.355469 L 2078.789062 3047.355469 L 2099.710938 3025.945312 L 2400.289062 3025.945312 L 2421.210938 3047.355469 L 3262.410156 3047.355469 L 3304.21875 3090.152344 L 3346.03125 3132.949219 L 3784.730469 3132.949219 L 3742.921875 3090.152344 L 3978.160156 3090.152344 L 4019.96875 3047.355469 L 3536.058594 3047.355469 L 3494.25 3004.554688 L 3056.46875 3004.554688 L 2972.851562 2918.960938 L 1527.148438 2918.960938 L 1443.53125 3004.554688 L 1005.75 3004.554688 L 963.941406 3047.355469 L 480.023438 3047.355469 Z M 1529.328125 3004.554688 L 1571.140625 2961.757812 L 2078.789062 2961.757812 L 2099.710938 2940.351562 L 2400.289062 2940.351562 L 2421.210938 2961.757812 L 2928.859375 2961.757812 L 2970.671875 3004.554688 Z M 1240.898438 3068.75 L 3259.101562 3068.75 L 3300.910156 3111.546875 L 1199.089844 3111.546875 Z M 3619.320312 2933.589844 L 3635.839844 2943.136719 L 3652.371094 2952.671875 L 3652.371094 2990.832031 L 3635.839844 3000.378906 L 3619.320312 3009.914062 L 3602.800781 3000.378906 L 3586.269531 2990.832031 L 3586.269531 2952.671875 L 3602.800781 2943.136719 Z M 3720.328125 2933.589844 L 3736.859375 2943.136719 L 3753.378906 2952.671875 L 3753.378906 2990.832031 L 3736.859375 3000.378906 L 3720.328125 3009.914062 L 3703.800781 3000.378906 L 3687.28125 2990.832031 L 3687.28125 2952.671875 L 3703.800781 2943.136719 Z M 3821.328125 2933.589844 L 3837.859375 2943.136719 L 3854.390625 2952.671875 L 3854.390625 2990.832031 L 3837.859375 3000.378906 L 3821.328125 3009.914062 L 3804.808594 3000.378906 L 3788.289062 2990.832031 L 3788.289062 2952.671875 L 3804.808594 2943.136719 Z M 3438.539062 2982.480469 L 3338.691406 2982.480469 L 3369.71875 2950.722656 L 3338.691406 2918.960938 L 3438.539062 2918.960938 L 3469.570312 2950.722656 Z M 3307.660156 2982.480469 L 3207.808594 2982.480469 L 3238.839844 2950.722656 L 3207.808594 2918.960938 L 3307.660156 2918.960938 L 3338.691406 2950.722656 L 3307.660156 2982.480469"
+    })
+  );
+}
+
+function StatusDotBar(props){
+  var color=props.color||"#00FFD0",width=props.width||600,opacity=props.opacity||.7;
+  var dotActive=props.dotActive!==undefined?props.dotActive:3;
+  var label=props.label||"",style=props.style||{};
+  var dots=[
+    {cx:2133.648438,cy:1993.820312,r:35.351562},
+    {cx:2250,cy:1993.820312,r:35.351562},
+    {cx:2366.351562,cy:1993.820312,r:35.351562}
+  ];
+  return React.createElement("div",{style:Object.assign({position:"relative"},style)},
+    label?React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:color,letterSpacing:3,opacity:.55,marginBottom:2,textAlign:"center"}},label):null,
+    React.createElement("svg",{
+      viewBox:"448 1958 3603 226",width:width,height:Math.round(width*226/3603),
+      style:{display:"block"}
+    },
+      React.createElement("path",{
+        fillRule:"evenodd",fill:color,fillOpacity:opacity*.55,
+        d:"M 4030.78125 2136.011719 L 2825.109375 2136.011719 L 2778.511719 2088.308594 L 1721.488281 2088.308594 L 1674.890625 2136.011719 L 469.222656 2136.011719 L 448.5 2157.21875 L 842.390625 2157.21875 L 816.515625 2183.710938 L 1718.101562 2183.710938 L 1764.691406 2136.011719 L 2735.308594 2136.011719 L 2781.898438 2183.710938 L 3683.488281 2183.710938 L 3657.609375 2157.21875 L 4051.5 2157.21875 Z M 2946.101562 2088.308594 L 2834.808594 2088.308594 L 2869.390625 2123.710938 L 2980.679688 2123.710938 Z M 3091.96875 2088.308594 L 2980.679688 2088.308594 L 3015.261719 2123.710938 L 3126.550781 2123.710938 Z M 3187.949219 2112.160156 L 4007.480469 2112.160156 L 3984.179688 2088.320312 L 3164.648438 2088.308594 Z M 1553.898438 2088.308594 L 1665.191406 2088.308594 L 1630.609375 2123.710938 L 1519.320312 2123.710938 Z M 1408.03125 2088.308594 L 1519.320312 2088.308594 L 1484.738281 2123.710938 L 1373.449219 2123.710938 Z M 1312.050781 2112.160156 L 492.515625 2112.160156 L 515.816406 2088.320312 L 1335.351562 2088.308594 L 1312.050781 2112.160156"
+      }),
+      dots.map(function(dp,i){
+        var active=i<dotActive;
+        return React.createElement("circle",{
+          key:i,cx:dp.cx,cy:dp.cy,r:dp.r,
+          fill:active?color:"none",
+          stroke:color,strokeWidth:active?0:10,
+          fillOpacity:active?opacity:0,
+          strokeOpacity:opacity*.45,
+          style:active&&i===dotActive-1?{animation:"dotBlink 1.4s ease-in-out infinite"}:{}
+        });
+      })
+    )
+  );
+}
+
+function GyroSphere(props){
+  var color=props.color||"#00FFD0",size=props.size||300,opacity=props.opacity||.3;
+  var spin=props.spin!==false,style=props.style||{};
+  return React.createElement("svg",{
+    viewBox:"3749 486 760 760",width:size,height:size,
+    style:Object.assign({display:"block"},style)
+  },
+    React.createElement("g",{style:spin?{animation:"gyroSpin 35s linear infinite",transformOrigin:"4129px 866px"}:{}},
+      React.createElement("path",{fillRule:"nonzero",fill:color,fillOpacity:opacity,
+        d:"M 4129.390625 486.261719 C 4234.398438 486.261719 4329.46875 528.828125 4398.289062 597.640625 C 4467.109375 666.460938 4509.679688 761.539062 4509.679688 866.550781 C 4509.679688 971.558594 4467.109375 1066.628906 4398.289062 1135.449219 C 4329.46875 1204.269531 4234.398438 1246.828125 4129.390625 1246.828125 C 4024.378906 1246.828125 3929.300781 1204.269531 3860.488281 1135.449219 C 3791.671875 1066.628906 3749.101562 971.550781 3749.101562 866.550781 C 3749.101562 761.539062 3791.671875 666.460938 3860.488281 597.640625 C 3929.308594 528.820312 4024.378906 486.261719 4129.390625 486.261719 Z M 4122.328125 1029.929688 L 4122.109375 882.359375 C 4122.101562 878.269531 4118.761719 874.941406 4114.671875 874.941406 L 3774.121094 875.441406 C 3771.789062 875.441406 3769.78125 876.410156 3768.320312 878.238281 C 3766.871094 880.058594 3766.371094 882.238281 3766.890625 884.519531 C 3775.789062 923.570312 3813.308594 958.980469 3869.441406 985.929688 C 3932.601562 1016.261719 4018.898438 1035.578125 4114.761719 1037.371094 C 4118.828125 1037.410156 4122.328125 1034.011719 4122.328125 1029.929688 Z M 3773.699219 859.75 L 4114.648438 859.261719 C 4118.738281 859.25 4122.070312 855.910156 4122.070312 851.820312 L 4121.851562 703.148438 C 4121.851562 699.078125 4118.28125 695.691406 4114.28125 695.730469 C 4018.609375 697.578125 3932.5 716.878906 3869.441406 747.160156 C 3812.210938 774.640625 3774.320312 810.921875 3766.398438 850.878906 C 3765.949219 853.140625 3766.488281 855.261719 3767.949219 857.039062 C 3769.410156 858.820312 3771.398438 859.761719 3773.699219 859.75 Z M 4137.53125 703.179688 L 4137.75 851.800781 C 4137.761719 855.890625 4141.101562 859.21875 4145.191406 859.210938 L 4484.890625 858.71875 C 4489.210938 858.71875 4492.140625 855.148438 4492.140625 849.75 C 4483.730469 810.230469 4446.019531 774.378906 4389.339844 747.160156 C 4326.421875 716.941406 4240.53125 697.660156 4145.109375 695.738281 C 4141.039062 695.699219 4137.53125 699.109375 4137.53125 703.179688 Z M 4484.859375 874.410156 L 4145.210938 874.898438 C 4141.121094 874.910156 4137.789062 878.25 4137.789062 882.339844 L 4138.011719 1029.929688 C 4138.011719 1034.011719 4141.511719 1037.390625 4145.589844 1037.339844 C 4240.820312 1035.371094 4326.53125 1016.101562 4389.339844 985.929688 C 4446.011719 958.71875 4483.71875 922.878906 4492.140625 883.378906 C 4492.621094 881.109375 4489.179688 874.398438 4484.859375 874.410156 Z"
+      })
+    )
+  );
+}
+
+function OrreryRings(props){
+  var color=props.color||"#00FFD0",size=props.size||300,opacity=props.opacity||.25,style=props.style||{};
+  return React.createElement("svg",{
+    viewBox:"2665 2534 513 513",width:size,height:size,
+    style:Object.assign({display:"block"},style)
+  },
+    React.createElement("path",{
+      fillRule:"evenodd",fill:color,fillOpacity:opacity,
+      d:"M 2665.261719 2791.179688 C 2665.261719 2734.101562 2713.738281 2684.039062 2786.558594 2655.980469 C 2776.53125 2682 2769.308594 2711.140625 2765.578125 2742.28125 C 2704.578125 2753.550781 2665.261719 2771.261719 2665.261719 2791.179688 C 2665.261719 2811.101562 2704.578125 2828.808594 2765.578125 2840.078125 C 2769.308594 2871.21875 2776.53125 2900.359375 2786.558594 2926.378906 C 2713.738281 2898.320312 2665.261719 2848.261719 2665.261719 2791.179688 Z M 2921.761719 2534.679688 C 2978.839844 2534.679688 3028.898438 2583.160156 3056.96875 2655.980469 C 3030.941406 2645.941406 3001.808594 2638.71875 2970.660156 2635 C 2959.398438 2573.988281 2941.679688 2534.679688 2921.761719 2534.679688 Z M 3056.96875 2655.980469 C 3178.269531 2703.300781 3178.269531 2879.058594 3056.96875 2926.390625 C 3067 2900.359375 3074.21875 2871.21875 3077.949219 2840.078125 C 3138.949219 2828.808594 3178.269531 2811.101562 3178.269531 2791.179688 C 3178.269531 2771.261719 3138.949219 2753.550781 3077.949219 2742.28125 C 3074.21875 2711.140625 3067 2682 3056.96875 2655.980469 Z M 2861.808594 2731.230469 C 2860.710938 2750.460938 2860.121094 2770.539062 2860.121094 2791.179688 C 2860.121094 2811.820312 2860.710938 2831.898438 2861.808594 2851.128906 C 2826.289062 2849.089844 2793.640625 2845.269531 2765.578125 2840.078125 C 2763.679688 2824.25 2762.691406 2807.898438 2762.691406 2791.179688 C 2762.691406 2774.460938 2763.679688 2758.109375 2765.578125 2742.28125 C 2793.640625 2737.101562 2826.289062 2733.28125 2861.808594 2731.230469 Z M 2921.761719 2534.679688 C 2901.839844 2534.679688 2884.128906 2574 2872.859375 2635 C 2841.71875 2638.71875 2812.589844 2645.941406 2786.558594 2655.980469 C 2814.621094 2583.160156 2864.679688 2534.679688 2921.761719 2534.679688"
+    })
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GHOST SIGNAL — BATCH 3: SYMBOL-BASED UI COMPONENTS
+// Append these to the same block, still above function Toast(
+// ══════════════════════════════════════════════════════════════════
+
+function CPHeaderBar(props){
+  var color=props.color||"#00FFD0",width=props.width||400,opacity=props.opacity||.55,style=props.style||{};
+  var h=Math.round(width*50/500);
+  return React.createElement("svg",{viewBox:"0 0 500 50",width:width,height:h,style:Object.assign({display:"block",overflow:"visible"},style)},
+    React.createElement("defs",null,
+      React.createElement("filter",{id:"cpglow-hdr-"+color.replace("#",""),x:"-50%",y:"-50%",width:"200%",height:"200%"},
+        React.createElement("feGaussianBlur",{stdDeviation:"2",result:"coloredBlur"}),
+        React.createElement("feMerge",null,
+          React.createElement("feMergeNode",{in:"coloredBlur"}),
+          React.createElement("feMergeNode",{in:"SourceGraphic"})
+        )
+      )
+    ),
+    React.createElement("path",{fill:color,fillOpacity:opacity*.18,stroke:"none",d:"M0,10 L400,10 L420,30 L500,30 L500,50 L0,50 Z"}),
+    React.createElement("path",{fill:"none",stroke:color,strokeWidth:1.5,strokeOpacity:opacity,d:"M0,10 L400,10 L420,30 L500,30",filter:"url(#cpglow-hdr-"+color.replace("#","")+")"}),
+    React.createElement("rect",{x:10,y:15,width:50,height:2,fill:color,fillOpacity:opacity}),
+    React.createElement("rect",{x:70,y:15,width:10,height:2,fill:color,fillOpacity:opacity})
+  );
+}
+
+function CPCornerData(props){
+  var color=props.color||"#00FFD0",size=props.size||80,label=props.label||"STATUS: OK",style=props.style||{};
+  return React.createElement("svg",{viewBox:"0 0 100 100",width:size,height:size,style:Object.assign({display:"block",overflow:"visible"},style)},
+    React.createElement("defs",null,
+      React.createElement("filter",{id:"cpglow-cor-"+color.replace("#",""),x:"-50%",y:"-50%",width:"200%",height:"200%"},
+        React.createElement("feGaussianBlur",{stdDeviation:"3",result:"coloredBlur"}),
+        React.createElement("feMerge",null,
+          React.createElement("feMergeNode",{in:"coloredBlur"}),
+          React.createElement("feMergeNode",{in:"SourceGraphic"})
+        )
+      )
+    ),
+    React.createElement("path",{fill:"none",stroke:color,strokeWidth:1.5,d:"M100,0 L0,0 L0,100",filter:"url(#cpglow-cor-"+color.replace("#","")+")"}),
+    React.createElement("rect",{x:5,y:5,width:15,height:15,fill:color,fillOpacity:.35}),
+    label?React.createElement("text",{x:30,y:15,fill:color,fontFamily:"monospace",fontSize:10,fillOpacity:.8},label):null
+  );
+}
+
+function CPButton(props){
+  var color=props.color||"#00FFD0",width=props.width||160,label=props.label||"",onClick=props.onClick,style=props.style||{};
+  var h=Math.round(width*50/200);
+  var flip=props.flip; // flip=true gives the magenta mirrored shape
+  var pathD=flip
+    ?"M20,0 L200,0 L200,30 L180,50 L0,50 L0,20 Z"
+    :"M0,0 L180,0 L200,20 L200,50 L20,50 L0,30 Z";
+  return React.createElement("div",{onClick:onClick,style:Object.assign({position:"relative",display:"inline-flex",alignItems:"center",justifyContent:"center",cursor:onClick?"pointer":"default"},style)},
+    React.createElement("svg",{viewBox:"0 0 200 50",width:width,height:h,style:{display:"block",overflow:"visible"}},
+      React.createElement("defs",null,
+        React.createElement("filter",{id:"cpglow-btn-"+color.replace("#",""),x:"-50%",y:"-50%",width:"200%",height:"200%"},
+          React.createElement("feGaussianBlur",{stdDeviation:"2",result:"coloredBlur"}),
+          React.createElement("feMerge",null,
+            React.createElement("feMergeNode",{in:"coloredBlur"}),
+            React.createElement("feMergeNode",{in:"SourceGraphic"})
+          )
+        ),
+        React.createElement("linearGradient",{id:"cpgrad-btn-"+color.replace("#",""),x1:"0%",y1:"0%",x2:"100%",y2:"0%"},
+          React.createElement("stop",{offset:"0%",style:{stopColor:color,stopOpacity:.05}}),
+          React.createElement("stop",{offset:"100%",style:{stopColor:color,stopOpacity:.2}})
+        )
+      ),
+      React.createElement("path",{fill:"url(#cpgrad-btn-"+color.replace("#","")+")",stroke:"none",d:pathD}),
+      React.createElement("path",{fill:"none",stroke:color,strokeWidth:1.5,d:pathD,filter:"url(#cpglow-btn-"+color.replace("#","")+")"})        
+    ),
+    label?React.createElement("span",{style:{position:"absolute",fontFamily:MONO,fontSize:10,letterSpacing:2,color:color,pointerEvents:"none"}},label):null
+  );
+}
+
+function CPProgressBar(props){
+  // value: 0-1, color defaults to Vela teal
+  var color=props.color||"#00FFD0",width=props.width||240,value=props.value!==undefined?props.value:.75;
+  var label=props.label||"",style=props.style||{};
+  var trackH=16,tileW=14,gap=2;
+  var filledTiles=Math.round(value*Math.floor(width/tileW));
+  var totalTiles=Math.floor(width/(tileW+gap));
+  return React.createElement("div",{style:Object.assign({display:"flex",flexDirection:"column",gap:3},style)},
+    label?React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:color,letterSpacing:3,opacity:.55}},label):null,
+    React.createElement("svg",{width:width,height:trackH,style:{display:"block",overflow:"visible"}},
+      React.createElement("defs",null,
+        React.createElement("filter",{id:"cpglow-bar-"+color.replace("#",""),x:"-50%",y:"-50%",width:"200%",height:"200%"},
+          React.createElement("feGaussianBlur",{stdDeviation:"1.5",result:"coloredBlur"}),
+          React.createElement("feMerge",null,
+            React.createElement("feMergeNode",{in:"coloredBlur"}),
+            React.createElement("feMergeNode",{in:"SourceGraphic"})
+          )
+        )
+      ),
+      React.createElement("rect",{x:0,y:0,width:width,height:trackH,rx:2,fill:"#0a0a12",stroke:color,strokeWidth:1,strokeOpacity:.25}),
+      Array.from({length:totalTiles},function(_,i){
+        var filled=i<filledTiles;
+        var x=i*(tileW+gap)+gap;
+        return React.createElement("rect",{
+          key:i,x:x,y:3,width:tileW-2,height:trackH-6,rx:1,
+          fill:filled?color:"none",
+          fillOpacity:filled?.85:0,
+          stroke:filled?"none":color,strokeWidth:filled?0:.5,strokeOpacity:.2,
+          filter:filled?"url(#cpglow-bar-"+color.replace("#","")+")":undefined
+        });
+      })
+    )
+  );
+}
+
+function CPGaugeArc(props){
+  var color=props.color||"#00FFD0",size=props.size||100,value=props.value!==undefined?props.value:.75;
+  var label=props.label||(Math.round(value*100)+"%"),style=props.style||{};
+  var circumference=2*Math.PI*40;
+  var arcFill=value*circumference*0.5; // semicircle gauge
+  var arcTotal=circumference;
+  return React.createElement("svg",{viewBox:"0 0 100 100",width:size,height:size,style:Object.assign({display:"block"},style)},
+    React.createElement("defs",null,
+      React.createElement("filter",{id:"cpglow-gauge-"+color.replace("#",""),x:"-50%",y:"-50%",width:"200%",height:"200%"},
+        React.createElement("feGaussianBlur",{stdDeviation:"2",result:"coloredBlur"}),
+        React.createElement("feMerge",null,
+          React.createElement("feMergeNode",{in:"coloredBlur"}),
+          React.createElement("feMergeNode",{in:"SourceGraphic"})
+        )
+      )
+    ),
+    React.createElement("circle",{cx:50,cy:50,r:40,fill:"none",stroke:color,strokeOpacity:.2,strokeWidth:4,strokeDasharray:"180 360",strokeLinecap:"round",transform:"rotate(-90 50 50)"}),
+    React.createElement("circle",{cx:50,cy:50,r:40,fill:"none",stroke:color,strokeWidth:4,strokeDasharray:(value*180)+" 360",strokeLinecap:"round",transform:"rotate(-90 50 50)",filter:"url(#cpglow-gauge-"+color.replace("#","")+")"}),
+    React.createElement("text",{x:50,y:56,textAnchor:"middle",fill:color,fontFamily:MONO,fontSize:14,fontWeight:"bold",fillOpacity:.9},label)
+  );
+}
+
+function CPIconGlitch(props){
+  var color=props.color||"#00FFD0",accentA=props.accentA||"#FF2D78",accentB=props.accentB||"#00FFD0";
+  var size=props.size||24,style=props.style||{};
+  return React.createElement("svg",{viewBox:"0 0 24 24",width:size,height:size,style:Object.assign({display:"block"},style)},
+    React.createElement("defs",null,
+      React.createElement("filter",{id:"cpglow-glitch",x:"-50%",y:"-50%",width:"200%",height:"200%"},
+        React.createElement("feGaussianBlur",{stdDeviation:"1",result:"coloredBlur"}),
+        React.createElement("feMerge",null,
+          React.createElement("feMergeNode",{in:"coloredBlur"}),
+          React.createElement("feMergeNode",{in:"SourceGraphic"})
+        )
+      )
+    ),
+    React.createElement("path",{fill:color,d:"M12,2 L2,22 L22,22 Z M12,6 L19,19 L5,19 Z",filter:"url(#cpglow-glitch)"}),
+    React.createElement("rect",{x:11,y:10,width:2,height:5,fill:color}),
+    React.createElement("rect",{x:11,y:16,width:2,height:2,fill:color}),
+    React.createElement("rect",{x:2,y:5,width:6,height:1,fill:accentA,fillOpacity:.7}),
+    React.createElement("rect",{x:18,y:15,width:4,height:1,fill:accentB,fillOpacity:.7})
+  );
+}
+
+function CPIconTarget(props){
+  var color=props.color||"#00FFD0",size=props.size||24,style=props.style||{};
+  return React.createElement("svg",{viewBox:"0 0 24 24",width:size,height:size,style:Object.assign({display:"block"},style)},
+    React.createElement("defs",null,
+      React.createElement("filter",{id:"cpglow-tgt",x:"-50%",y:"-50%",width:"200%",height:"200%"},
+        React.createElement("feGaussianBlur",{stdDeviation:"1.5",result:"coloredBlur"}),
+        React.createElement("feMerge",null,
+          React.createElement("feMergeNode",{in:"coloredBlur"}),
+          React.createElement("feMergeNode",{in:"SourceGraphic"})
+        )
+      )
+    ),
+    React.createElement("circle",{cx:12,cy:12,r:10,fill:"none",stroke:color,strokeWidth:1.5,filter:"url(#cpglow-tgt)"}),
+    React.createElement("circle",{cx:12,cy:12,r:3,fill:"none",stroke:color,strokeWidth:1.5}),
+    React.createElement("path",{fill:"none",stroke:color,strokeWidth:1.5,d:"M12,2 L12,6 M12,18 L12,22 M2,12 L6,12 M18,12 L22,12"})
+  );
+}
+
+function RadialBurst(props){
+  var color=props.color||"#00FFD0",size=props.size||120,opacity=props.opacity||.6;
+  var spin=props.spin!==false,style=props.style||{};
+  var petalDs=[
+    "M 4129.140625 2534.679688 C 4139.710938 2534.679688 4148.28125 2592.101562 4148.28125 2662.929688 C 4148.28125 2674.28125 4148.050781 2685.28125 4147.640625 2695.761719 C 4141.648438 2694.609375 4135.46875 2694 4129.140625 2694 C 4122.808594 2694 4116.628906 2694.609375 4110.628906 2695.761719 C 4110.21875 2685.28125 4110 2674.28125 4110 2662.929688 C 4110 2592.101562 4118.570312 2534.679688 4129.140625 2534.679688",
+    "M 4385.640625 2791.179688 C 4385.640625 2801.75 4328.21875 2810.320312 4257.390625 2810.320312 C 4246.039062 2810.320312 4235.039062 2810.101562 4224.558594 2809.679688 C 4225.710938 2803.691406 4226.320312 2797.511719 4226.320312 2791.179688 C 4226.320312 2784.851562 4225.710938 2778.671875 4224.558594 2772.679688 C 4235.039062 2772.261719 4246.039062 2772.039062 4257.390625 2772.039062 C 4328.21875 2772.039062 4385.640625 2780.609375 4385.640625 2791.179688",
+    "M 4129.140625 3047.679688 C 4118.570312 3047.679688 4110 2990.261719 4110 2919.429688 C 4110 2908.078125 4110.21875 2897.078125 4110.628906 2886.601562 C 4116.628906 2887.75 4122.808594 2888.371094 4129.140625 2888.371094 C 4135.46875 2888.371094 4141.648438 2887.75 4147.640625 2886.601562 C 4148.058594 2897.078125 4148.28125 2908.078125 4148.28125 2919.429688 C 4148.28125 2990.261719 4139.710938 3047.679688 4129.140625 3047.679688",
+    "M 3872.640625 2791.179688 C 3872.640625 2780.609375 3930.050781 2772.039062 4000.890625 2772.039062 C 4012.238281 2772.039062 4023.238281 2772.261719 4033.71875 2772.679688 C 4032.558594 2778.671875 4031.949219 2784.851562 4031.949219 2791.179688 C 4031.949219 2797.511719 4032.558594 2803.691406 4033.71875 2809.691406 C 4023.238281 2810.101562 4012.238281 2810.320312 4000.890625 2810.320312 C 3930.050781 2810.320312 3872.640625 2801.75 3872.640625 2791.179688",
+    "M 4351.28125 2662.929688 C 4356.558594 2672.078125 4311.121094 2708.210938 4249.78125 2743.628906 C 4239.949219 2749.300781 4230.308594 2754.609375 4221.03125 2759.488281 C 4216.929688 2747.601562 4210.589844 2736.75 4202.511719 2727.449219 C 4211.378906 2721.851562 4220.800781 2716.160156 4230.640625 2710.480469 C 4291.980469 2675.070312 4345.988281 2653.78125 4351.28125 2662.929688",
+    "M 3907 2919.429688 C 3901.71875 2910.28125 3947.160156 2874.148438 4008.5 2838.730469 C 4018.328125 2833.058594 4027.960938 2827.75 4037.238281 2822.871094 C 4041.339844 2834.761719 4047.679688 2845.609375 4055.761719 2854.910156 C 4046.890625 2860.511719 4037.46875 2866.199219 4027.640625 2871.878906 C 3966.300781 2907.300781 3912.289062 2928.589844 3907 2919.429688",
+    "M 4351.28125 2919.429688 C 4345.988281 2928.589844 4291.980469 2907.300781 4230.640625 2871.878906 C 4220.800781 2866.199219 4211.378906 2860.511719 4202.511719 2854.910156 C 4210.589844 2845.609375 4216.929688 2834.761719 4221.03125 2822.871094 C 4230.308594 2827.75 4239.949219 2833.058594 4249.78125 2838.730469 C 4311.121094 2874.148438 4356.558594 2910.28125 4351.28125 2919.429688",
+    "M 3907 2662.929688 C 3912.289062 2653.78125 3966.289062 2675.070312 4027.640625 2710.480469 C 4037.46875 2716.160156 4046.890625 2721.851562 4055.761719 2727.449219 C 4047.679688 2736.75 4041.339844 2747.601562 4037.238281 2759.488281 C 4027.960938 2754.609375 4018.328125 2749.300781 4008.5 2743.628906 C 3947.160156 2708.210938 3901.71875 2672.078125 3907 2662.929688"
+  ];
+  return React.createElement("svg",{
+    viewBox:"3872 2534 514 514",width:size,height:size,
+    style:Object.assign({display:"block"},style)
+  },
+    React.createElement("g",{style:spin?{animation:"burstSpin 20s linear infinite",transformOrigin:"4129px 2791px"}:{}},
+      petalDs.map(function(d,i){
+        return React.createElement("path",{key:i,fillRule:"evenodd",fill:color,fillOpacity:opacity,d:d});
+      })
+    )
+  );
+}
 
 // ── TOAST ──────────────────────────────────────────────────────────────────
 function Toast(props){
