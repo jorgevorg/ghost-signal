@@ -127,10 +127,7 @@ function ResetRunButton(props){
     setTimeout(function(){ setFlash(false); },800);
     onReset&&onReset();
   }
-  return React.createElement("div",{style:Object.assign({display:"flex",flexDirection:"column",alignItems:"center",gap:3},style)},
-    flash?React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:CB_NORM,letterSpacing:3,opacity:.9}},"✓ SESSION FLUSHED"):null,
-    React.createElement("button",{onClick:handleClick,style:{background:"transparent",border:"1px solid "+CB_NORM+(flash?"ff":"55"),color:CB_NORM+(flash?"ff":"88"),fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"3px 9px",cursor:"pointer",borderRadius:1,transition:"all .2s"}},"↺ RESET RUN")
-  );
+  return React.createElement("button",{onClick:handleClick,style:Object.assign({background:"transparent",border:"1px solid "+CB_NORM+(flash?"ff":"55"),color:CB_NORM+(flash?"ff":"88"),fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"5px 10px",cursor:"pointer",borderRadius:1,transition:"all .2s",boxShadow:flash?"0 0 8px "+CB_NORM+"88":undefined},style)},"↺ RESET RUN");
 }
 
 // Paste this entire block directly above: function Toast(props){
@@ -1461,7 +1458,7 @@ function CybersphereTab(props){
         React.createElement("button",{onClick:function(){if(!inSession)setSelectedMap(Math.floor(Math.random()*6));},style:{marginLeft:"auto",background:"transparent",border:"1px solid "+CB_NORM+"55",color:CB_NORM+"99",fontFamily:ORB,fontSize:9,letterSpacing:2,padding:"5px 10px",cursor:inSession?"default":"pointer",borderRadius:1}},"↺")
         ,inSession&&React.createElement("div",{style:{display:"flex",gap:5,marginLeft:8}},
           React.createElement(ResetRunButton,{onReset:function(){setCyberSess({mapId:selectedMap+1,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});}}),
-          React.createElement("button",{onClick:function(){jackOut("clean");},style:{background:"transparent",border:"2px solid #FF2060",color:"#FF2060",fontFamily:ORB,fontSize:8,letterSpacing:3,padding:"3px 10px",cursor:"pointer",borderRadius:1,boxShadow:"0 0 8px #FF206044",textShadow:"0 0 4px #FF2060"}},"⏏ JACK OUT")
+          React.createElement("button",{onClick:function(){jackOut("clean");},style:{background:"transparent",border:"2px solid #FF2060",color:"#FF2060",fontFamily:ORB,fontSize:8,letterSpacing:3,padding:"5px 10px",cursor:"pointer",borderRadius:1,boxShadow:"0 0 8px #FF206044",textShadow:"0 0 4px #FF2060"}},"⏏ JACK OUT")
         )
       ),
       React.createElement("div",{style:{fontSize:9,letterSpacing:2,marginBottom:10,color:inSession?(danger?"#FF2060":warn?"#FFD166":CB_NORM):CB_NORM+"cc",animation:inSession&&glitch?"cyberGlitch .3s ease":undefined}},
