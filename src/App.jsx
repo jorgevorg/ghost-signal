@@ -1464,7 +1464,7 @@ function CybersphereTab(props){
       React.createElement("div",{style:{fontSize:9,letterSpacing:2,marginBottom:10,color:inSession?(danger?"#FF2060":warn?"#FFD166":CB_NORM):CB_NORM+"cc",animation:inSession&&glitch?"cyberGlitch .3s ease":undefined}},
         inSession?"HACKER @ NODE-"+String(cyberSess.hackerPos).padStart(2,"0")+"  //  CLICK ADJACENT ◇ TO MOVE":"SELECT MAP  //  CLICK AN ACCESS PORT ◈ TO JACK IN"
       ),
-        React.createElement("div",{style:{display:"flex",gap:10,justifyContent:"center",alignItems:"flex-start",margin:"0 auto 12px"}},
+        React.createElement("div",{style:{display:"flex",gap:10,justifyContent:"flex-start",alignItems:"flex-start",margin:"0 0 12px 0"}},
           React.createElement("div",{style:{width:158,flexShrink:0,border:"1px solid "+CB_NORM+"22",background:CB_NORM+"04",borderRadius:2,padding:"10px 10px 8px",fontFamily:MONO,fontSize:7.5,color:CB_NORM+"88",letterSpacing:.5,lineHeight:1.8}},
             React.createElement("div",{style:{fontFamily:ORB,fontSize:7,letterSpacing:3,color:CB_NORM,marginBottom:8,paddingBottom:5,borderBottom:"1px solid "+CB_NORM+"22"}},"NETWORK RULES"),
             React.createElement("div",{style:{marginBottom:7}},
