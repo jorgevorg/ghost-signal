@@ -119,6 +119,20 @@ const CYBER_ADJ={1:[2,3],2:[1,4,5],3:[1,5,6],4:[2,7],5:[2,3,7,8],6:[3,8],7:[4,5,
 
 // ══════════════════════════════════════════════════════════════════
 // GHOST SIGNAL — SVG CHROME COMPONENTS
+function ResetRunButton(props){
+  var onReset=props.onReset,style=props.style||{};
+  var [flash,setFlash]=React.useState(false);
+  function handleClick(){
+    setFlash(true);
+    setTimeout(function(){ setFlash(false); },800);
+    onReset&&onReset();
+  }
+  return React.createElement("div",{style:Object.assign({display:"flex",flexDirection:"column",alignItems:"center",gap:3},style)},
+    flash?React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:CB_NORM,letterSpacing:3,opacity:.9}},"✓ SESSION FLUSHED"):null,
+    React.createElement("button",{onClick:handleClick,style:{background:"transparent",border:"1px solid "+CB_NORM+(flash?"ff":"55"),color:CB_NORM+(flash?"ff":"88"),fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"3px 9px",cursor:"pointer",borderRadius:1,transition:"all .2s"}},"↺ RESET RUN")
+  );
+}
+
 // Paste this entire block directly above: function Toast(props){
 // Also add the 4 @keyframes lines below into the END of your css const
 // ══════════════════════════════════════════════════════════════════
@@ -1424,7 +1438,7 @@ function CybersphereTab(props){
             return React.createElement("button",{key:key,onClick:function(){if(!inSession)setHackerSel(key);},style:{background:active?hd.color+"22":"transparent",border:"1px solid "+(active?hd.color:hd.color+"44"),color:active?hd.color:hd.color+"88",fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"3px 9px",cursor:inSession?"default":"pointer",borderRadius:1,boxShadow:active?"0 0 8px "+hd.color+"33":undefined,transition:"all .2s"}},hd.name);
           }),
           inSession&&React.createElement("div",{style:{display:"flex",gap:5,marginLeft:6}},
-            React.createElement("button",{onClick:function(){setCyberSess({mapId:selectedMap+1,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});},style:{background:"transparent",border:"1px solid "+CB_GREEN+"55",color:CB_GREEN+"88",fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"3px 9px",cursor:"pointer",borderRadius:1}},"↺ REBOOT"),
+            React.createElement(ResetRunButton,{onReset:function(){setCyberSess({mapId:selectedMap+1,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});}}),
             React.createElement("button",{onClick:function(){jackOut("clean");},style:{background:"transparent",border:"2px solid #FF2060",color:"#FF2060",fontFamily:ORB,fontSize:8,letterSpacing:3,padding:"3px 10px",cursor:"pointer",borderRadius:1,boxShadow:"0 0 8px #FF206044",textShadow:"0 0 4px #FF2060"}},"⏏ JACK OUT")
           )
         )
