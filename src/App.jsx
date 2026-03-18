@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import ReactDOM from "react-dom/client";
 import * as THREE from "three";
 
+const SAVES_KEY="gs_saves";
 const MONO="'Share Tech Mono',monospace",ORB="'Orbitron',sans-serif",RAJ="'Rajdhani',sans-serif",BG="#0a0a14";
 const B1="#7a7aaa",B2="#555578",B3="#9090b8";
 const css=`@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap');
@@ -1335,6 +1336,71 @@ function MissionPanel(props){
     )
   );
 }
+// SAVE MANAGER
+function SaveManager(props){
+  var gs=props.gs,onLoad=props.onLoad,onClose=props.onClose,AC="#FF6EC7";
+  var savesS=useState(function(){try{return JSON.parse(localStorage.getItem(SAVES_KEY)||"[]");}catch(e){return [];}}),setSaves=savesS[1];var saves=savesS[0];
+  var nameS=useState(""),setName=nameS[1];var name=nameS[0];
+  var confirmS=useState(null),setConfirm=confirmS[1];var confirm=confirmS[0];
+  var msgS=useState(""),setMsg=msgS[1];var msg=msgS[0];
+  var renamingS=useState(null),setRenaming=renamingS[1];var renaming=renamingS[0];
+  var rvS=useState(""),setRv=rvS[1];var rv=rvS[0];
+  var flash=function(m){setMsg(m);setTimeout(function(){setMsg("");},2000);};
+  var doSave=function(n){
+    if(!n.trim())return;
+    var arr=saves.slice(),ix=arr.findIndex(function(s){return s.name===n.trim();});
+    var slot={id:Date.now(),name:n.trim(),date:new Date().toLocaleString(),session:gs.session||0,cole:(gs.cole&&gs.cole.name)||"",ship:(gs.ship&&gs.ship.name)||"",state:JSON.parse(JSON.stringify(gs))};
+    if(ix>=0)arr[ix]=slot;else arr.unshift(slot);
+    if(arr.length>20)arr=arr.slice(0,20);
+    localStorage.setItem(SAVES_KEY,JSON.stringify(arr));setSaves(arr);setName("");flash("SAVED — "+n.trim());
+  };
+  var doLoad=function(slot){onLoad(slot.state);flash("LOADED — "+slot.name);setTimeout(onClose,700);};
+  var doDel=function(n){var arr=saves.filter(function(s){return s.name!==n;});localStorage.setItem(SAVES_KEY,JSON.stringify(arr));setSaves(arr);setConfirm(null);flash("DELETED");};
+  var doRen=function(o,n){if(!n.trim())return;var arr=saves.map(function(s){return s.name===o?Object.assign({},s,{name:n.trim()}):s;});localStorage.setItem(SAVES_KEY,JSON.stringify(arr));setSaves(arr);setRenaming(null);setRv("");flash("RENAMED");};
+  return React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.92)",zIndex:9100,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:MONO}},
+    React.createElement("div",{style:{width:"100%",maxWidth:600,background:BG,border:"1px solid "+AC+"44",borderRadius:10,overflow:"hidden",maxHeight:"85vh",display:"flex",flexDirection:"column",boxShadow:"0 0 40px "+AC+"14"}},
+      React.createElement("div",{style:{padding:"13px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+AC+"22",background:AC+"08"}},
+        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:9}},
+          React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:AC,boxShadow:"0 0 10px "+AC}}),
+          React.createElement("span",{style:{fontFamily:ORB,fontSize:12,color:AC,letterSpacing:4}},"SAVE MANAGER")
+        ),
+        React.createElement("button",{onClick:onClose,style:{background:"none",border:"1px solid #333",color:"#888",borderRadius:4,padding:"4px 12px",cursor:"pointer",fontFamily:MONO,fontSize:9}},"X CLOSE")
+      ),
+      React.createElement("div",{style:{padding:"11px 14px",borderBottom:"1px solid #111",display:"flex",gap:7}},
+        React.createElement("input",{value:name,onChange:function(e){setName(e.target.value);},onKeyDown:function(e){if(e.key==="Enter")doSave(name);},placeholder:"Save name...",style:{flex:1,background:"#050510",border:"1px solid "+AC+"33",borderRadius:4,padding:"7px 11px",color:"#ddd",fontFamily:MONO,fontSize:10,outline:"none"}}),
+        React.createElement("button",{onClick:function(){doSave(name);},disabled:!name.trim(),style:{padding:"7px 16px",background:name.trim()?AC+"22":"#111",border:"1px solid "+(name.trim()?AC+"55":"#222"),color:name.trim()?AC:"#444",borderRadius:4,cursor:name.trim()?"pointer":"not-allowed",fontFamily:MONO,fontSize:9,letterSpacing:2}},"SAVE")
+      ),
+      msg&&React.createElement("div",{style:{padding:"7px 18px",background:AC+"18",fontFamily:MONO,fontSize:9,color:AC,letterSpacing:2,textAlign:"center"}},msg),
+      React.createElement("div",{style:{overflowY:"auto",flex:1,padding:"9px 12px",display:"flex",flexDirection:"column",gap:6}},
+        saves.length===0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#334",textAlign:"center",padding:"36px 0",letterSpacing:2}},"NO SAVES"),
+        saves.map(function(slot){
+          var isRen=renaming===slot.name;
+          return React.createElement("div",{key:slot.id,style:{background:"#050510",border:"1px solid #1a1a2e",borderRadius:5,padding:"10px 12px"}},
+            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:7,marginBottom:4}},
+              isRen?React.createElement("div",{style:{display:"flex",gap:5,flex:1}},
+                React.createElement("input",{value:rv,onChange:function(e){setRv(e.target.value);},autoFocus:true,onKeyDown:function(e){if(e.key==="Enter")doRen(slot.name,rv);if(e.key==="Escape"){setRenaming(null);setRv("");}},style:{flex:1,background:"#0a0a20",border:"1px solid "+AC+"44",borderRadius:3,padding:"3px 7px",color:"#ddd",fontFamily:MONO,fontSize:9,outline:"none"}}),
+                React.createElement("button",{onClick:function(){doRen(slot.name,rv);},style:{padding:"3px 8px",background:AC+"18",border:"1px solid "+AC+"44",color:AC,borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8}},"OK"),
+                React.createElement("button",{onClick:function(){setRenaming(null);setRv("");},style:{padding:"3px 8px",background:"none",border:"1px solid #333",color:"#666",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8}},"X")
+              ):React.createElement("span",{style:{fontFamily:ORB,fontSize:10,color:"#ccc",letterSpacing:2,flex:1}},slot.name),
+              !isRen&&React.createElement("div",{style:{display:"flex",gap:4}},
+                React.createElement("button",{onClick:function(){doLoad(slot);},style:{padding:"3px 9px",background:"#00FFD018",border:"1px solid #00FFD044",color:"#00FFD0",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1}},"LOAD"),
+                React.createElement("button",{onClick:function(){setRenaming(slot.name);setRv(slot.name);},style:{padding:"3px 8px",background:"#FFD16614",border:"1px solid #FFD16633",color:"#FFD166",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8}},"REN"),
+                confirm===slot.name?React.createElement("button",{onClick:function(){doDel(slot.name);},style:{padding:"3px 9px",background:"#FF206033",border:"1px solid #FF2060",color:"#FF2060",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8}},"CONFIRM?"):React.createElement("button",{onClick:function(){setConfirm(slot.name);setTimeout(function(){setConfirm(function(c){return c===slot.name?null:c;});},3000);},style:{padding:"3px 8px",background:"none",border:"1px solid #FF206033",color:"#FF206077",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8}},"DEL")
+              )
+            ),
+            React.createElement("div",{style:{display:"flex",gap:12,flexWrap:"wrap"}},
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#556"}},"SESSION "+slot.session),
+              slot.cole&&React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#556"}},slot.cole),
+              slot.ship&&React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#556"}},slot.ship),
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#334"}},slot.date)
+            )
+          );
+        })
+      )
+    )
+  );
+}
+
 function HexMap(props){
   var hexMap=props.hexMap,onUpdate=props.onUpdate,shipName=props.shipName||"THE INCONCEIVABLE",phase=props.phase||"outer",setPhase=props.setPhase||function(){},gsForPanel=props.gameState||INIT;
   var mapZoomS=useState(1),setMapZoom=mapZoomS[1];var mapZoom=mapZoomS[0];
@@ -1498,6 +1564,7 @@ function App(){
  var commsLoadingS=useState(false),setCommsLoading=commsLoadingS[1];var commsLoading=commsLoadingS[0];
  var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
  var histLoadedS=useState(false),setHistLoaded=histLoadedS[1];
+var smOpenS=useState(false),setSmOpen=smOpenS[1];var smOpen=smOpenS[0];
 var ringPhaseS=useState((function(){try{return localStorage.getItem("gs_ring_phase")||"outer";}catch(e){return "outer";}})()),setRingPhase=ringPhaseS[1];var ringPhase=ringPhaseS[0];
 var cyberSessS=useState(null),setCyberSess=cyberSessS[1];var cyberSess=cyberSessS[0];
 
@@ -1558,6 +1625,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
 
  return React.createElement("div",{style:{height:"100vh",overflow:"hidden",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
+    smOpen&&React.createElement(SaveManager,{gs:gs,onClose:function(){setSmOpen(false);},onLoad:function(state){upGs(function(){return merge(state);});}}),
     gs.campaignMap&&gs.shipPopup&&SHIP_DATA[gs.shipPopup.ship]&&React.createElement("div",{onClick:function(){setGs(function(g){return Object.assign({},g,{shipPopup:null});});},style:{position:"fixed",top:gs.shipPopup.y+12,left:gs.shipPopup.x+12,background:"#0a0a14ee",border:"1px solid "+SHIP_DATA[gs.shipPopup.ship].color+"66",borderRadius:8,padding:"12px 16px",fontFamily:"'Share Tech Mono',monospace",zIndex:9999,minWidth:180,cursor:"pointer"}},React.createElement("div",{style:{color:SHIP_DATA[gs.shipPopup.ship].color,fontSize:10,fontFamily:"'Orbitron',sans-serif",marginBottom:2}},SHIP_DATA[gs.shipPopup.ship].name),React.createElement("div",{style:{color:"#aaaacc",fontSize:8,marginBottom:6}},SHIP_DATA[gs.shipPopup.ship].cls+" • HULL "+SHIP_DATA[gs.shipPopup.ship].hull+" • ACT "+SHIP_DATA[gs.shipPopup.ship].act),React.createElement("div",{style:{height:1,background:"#ffffff18",margin:"4px 0 8px"}}),React.createElement("div",{style:{color:"#aaaacc",fontSize:8,lineHeight:"1.6"}},SHIP_DATA[gs.shipPopup.ship].skill),React.createElement("div",{style:{color:"#ffffff22",fontSize:7,marginTop:8,textAlign:"right"}},"CLICK TO DISMISS")),
   boot&&React.createElement(BootSequence,{onDone:function(){setBoot(false);}}),
    tab!=="CYBER"&&React.createElement(Starfield,null),
@@ -1574,7 +1642,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
   !boot&&React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
   React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box"}},
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #222230",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
-     TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);})
+     TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);},React.createElement("button",{onClick:function(){setSmOpen(true);},style:{marginLeft:6,padding:"5px 13px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"SAVE"))
     ),
     React.createElement("div",{style:{paddingTop:20,flex:1,overflowY:"auto",minHeight:0,paddingBottom:60}},
      React.createElement("div",{style:{display:tab==="MAP"?"block":"none"}},
