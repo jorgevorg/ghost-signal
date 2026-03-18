@@ -1464,7 +1464,31 @@ function CybersphereTab(props){
       React.createElement("div",{style:{fontSize:9,letterSpacing:2,marginBottom:10,color:inSession?(danger?"#FF2060":warn?"#FFD166":CB_NORM):CB_NORM+"cc",animation:inSession&&glitch?"cyberGlitch .3s ease":undefined}},
         inSession?"HACKER @ NODE-"+String(cyberSess.hackerPos).padStart(2,"0")+"  //  CLICK ADJACENT ◇ TO MOVE":"SELECT MAP  //  CLICK AN ACCESS PORT ◈ TO JACK IN"
       ),
-      React.createElement("div",{style:{position:"relative",width:gridW,height:gridH,margin:"0 auto 12px",flexShrink:0}},
+        React.createElement("div",{style:{display:"flex",gap:10,justifyContent:"center",alignItems:"flex-start",margin:"0 auto 12px"}},
+          React.createElement("div",{style:{width:158,flexShrink:0,border:"1px solid "+CB_NORM+"22",background:CB_NORM+"04",borderRadius:2,padding:"10px 10px 8px",fontFamily:MONO,fontSize:7.5,color:CB_NORM+"88",letterSpacing:.5,lineHeight:1.8}},
+            React.createElement("div",{style:{fontFamily:ORB,fontSize:7,letterSpacing:3,color:CB_NORM,marginBottom:8,paddingBottom:5,borderBottom:"1px solid "+CB_NORM+"22"}},"NETWORK RULES"),
+            React.createElement("div",{style:{marginBottom:7}},
+              React.createElement("div",{style:{color:CB_NORM,letterSpacing:2,marginBottom:2,fontSize:6.5}},"EXPLORATION"),
+              "Move one tile at a time. Diagonal adjacency only. Enter a Normal Tile to trigger a d66 encounter."
+            ),
+            React.createElement("div",{style:{marginBottom:7}},
+              React.createElement("div",{style:{color:"#FF2060",letterSpacing:2,marginBottom:2,fontSize:6.5}},"DEFEAT"),
+              "Logged out of network. Lose 10⚡. You don't die."
+            ),
+            React.createElement("div",{style:{marginBottom:7}},
+              React.createElement("div",{style:{color:inSession&&danger?"#FF2060":inSession&&warn?"#FFD166":CB_NORM,letterSpacing:2,marginBottom:2,fontSize:6.5}},"MEMORY CLOCK"),
+              "12 moves max. +1 per tile entry or {CLOCK+N} event. Abyssal Scar at limit."
+            ),
+            React.createElement("div",{style:{borderTop:"1px solid "+CB_NORM+"22",paddingTop:6}},
+              React.createElement("div",{style:{color:CB_NODE,letterSpacing:2,marginBottom:2,fontSize:6.5}},"◆  MATRIX NODES"),
+              React.createElement("div",{style:{marginBottom:5}},"d66 reward. High clock cost."),
+              React.createElement("div",{style:{color:CB_NORM,letterSpacing:2,marginBottom:2,fontSize:6.5}},"◇  NORMAL TILES"),
+              React.createElement("div",{style:{marginBottom:5}},"d66 encounter on first entry."),
+              React.createElement("div",{style:{color:CB_ACC,letterSpacing:2,marginBottom:2,fontSize:6.5}},"◈  ACCESS PORTS"),
+              "Entry — exit points. Jack in here."
+            )
+          ),
+      React.createElement("div",{style:{position:"relative",width:gridW,height:gridH,flexShrink:0}},
         React.createElement("svg",{style:{position:"absolute",top:0,left:0,overflow:"visible",pointerEvents:"none"},width:gridW,height:gridH},
           CONNECTIONS.map(function(pair){
             var a=TPOS[pair[0]],b=TPOS[pair[1]];
@@ -1488,6 +1512,7 @@ function CybersphereTab(props){
           );
         })
       ),
+        ),
       React.createElement("div",{style:{display:"flex",gap:12,alignItems:"flex-start",marginBottom:4}},
         React.createElement("div",{style:{flex:1}},
           [[CB_NODE,"◆","Matrix Nodes — d66 rewards"],[CB_NORM,"◇","Normal Tiles — d66 encounter"],[CB_ACC,"◈","Access Ports — entry/exit"]].map(function(e){
