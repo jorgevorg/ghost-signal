@@ -704,7 +704,7 @@ function BootSequence(props){
   ts2.push(fadeId);
   return function(){ts2.forEach(function(id){clearTimeout(id);clearInterval(id);});};
  },[phase]);
- if(fading)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,animation:"bootFadeOut 1.5s ease forwards",pointerEvents:"none"}});
+ if(fading)return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,animation:"bootFadeOut 1.5s ease forwards",pointerEvents:"none"},onClick:function(){if(props.onDone)props.onDone();}},React.createElement("div",{style:{position:"absolute",bottom:24,right:28,fontFamily:"monospace",fontSize:9,color:"#ffffff22",letterSpacing:3,pointerEvents:"none"}},"CLICK TO SKIP"));
  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#0a0a14",zIndex:9998,overflow:"hidden"}},
   React.createElement("div",{style:{position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.42) 3px,rgba(0,0,0,.42) 6px)",zIndex:2,pointerEvents:"none"}}),
   phase>=1&&React.createElement("div",{style:{position:"absolute",left:0,right:0,top:"50%",transform:"translateY(-50%)",height:phase===1?"3px":"130vh",background:"radial-gradient(ellipse 120% 50% at 50% 50%,#00e5ff2a 0%,#ffffff18 30%,transparent 75%)",filter:"blur(14px)",opacity:phase<=2?1:0.06,transition:phase<=2?"height 0.5s cubic-bezier(0.2,0.8,0.4,1)":"opacity 2.5s ease",boxShadow:"0 0 120px 60px #00e5ff06",zIndex:3,pointerEvents:"none"}}),
