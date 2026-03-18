@@ -1514,6 +1514,7 @@ function CybersphereTab(props){
         })
       ),
           ),
+          React.createElement("div",{style:{width:158,flexShrink:0}}),
         ),
       React.createElement("div",{style:{display:"flex",gap:12,alignItems:"flex-start",marginBottom:4}},
         React.createElement("div",{style:{flex:1}},
