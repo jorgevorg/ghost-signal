@@ -1517,12 +1517,6 @@ function CybersphereTab(props){
           React.createElement("div",{style:{width:158,flexShrink:0}}),
         ),
       React.createElement("div",{style:{display:"flex",gap:12,alignItems:"flex-start",marginBottom:4}},
-        React.createElement("div",{style:{flex:1}},
-          [[CB_NODE,"◆","Matrix Nodes — d66 rewards"],[CB_NORM,"◇","Normal Tiles — d66 encounter"],[CB_ACC,"◈","Access Ports — entry/exit"]].map(function(e){
-            return React.createElement("div",{key:e[0],style:{display:"flex",gap:7,alignItems:"center",fontSize:9,color:CB_NORM+"99",marginBottom:4,letterSpacing:.5}},
-              React.createElement("span",{style:{color:e[0],textShadow:"0 0 4px "+e[0]}}),e[2]);
-          })
-        ),
         React.createElement("div",{style:{width:170,flexShrink:0}},
           React.createElement("div",{style:{fontFamily:ORB,fontSize:9,letterSpacing:2,marginBottom:5,color:danger?"#FF2060":warn?"#FFD166":CB_NORM,animation:danger?"clockDanger 1s ease-in-out infinite":"none"}},"MEMORY CLOCK  "+(inSession?cyberSess.clock:0)+"/12"),
           React.createElement("div",{style:{display:"flex",gap:2}},
