@@ -1668,7 +1668,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
      ),
      tab==="SHIP"&&React.createElement("div",{style:{maxWidth:600}},
       React.createElement("div",{style:{background:BG,border:"1px solid #00FFD055",borderRadius:8,padding:22}},
-       editShipName?React.createElement("input",{defaultValue:gs.ship.name||"THE INCONCEIVABLE",onBlur:function(e){upShip("name",e.target.value);setEditShipName(false);},onKeyDown:function(e){if(e.key==="Enter")e.target.blur();if(e.key==="Escape")setEditShipName(false);},style:{background:"transparent",border:"none",borderBottom:"1px solid #00FFD0",color:"#00FFD0",fontFamily:ORB,fontSize:15,letterSpacing:3,outline:"none",width:"100%",marginBottom:18},autoFocus:true}):
+       editShipName?React.createElement("input",{defaultValue:gs.ship.name||"THE INCONCEIVABLE",onBlur:function(e){upS("name",e.target.value);setEditShipName(false);},onKeyDown:function(e){if(e.key==="Enter")e.target.blur();if(e.key==="Escape")setEditShipName(false);},style:{background:"transparent",border:"none",borderBottom:"1px solid #00FFD0",color:"#00FFD0",fontFamily:ORB,fontSize:15,letterSpacing:3,outline:"none",width:"100%",marginBottom:18},autoFocus:true}):
        React.createElement("div",{onClick:function(){setEditShipName(true);},style:{fontFamily:ORB,fontSize:15,fontWeight:700,color:"#00FFD0",letterSpacing:3,marginBottom:18,cursor:"text"}},gs.ship.name||"THE INCONCEIVABLE"),
        [["HULL","hull"],["FUEL","fuel"]].map(function(pr){return React.createElement("div",{key:pr[1],style:{marginBottom:16}},
         React.createElement("div",{style:{fontFamily:MONO,fontSize:13,color:"#bbb",letterSpacing:2,marginBottom:7}},pr[0]),
