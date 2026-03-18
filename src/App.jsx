@@ -1437,10 +1437,6 @@ function CybersphereTab(props){
             var hd=hackerData[key],active=hackerSel===key;
             return React.createElement("button",{key:key,onClick:function(){if(!inSession)setHackerSel(key);},style:{background:active?hd.color+"22":"transparent",border:"1px solid "+(active?hd.color:hd.color+"44"),color:active?hd.color:hd.color+"88",fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"3px 9px",cursor:inSession?"default":"pointer",borderRadius:1,boxShadow:active?"0 0 8px "+hd.color+"33":undefined,transition:"all .2s"}},hd.name);
           }),
-          inSession&&React.createElement("div",{style:{display:"flex",gap:5,marginLeft:6}},
-            React.createElement(ResetRunButton,{onReset:function(){setCyberSess({mapId:selectedMap+1,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});}}),
-            React.createElement("button",{onClick:function(){jackOut("clean");},style:{background:"transparent",border:"2px solid #FF2060",color:"#FF2060",fontFamily:ORB,fontSize:8,letterSpacing:3,padding:"3px 10px",cursor:"pointer",borderRadius:1,boxShadow:"0 0 8px #FF206044",textShadow:"0 0 4px #FF2060"}},"⏏ JACK OUT")
-          )
         )
       ),
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,background:hacker.color+"0d",border:"1px solid "+hacker.color+"33",borderRadius:2,padding:"7px 12px",marginBottom:10,transition:"background .3s,border-color .3s"}},
@@ -1463,6 +1459,10 @@ function CybersphereTab(props){
           return React.createElement("button",{key:i,onClick:function(){if(!inSession)setSelectedMap(i);},style:{background:active?CB_NORM+"22":"transparent",border:"1px solid "+(active?CB_NORM:CB_NORM+"55"),color:active?CB_NORM:CB_NORM+"99",fontFamily:ORB,fontSize:9,letterSpacing:2,padding:"5px 10px",cursor:inSession?"default":"pointer",borderRadius:1,boxShadow:active?"0 0 8px "+CB_NORM+"33":undefined}},"MAP0"+(i+1));
         }),
         React.createElement("button",{onClick:function(){if(!inSession)setSelectedMap(Math.floor(Math.random()*6));},style:{marginLeft:"auto",background:"transparent",border:"1px solid "+CB_NORM+"55",color:CB_NORM+"99",fontFamily:ORB,fontSize:9,letterSpacing:2,padding:"5px 10px",cursor:inSession?"default":"pointer",borderRadius:1}},"↺")
+        ,inSession&&React.createElement("div",{style:{display:"flex",gap:5,marginLeft:8}},
+          React.createElement(ResetRunButton,{onReset:function(){setCyberSess({mapId:selectedMap+1,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});}}),
+          React.createElement("button",{onClick:function(){jackOut("clean");},style:{background:"transparent",border:"2px solid #FF2060",color:"#FF2060",fontFamily:ORB,fontSize:8,letterSpacing:3,padding:"3px 10px",cursor:"pointer",borderRadius:1,boxShadow:"0 0 8px #FF206044",textShadow:"0 0 4px #FF2060"}},"⏏ JACK OUT")
+        )
       ),
       React.createElement("div",{style:{fontSize:9,letterSpacing:2,marginBottom:10,color:inSession?(danger?"#FF2060":warn?"#FFD166":CB_NORM):CB_NORM+"cc",animation:inSession&&glitch?"cyberGlitch .3s ease":undefined}},
         inSession?"HACKER @ NODE-"+String(cyberSess.hackerPos).padStart(2,"0")+"  //  CLICK ADJACENT ◇ TO MOVE":"SELECT MAP  //  CLICK AN ACCESS PORT ◈ TO JACK IN"
