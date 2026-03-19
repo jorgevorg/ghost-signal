@@ -1195,43 +1195,40 @@ function DiceRoller(props){
 
 // ── MABEL MINI (floating widget, all tabs) ────────────────────────────────
 function MabelMini(props){
- var msgs=props.msgs,onSend=props.onSend,loading=props.loading;
- var openS=useState(false),setOpen=openS[1];var open=openS[0];
- var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
- var endRef=useRef(null);
- useEffect(function(){if(open&&endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs,open]);
- var lastMsg=msgs[msgs.length-1];
- var send=function(){if(!input.trim()||loading)return;onSend(input.trim());setInput("");};
- return React.createElement("div",{style:{position:"fixed",bottom:35,left:"calc(50vw - 161.5px)",transform:"translateX(-50%)",width:open?360:200,zIndex:200,transform:"translateX(-50%)",background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s"}},
-  React.createElement("div",{onClick:function(){setOpen(!open);},style:{padding:"8px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:MABEL_C+"08",borderBottom:open?"1px solid "+MABEL_C+"33":"none"}},
-   React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-    React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 6px "+MABEL_C,animation:"pulse 2s infinite"}}),
-    React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:MABEL_C,letterSpacing:2}},loading?"MABEL...":"MABEL")
-   ),
-   React.createElement("span",{style:{color:MABEL_C+"88",fontSize:10}},open?"▼":"▲")
-  ),
-  !open&&lastMsg&&lastMsg.role==="assistant"&&React.createElement("div",{style:{padding:"6px 12px",fontFamily:MONO,fontSize:9,color:"#88BBFF88",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},
-   lastMsg.content.slice(0,55)+(lastMsg.content.length>55?"...":"")
-  ),
-  open&&React.createElement("div",null,
-   React.createElement("div",{style:{height:220,overflowY:"auto",padding:"8px 12px",display:"flex",flexDirection:"column",gap:6}},
-    msgs.slice(-10).map(function(m,i){
-     var isA=m.role==="assistant";
-     return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end"}},
-      React.createElement("div",{style:{maxWidth:"85%",padding:"5px 9px",borderRadius:4,background:isA?MABEL_C+"12":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"33":"#ffffff22"),fontFamily:isA?MONO:RAJ,fontSize:isA?10:12,color:isA?MABEL_C:"#ddd",lineHeight:1.5}},
-       isA?((/roll?\s+d\d+/i.test(m.content))?React.createElement("span",{style:{fontFamily:MONO,fontSize:"inherit",lineHeight:1.5}},parseInlineDice(m.content,function(result,sides,isReroll){var note=isReroll?"[CYBERHACK REROLL: d"+sides+" -> "+result+"]":"[DICE ROLL: d"+sides+" -> "+result+"]";props.onSend&&props.onSend(note);},MABEL_C,false)):React.createElement(MadText,{text:m.content.length>200?m.content.slice(0,200)+"...":m.content})):m.content
-      )
-     );
-    }),
-    React.createElement("div",{ref:endRef})
-   ),
-   React.createElement("div",{style:{padding:"8px 10px",borderTop:"1px solid "+MABEL_C+"22",display:"flex",gap:6}},
-    React.createElement("div",{style:{display:"flex",gap:4,padding:"4px 8px 2px",overflowX:"auto",flexShrink:0,justifyContent:"center"}},QUICK_ACTIONS.slice(0,4).map(function(qa,qi){return React.createElement("button",{key:qi,onClick:function(e){e.stopPropagation();if(!loading)onSend(qa.prompt);},style:{flexShrink:0,fontFamily:MONO,fontSize:8,padding:"2px 8px",background:"transparent",border:"1px solid "+MABEL_C+"44",color:MABEL_C+"99",borderRadius:10,cursor:"pointer",whiteSpace:"nowrap",letterSpacing:.5}},qa.label);})),React.createElement("input",{value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter")send();},placeholder:"Query MABEL...",style:{flex:1,background:"transparent",border:"1px solid "+MABEL_C+"33",borderRadius:3,color:"#eee",fontFamily:MONO,fontSize:10,padding:"5px 8px",outline:"none"}}),
-    React.createElement("button",{onClick:send,disabled:loading,style:{padding:"5px 10px",background:MABEL_C+"14",border:"1px solid "+MABEL_C+"44",color:MABEL_C,borderRadius:3,cursor:loading?"not-allowed":"pointer",fontFamily:MONO,fontSize:10}},loading?"...":"►")
-   )
+var msgs=props.msgs,onSend=props.onSend,loading=props.loading;
+var openS=useState(false),setOpen=openS[1];var open=openS[0];
+var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
+var endRef=useRef(null);
+useEffect(function(){if(open&&endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs,open]);
+var lastMsg=msgs[msgs.length-1];
+var send=function(){if(!input.trim()||loading)return;onSend(input.trim());setInput("");};
+return React.createElement("div",{style:{position:"fixed",bottom:35,left:"calc(50vw - 161.5px)",transform:"translateX(-50%)",width:open?375:200,zIndex:200,background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s",boxShadow:"0 0 18px "+MABEL_C+"18"}},
+ React.createElement("div",{onClick:function(){setOpen(!open);},style:{padding:"8px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:MABEL_C+"08",borderBottom:open?"1px solid "+MABEL_C+"33":"none"}},
+  React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+   React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 6px "+MABEL_C,animation:"pulse 2s infinite"}}),
+   React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:MABEL_C,letterSpacing:2}},loading?"MABEL...":"MABEL")),
+  React.createElement("span",{style:{color:MABEL_C+"88",fontSize:10}},open?"▼":"▲")),
+ !open&&lastMsg&&lastMsg.role==="assistant"&&React.createElement("div",{style:{padding:"6px 12px",fontFamily:MONO,fontSize:9,color:"#88BBFF88",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},
+  lastMsg.content.slice(0,55)+(lastMsg.content.length>55?"...":"")),
+ open&&React.createElement("div",null,
+  React.createElement("div",{style:{minHeight:60,maxHeight:320,overflowY:"auto",padding:"8px 12px",display:"flex",flexDirection:"column",gap:6}},
+   msgs.slice(-10).map(function(m,i){
+    var isA=m.role==="assistant";
+    return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end"}},
+     React.createElement("div",{style:{maxWidth:"90%",padding:"5px 9px",borderRadius:4,background:isA?MABEL_C+"12":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"33":"#ffffff22"),fontFamily:isA?MONO:RAJ,fontSize:isA?10:12,color:isA?MABEL_C:"#ddd",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}},
+      isA?((/rol\s+d\d+/i.test(m.content))?React.createElement("span",{style:{fontFamily:MONO,fontSize:"inherit",lineHeight:1.5}},parseInlineDice(m.content,function(result,sides,isReroll){var note=isReroll?"[CYBERHACK REROLL: d"+sides+" -> "+result+"]":"[DICE ROLL: d"+sides+" -> "+result+"]";props.onSend&&props.onSend(note);},MABEL_C,false)):React.createElement(MadText,{text:m.content})):m.content)
+    );
+   }),
+   React.createElement("div",{ref:endRef})),
+  React.createElement("div",{style:{borderTop:"1px solid "+MABEL_C+"22",padding:"5px 10px 4px"}},
+   React.createElement("div",{style:{display:"flex",gap:4,justifyContent:"center",marginLeft:"-5px",marginBottom:5}},
+    QUICK_ACTIONS.slice(0,4).map(function(qa,qi){return React.createElement("button",{key:qi,onClick:function(e){e.stopPropagation();if(!loading)onSend(qa.prompt);},style:{flexShrink:0,fontFamily:MONO,fontSize:8,padding:"2px 8px",background:"transparent",border:"1px solid "+MABEL_C+"44",color:MABEL_C+"99",borderRadius:10,cursor:"pointer",whiteSpace:"nowrap",letterSpacing:.5}},qa.label);})),
+   React.createElement("div",{style:{display:"flex",gap:5}},
+    React.createElement("input",{value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter")send();},placeholder:"Query MABEL...",style:{flex:1,background:"transparent",border:"1px solid "+MABEL_C+"33",borderRadius:3,color:"#eee",fontFamily:MONO,fontSize:10,padding:"5px 8px",outline:"none"}}),
+    React.createElement("button",{onClick:send,disabled:loading,style:{padding:"5px 10px",background:MABEL_C+"14",border:"1px solid "+MABEL_C+"44",color:MABEL_C,borderRadius:3,cursor:loading?"not-allowed":"pointer",fontFamily:MONO,fontSize:10}},loading?"...":"►"))
   )
- );
-}
+ )
+);}
 
 // ── CLIPBOARD PREVIEW ─────────────────────────────────────────────────────
 function ClipboardPreview(props){
@@ -1298,35 +1295,41 @@ function CommsTab(props){
 
  var send=function(){if(!input.trim()||commsLoading)return;onSend(input.trim());setInput("");};
 
- return React.createElement("div",{style:{maxWidth:680}},
-  React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}},
-   QUICK_ACTIONS.map(function(qa){return React.createElement("button",{key:qa.label,onClick:function(){onSend(qa.prompt);},disabled:commsLoading,style:{padding:"5px 12px",background:"#88BBFF12",border:"1px solid #88BBFF33",color:"#88BBFF",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},qa.label);})
+ return React.createElement("div",{style:{width:"100%",boxSizing:"border-box"}},
+ React.createElement("div",{style:{border:"1px solid "+MABEL_C+"44",borderRadius:6,background:"#03080d",boxShadow:"0 0 24px "+MABEL_C+"12,inset 0 0 40px "+MABEL_C+"06",overflow:"hidden",marginBottom:10}},
+  React.createElement("div",{style:{padding:"8px 16px",borderBottom:"1px solid "+MABEL_C+"30",display:"flex",alignItems:"center",justifyContent:"space-between",background:MABEL_C+"08"}},
+   React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+    React.createElement("div",{style:{width:8,height:8,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 8px "+MABEL_C,animation:"pulse 2s infinite"}}),
+    React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:MABEL_C,letterSpacing:3}},"M.A.B.E.L"),
+    React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:MABEL_C+"66",letterSpacing:2}},"ORACLE INTERFACE // SHIP COMMS")),
+   React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
+    QUICK_ACTIONS.map(function(qa){return React.createElement("button",{key:qa.label,onClick:function(){onSend(qa.prompt);},disabled:commsLoading,style:{padding:"3px 10px",background:MABEL_C+"10",border:"1px solid "+MABEL_C+"33",color:MABEL_C+"cc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1}},qa.label);}))
   ),
-  React.createElement("div",{style:{background:"#05050e",border:"1px solid "+B2,borderRadius:6,minHeight:340,maxHeight:500,overflowY:"auto",padding:"12px 14px",display:"flex",flexDirection:"column",gap:10,marginBottom:10}},
+  React.createElement("div",{style:{minHeight:480,maxHeight:620,overflowY:"auto",padding:"14px 18px",display:"flex",flexDirection:"column",gap:12}},
    msgs.map(function(m,i){
     var isA=m.role==="assistant";
     return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end",animation:"in .2s ease"}},
-     React.createElement("div",{style:{maxWidth:"88%",padding:"8px 12px",borderRadius:4,background:isA?MABEL_C+"10":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"44":"#ffffff1a"),fontFamily:isA?MONO:RAJ,fontSize:isA?11:14,color:isA?MABEL_C:"#ddd",lineHeight:1.75}},
-      isA?React.createElement(MadText,{text:m.content}):m.content
-     ),
+     React.createElement("div",{style:{maxWidth:"88%",padding:"10px 14px",borderRadius:4,background:isA?MABEL_C+"10":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"44":"#ffffff1a"),fontFamily:isA?MONO:RAJ,fontSize:isA?11:14,color:isA?MABEL_C:"#ddd",lineHeight:1.75,whiteSpace:"pre-wrap",wordBreak:"break-word"}},
+      isA?React.createElement(MadText,{text:m.content}):m.content),
      React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#445",marginTop:2,letterSpacing:1}},isA?"MABEL":"COMMANDER")
     );
    }),
    commsLoading&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:MABEL_C,animation:"pulse 1s infinite"}},"// PROCESSING..."),
    React.createElement("div",{ref:endRef})
   ),
-  React.createElement("div",{style:{display:"flex",gap:8,marginBottom:14}},
-   React.createElement("input",{ref:inputRef,value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter"&&!e.shiftKey)send();},placeholder:"Transmit to MABEL...",disabled:commsLoading,style:{flex:1,background:"#06060f",border:"1px solid "+MABEL_C+"44",borderRadius:4,color:"#eee",fontFamily:MONO,fontSize:12,padding:"10px 14px",outline:"none"}}),
-   React.createElement("button",{onClick:send,disabled:commsLoading||!input.trim(),style:{padding:"10px 20px",background:MABEL_C+"18",border:"1px solid "+MABEL_C+"55",color:MABEL_C,borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:11}},commsLoading?"...":"SEND")
-  ),
-  React.createElement("div",{style:{borderTop:"1px solid "+B2,paddingTop:14}},
-   React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
-    React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2}},"SESSION RECAP LOG"),
-    React.createElement("button",{onClick:genRecap,disabled:recapLoading,style:{padding:"5px 14px",background:"#88BBFF12",border:"1px solid #88BBFF44",color:MABEL_C,borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},recapLoading?"COMPOSING...":"GENERATE")
-   ),
-   React.createElement(CopyBox,{text:recapText,loading:recapLoading})
+  React.createElement("div",{style:{borderTop:"1px solid "+MABEL_C+"22",padding:"10px 16px"}},
+   React.createElement("div",{style:{display:"flex",gap:8}},
+    React.createElement("input",{ref:inputRef,value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter"&&!e.shiftKey)send();},placeholder:"Transmit to MABEL...",disabled:commsLoading,style:{flex:1,background:"#06060f",border:"1px solid "+MABEL_C+"44",borderRadius:4,color:"#eee",fontFamily:MONO,fontSize:12,padding:"10px 14px",outline:"none"}}),
+    React.createElement("button",{onClick:send,disabled:commsLoading||!input.trim(),style:{padding:"10px 20px",background:MABEL_C+"18",border:"1px solid "+MABEL_C+"55",color:MABEL_C,borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:11}},commsLoading?"...":"SEND"))
   )
- );
+ ),
+ React.createElement("div",{style:{borderTop:"1px solid "+B2,paddingTop:12,marginTop:4}},
+  React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
+   React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2}},"SESSION RECAP LOG"),
+   React.createElement("button",{onClick:genRecap,disabled:recapLoading,style:{padding:"5px 14px",background:"#88BBFF12",border:"1px solid #88BBFF44",color:MABEL_C,borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},recapLoading?"COMPOSING...":"GENERATE")),
+  React.createElement(CopyBox,{text:recapText,loading:recapLoading})
+ )
+);
 }
 
 
@@ -2080,7 +2083,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
   React.createElement("div",{className:"gs-vig"}),
   React.createElement("div",{className:"gs-scan"}),
   // MABEL Mini — globally visible on all tabs
-  !boot&&React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
+  !boot&&tab!=="comms"&&React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
   React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box"}},
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #222230",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
      TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);}),React.createElement("button",{onClick:function(){setSmOpen(true);},style:{marginLeft:6,padding:"5px 13px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"SAVE")
