@@ -150,7 +150,99 @@ function ResetRunButton(props){
   return React.createElement("button",{onClick:handleClick,style:Object.assign({background:"transparent",border:"1px solid "+CB_NORM+(flash?"ff":"55"),color:CB_NORM+(flash?"ff":"88"),fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"5px 10px",cursor:"pointer",borderRadius:1,transition:"all .2s",boxShadow:flash?"0 0 8px "+CB_NORM+"88":undefined},style)},"↺ RESET RUN");
 }
 
-// Paste this entire block directly above: function Toast(props){
+// Paste this entire block directly above: 
+// ══════════════════════════════════════════════════════════════════
+// GHOST SIGNAL — INLINE DICE ROLL SYSTEM
+// ══════════════════════════════════════════════════════════════════
+
+function DiceRollInline(props){
+  var sides=props.sides||20;
+  var onRoll=props.onRoll;
+  var color=props.color||"#00FFD0";
+  var rerollAllowed=props.rerollAllowed||false;
+  var phaseS=React.useState("idle");var phase=phaseS[0];var setPhase=phaseS[1];
+  var resultS=React.useState(null);var result=resultS[0];var setResult=resultS[1];
+  var rerollUsedS=React.useState(false);var rerollUsed=rerollUsedS[0];var setRerollUsed=rerollUsedS[1];
+
+  function doRoll(isReroll){
+    var roll;
+    if(sides===66){
+      var tens=Math.floor(Math.random()*6)+1;
+      var units=Math.floor(Math.random()*6)+1;
+      roll=tens*10+units;
+    } else {
+      roll=Math.floor(Math.random()*sides)+1;
+    }
+    setTimeout(function(){
+      setResult(roll);
+      setPhase("done");
+      if(isReroll)setRerollUsed(true);
+      onRoll&&onRoll(roll,sides,isReroll);
+    },320);
+  }
+
+  function handleClick(){
+    if(phase==="idle"){setPhase("rolling");doRoll(false);return;}
+    if(phase==="done"&&rerollAllowed&&!rerollUsed){setPhase("rerolling");doRoll(true);}
+  }
+
+  var isCrit=sides!==66&&result===sides;
+  var isFumble=sides!==66&&result===1;
+  var canReroll=phase==="done"&&rerollAllowed&&!rerollUsed;
+  var isSpinning=phase==="rolling"||phase==="rerolling";
+
+  var displayColor=phase==="done"
+    ?(isCrit?"#FFD700":isFumble?"#FF2D78":color)
+    :color;
+
+  var label=phase==="idle"
+    ?"rol d"+sides
+    :isSpinning?"···"
+    :"d"+sides+" → "+result+(isCrit?" ★":isFumble?" ✗":"")+(canReroll?" ↺":"");
+
+  return React.createElement("span",{
+    onClick:handleClick,
+    title:canReroll?"CYBERHACK: reroll available":undefined,
+    style:{
+      display:"inline-block",
+      fontFamily:MONO,
+      fontSize:"0.82em",
+      letterSpacing:2,
+      color:displayColor,
+      border:"1px solid "+displayColor+(phase==="idle"?"99":""),
+      borderRadius:2,
+      padding:"1px 7px",
+      margin:"0 3px",
+      cursor:(phase==="idle"||canReroll)?"pointer":"default",
+      opacity:isSpinning?.5:1,
+      background:phase==="done"?displayColor+"16":displayColor+"0d",
+      boxShadow:phase==="done"?"0 0 6px "+displayColor+"55":"none",
+      transition:"color .25s,border-color .25s,box-shadow .25s,opacity .15s",
+      verticalAlign:"middle",
+      userSelect:"none",
+      animation:isSpinning?"dotBlink .25s ease-in-out 3":"none"
+    }
+  },label);
+}
+
+function parseInlineDice(text,onRoll,color,rerollAllowed){
+  if(!text||typeof text!=="string")return [text];
+  var parts=text.split(/(rol\s+d\d+)/gi);
+  if(parts.length===1)return [text];
+  return parts.map(function(part,i){
+    var m=part.match(/^rol\s+d(\d+)$/i);
+    if(m)return React.createElement(DiceRollInline,{
+      key:"dice-"+i+"-"+m[1],
+      sides:parseInt(m[1],10),
+      onRoll:onRoll,
+      color:color,
+      rerollAllowed:rerollAllowed||false
+    });
+    return part;
+  });
+}
+
+function Toast(props){
 // Also add the 4 @keyframes lines below into the END of your css const
 // ══════════════════════════════════════════════════════════════════
 
