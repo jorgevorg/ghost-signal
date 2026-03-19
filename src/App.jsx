@@ -151,7 +151,6 @@ function ResetRunButton(props){
 }
 
 // Paste this entire block directly above: 
-
 // ═══════════════════════════════════════════
 // GHOST SIGNAL — INLINE DICE ROLL SYSTEM
 // ═══════════════════════════════════════════
@@ -196,8 +195,8 @@ function DiceRollInline(props){
     :color;
   var label=phase==="idle"
     ?"rol d"+sides
-    :isSpinning?"···"
-    :"d"+sides+" \u2192 "+result+(isCrit?" \u2605":isFumble?" \u2717":"")+(canReroll?" \u21ba":"");
+    :isSpinning?"..."
+    :"d"+sides+" -> "+result+(isCrit?" [CRIT]":isFumble?" [FUMBLE]":"")+(canReroll?" [HACK]":"");
 
   return React.createElement("span",{
     onClick:handleClick,
@@ -213,7 +212,7 @@ function DiceRollInline(props){
       padding:"1px 7px",
       margin:"0 3px",
       cursor:(phase==="idle"||canReroll)?"pointer":"default",
-      opacity:isSpinning?.5:1,
+      opacity:isSpinning?0.5:1,
       background:phase==="done"?displayColor+"16":displayColor+"0d",
       boxShadow:phase==="done"?"0 0 6px "+displayColor+"55":"none",
       transition:"color .25s,border-color .25s,box-shadow .25s,opacity .15s",
