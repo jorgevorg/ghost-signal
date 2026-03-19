@@ -151,9 +151,10 @@ function ResetRunButton(props){
 }
 
 // Paste this entire block directly above: 
-// ══════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════
 // GHOST SIGNAL — INLINE DICE ROLL SYSTEM
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 
 function DiceRollInline(props){
   var sides=props.sides||20;
@@ -190,15 +191,13 @@ function DiceRollInline(props){
   var isFumble=sides!==66&&result===1;
   var canReroll=phase==="done"&&rerollAllowed&&!rerollUsed;
   var isSpinning=phase==="rolling"||phase==="rerolling";
-
   var displayColor=phase==="done"
     ?(isCrit?"#FFD700":isFumble?"#FF2D78":color)
     :color;
-
   var label=phase==="idle"
     ?"rol d"+sides
     :isSpinning?"···"
-    :"d"+sides+" → "+result+(isCrit?" ★":isFumble?" ✗":"")+(canReroll?" ↺":"");
+    :"d"+sides+" \u2192 "+result+(isCrit?" \u2605":isFumble?" \u2717":"")+(canReroll?" \u21ba":"");
 
   return React.createElement("span",{
     onClick:handleClick,
@@ -219,8 +218,7 @@ function DiceRollInline(props){
       boxShadow:phase==="done"?"0 0 6px "+displayColor+"55":"none",
       transition:"color .25s,border-color .25s,box-shadow .25s,opacity .15s",
       verticalAlign:"middle",
-      userSelect:"none",
-      animation:isSpinning?"dotBlink .25s ease-in-out 3":"none"
+      userSelect:"none"
     }
   },label);
 }
