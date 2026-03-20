@@ -1317,18 +1317,18 @@ var send=function(){if(!input.trim()||loading)return;onSend(input.trim());setInp
 return React.createElement("div",{style:{position:"fixed",bottom:35,left:"calc(50vw - 161.5px)",transform:"translateX(-50%)",width:open?375:200,zIndex:200,background:BG,border:"1px solid "+MABEL_C+"55",borderRadius:8,overflow:"hidden",transition:"width .2s",boxShadow:"0 0 18px "+MABEL_C+"18"}},
  React.createElement("div",{onClick:function(){setOpen(!open);},style:{padding:"8px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:MABEL_C+"08",borderBottom:open?"1px solid "+MABEL_C+"33":"none"}},
   React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-   React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 6px "+MABEL_C,animation:"pulse 2s infinite"}}),
+   React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 6px "+MABEL_C,animation:loading?"pulse 2s infinite":"none"}}),
    React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:MABEL_C,letterSpacing:2}},loading?"MABEL...":"MABEL")),
   React.createElement("span",{style:{color:MABEL_C+"88",fontSize:10}},open?"▼":"▲")),
  !open&&lastMsg&&lastMsg.role==="assistant"&&React.createElement("div",{style:{padding:"6px 12px",fontFamily:MONO,fontSize:9,color:"#88BBFF88",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},
-  lastMsg.content.slice(0,55)+(lastMsg.content.length>55?"...":"")),
+  (lastMsg.typing?lastMsg.displayText:lastMsg.content).slice(0,55)+((lastMsg.typing?lastMsg.displayText:lastMsg.content).length>55?"...":"")),
  open&&React.createElement("div",null,
   React.createElement("div",{style:{minHeight:60,maxHeight:320,overflowY:"auto",padding:"8px 12px",display:"flex",flexDirection:"column",gap:6}},
    msgs.slice(-10).map(function(m,i){
     var isA=m.role==="assistant";
     return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end"}},
      React.createElement("div",{style:{maxWidth:"90%",padding:"5px 9px",borderRadius:4,background:isA?MABEL_C+"12":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"33":"#ffffff22"),fontFamily:isA?MONO:RAJ,fontSize:isA?10:12,color:isA?MABEL_C:"#ddd",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}},
-      isA?((/rol\s+d\d+/i.test(m.content))?React.createElement("span",{style:{fontFamily:MONO,fontSize:"inherit",lineHeight:1.5}},parseInlineDice(m.content,function(result,sides,isReroll){var note=isReroll?"[CYBERHACK REROLL: d"+sides+" -> "+result+"]":"[DICE ROLL: d"+sides+" -> "+result+"]";props.onSend&&props.onSend(note);},MABEL_C,false)):React.createElement(MadText,{text:m.content})):m.content)
+      isA?((/rol\s+d\d+/i.test(m.content))?React.createElement("span",{style:{fontFamily:MONO,fontSize:"inherit",lineHeight:1.5}},parseInlineDice(m.content,function(result,sides,isReroll){var note=isReroll?"[CYBERHACK REROLL: d"+sides+" -> "+result+"]":"[DICE ROLL: d"+sides+" -> "+result+"]";props.onSend&&props.onSend(note);},MABEL_C,false)):m.typing?React.createElement("span",{style:{fontFamily:MONO,fontSize:"inherit",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}},m.displayText+"▮"):React.createElement(MadText,{text:m.content})):m.content)
     );
    }),
    React.createElement("div",{ref:endRef})),
@@ -1385,10 +1385,10 @@ function ContextMenu(props){
 
 // ── HEX MAP (Batch 1) ──────────────────────────────────────────────────────
 function MABELPortrait(props){
-  var loading=props.loading,MABEL_C="#00FFD0";
+  var loading=props.loading,isTalking=!!props.isTalking,MABEL_C="#00FFD0";
   var anim=loading
     ?"glitch 0.25s ease-in-out infinite"
-    :"sigPredator 5.5s ease-in-out infinite";
+    :"none";
   var glow=loading
     ?"0 0 24px "+MABEL_C+"cc, 0 0 8px "+MABEL_C+"88"
     :"0 0 10px "+MABEL_C+"44";
@@ -1424,8 +1424,8 @@ function MABELPortrait(props){
           fill:MABEL_C,
           style:{
             transformOrigin:"257px 331px",
-            animation:loading?"mabelTalk 0.38s ease-in-out infinite":"none",
-            opacity:loading?1:0,
+            animation:isTalking?"mabelTalk 0.38s ease-in-out infinite":"none",
+            opacity:isTalking?1:0,
             transition:"opacity .2s"
           }
         })
@@ -1528,7 +1528,7 @@ msgs.map(function(m,i){
 var isA=m.role==="assistant";
 return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end",animation:"in .2s ease",position:"relative",zIndex:1}},
 React.createElement("div",{style:{maxWidth:"88%",padding:"10px 14px",borderRadius:4,background:isA?MABEL_C+"10":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"44":"#ffffff1a"),fontFamily:isA?MONO:RAJ,fontSize:isA?11:14,color:isA?MABEL_C:"#ddd",lineHeight:1.75,whiteSpace:"pre-wrap",wordBreak:"break-word"}},
-isA?React.createElement(MadText,{text:m.content}):m.content),
+isA?m.typing?React.createElement("span",{style:{fontFamily:MONO,fontSize:"inherit",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}},m.displayText+"▮"):React.createElement(MadText,{text:m.content}):m.content),
 React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#445",marginTop:2,letterSpacing:1}},isA?"MABEL":"COMMANDER")
 );
 }),
@@ -1537,7 +1537,7 @@ React.createElement("div",{ref:endRef})
 ),
 
 React.createElement("div",{style:{width:156,flexShrink:0,borderLeft:"1px solid "+MABEL_C+"18",display:"flex",flexDirection:"column",gap:5,padding:"10px 6px",background:"#020b0844",overflowY:"auto"}},
-React.createElement(MABELPortrait,{loading:commsLoading}),React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
+React.createElement(MABELPortrait,{loading:commsLoading,isTalking:isTalking}),React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
 QUICK_ACTIONS.map(function(qa){
 var isActive=activeQA===qa.label;
 return React.createElement("button",{
@@ -2258,7 +2258,27 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
   return "You are MABEL — the ship intelligence aboard "+gs.ship.name+". Precise. Dry. Darkly witty. Loyal. No asterisk actions. Address user as Commander.\n\nFRAMING: Rules → 'Querying tactical database.' / 'End query.' | Rolls → 'Calculating...' | Lore → 'Archival record retrieved.' | Unknown → '[RECORD FRAGMENTED]'\n\n"+memBlock+cmBlock+RULES_DB+"\nMISSION STATE:\nSession: "+gs.session+"\nVessel: "+gs.ship.name+" Hull:"+gs.ship.hull+"/"+gs.ship.hullMax+" Fuel:"+gs.ship.fuel+"/"+gs.ship.fuelMax+" Scraps:"+gs.ship.scraps+"\nCole: HP "+gs.cole.hp+"/"+gs.cole.hpMax+" EN "+gs.cole.en+"/"+gs.cole.enMax+" VIG:"+gs.cole.vigor+" GRA:"+gs.cole.grace+" MIN:"+gs.cole.mind+" TEC:"+gs.cole.tech+"\nVela: HP "+gs.vela.hp+"/"+gs.vela.hpMax+" EN "+gs.vela.en+"/"+gs.vela.enMax+" VIG:"+gs.vela.vigor+" GRA:"+gs.vela.grace+" MIN:"+gs.vela.mind+" TEC:"+gs.vela.tech;
  };
 
- var sendToMabel=async function(userMsg){
+ var var twSpeedS=useState(function(){return parseInt(localStorage.getItem("gs_twSpeed")||"12");}),setTwSpeed=twSpeedS[1];var twSpeed=twSpeedS[0];
+var twRef=useRef(null);
+useEffect(function(){localStorage.setItem("gs_twSpeed",String(twSpeed));},[twSpeed]);
+useEffect(function(){
+var run=function(){setComms(function(prev){
+var idx=prev.findIndex(function(m){return m.typing;});
+if(idx===-1){if(twRef.current){clearInterval(twRef.current);twRef.current=null;}return prev;}
+var arr=prev.slice();var m=arr[idx];
+var next=m.content.slice(0,m.displayText.length+1);
+var done=next.length>=m.content.length;
+arr[idx]=Object.assign({},m,{displayText:next,typing:!done});
+if(done&&twRef.current){clearInterval(twRef.current);twRef.current=null;}
+return arr;
+});};
+var hasTyping=comms.some(function(m){return m.typing;});
+if(hasTyping&&!twRef.current){twRef.current=setInterval(run,twSpeed);}
+else if(!hasTyping&&twRef.current){clearInterval(twRef.current);twRef.current=null;}
+return function(){if(twRef.current){clearInterval(twRef.current);twRef.current=null;}};
+},[comms,twSpeed]);
+var isTalking=comms.some(function(m){return m.typing;});
+sendToMabel=async function(userMsg){
   if(!userMsg.trim()||commsLoading)return;
   setCommsLoading(true);
   var userMsgObj={role:"user",content:userMsg};
@@ -2268,7 +2288,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
    var res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:1200,system:buildSys(memory),messages:newMsgs.slice(-24).map(function(m){return{role:m.role,content:m.content};})})});
    var data=await res.json();
    var reply=(data.content&&data.content.find(function(b){return b.type==="text";}))||{text:"[SIGNAL LOST]"};
-   var replyMsg={role:"assistant",content:reply.text||"[SIGNAL LOST]"};
+   var replyMsg={role:"assistant",content:reply.text||"[SIGNAL LOST]",displayText:"",typing:true};
    setComms(newMsgs.concat([replyMsg]));
    // Consolidate memory
    try{
