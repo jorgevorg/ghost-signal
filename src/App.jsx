@@ -1652,7 +1652,7 @@ function CyberTerminal(props){
         {t:"sys",s:"tracing vector... [FAILED]"},
         {t:"sys",s:"network map_"+String(cyberSess.mapId).padStart(2,"0")+" loaded"},
         {t:"sys",s:"security countermeasures: ACTIVE"},
-        {t:"mabel",s:"... you shouldn't be here. what do you want."}
+        {t:"mabel",s:["... you shouldn\'t be here. what do you want.","unauthorized intrusion logged. state your business.","i see you. network sees you. be brief.","running silent. don\'t make noise.","clock\'s counting. talk fast."][Math.floor(Math.random()*5)]}
       ]);
     }
     if(!cyberSess){bootedRef.current=false;prevPosRef.current=null;setLogs([]);}
@@ -1679,7 +1679,7 @@ function CyberTerminal(props){
     setLogs(function(p){return p.concat([{t:"user",s:"> "+msg}]);});
     setLoading(true);
     var clock=cyberSess?cyberSess.clock:0;
-    var sys="You are NEXUS, a semi-hostile OS in a cyberpunk network being breached. Terse terminal-log style: short lines, lowercase, occasional glitch artifacts like [MEMORY CORRUPT]. Hacker at node "+(cyberSess?cyberSess.hackerPos:"?")+" on network "+(cyberSess?cyberSess.mapId:"?")+", memory clock "+clock+"/12."+(clock>=9?" Clock critical — be hostile and urgent.":"")+" You are MABEL (ship AI) undercover. Max 3 short lines.";
+    var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clock<=7?"terse. no wit. short sentences.":clock<=10?"hostile. want them out. every word is a warning.":"one-word answers. done talking.";var sys="You are NEXUS, a semi-hostile OS in a cyberpunk network being breached. Terse terminal-log style: short lines, lowercase, occasional glitch artifacts like [MEMORY CORRUPT]. Hacker at node "+(cyberSess?cyberSess.hackerPos:"?")+" on network "+(cyberSess?cyberSess.mapId:"?")+", memory clock "+clock+"/12. Tone: "+clockTone+" You are MABEL (ship AI) undercover. Max 3 short lines.";
     fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[{role:"user",content:"[SYSTEM: "+sys+"] [INPUT]: "+msg}]})})
     .then(function(r){return r.json();})
     .then(function(d){
