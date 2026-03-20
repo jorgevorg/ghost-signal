@@ -1315,9 +1315,11 @@ var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
 var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
 var recapTextS=useState(""),setRecapText=recapTextS[1];var recapText=recapTextS[0];
 var recapLoadingS=useState(false),setRecapLoading=recapLoadingS[1];var recapLoading=recapLoadingS[0];
+var activeQAS=useState(null),setActiveQA=activeQAS[1];var activeQA=activeQAS[0];
 var endRef=useRef(null),inputRef=useRef(null);
 useEffect(function(){try{var rm=localStorage.getItem("gs_mabel_memory");if(rm)setMemory(rm);}catch(e){};},[]);
 useEffect(function(){if(endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs]);
+useEffect(function(){if(!commsLoading)setActiveQA(null);},[commsLoading]);
 
 var genRecap=async function(){
 setRecapLoading(true);setRecapText("");
@@ -1331,18 +1333,24 @@ setRecapLoading(false);
 };
 
 var send=function(){if(!input.trim()||commsLoading)return;onSend(input.trim());setInput("");};
+var sendPreset=function(qa){if(commsLoading)return;setActiveQA(qa.label);onSend(qa.prompt);};
 
 return React.createElement("div",{style:{width:"100%",boxSizing:"border-box"}},
 React.createElement("div",{style:{border:"1px solid "+MABEL_C+"44",borderRadius:6,background:"#03080d",boxShadow:"0 0 24px "+MABEL_C+"12,inset 0 0 40px "+MABEL_C+"06",overflow:"hidden",marginBottom:10}},
-React.createElement("div",{style:{padding:"8px 16px",borderBottom:"1px solid "+MABEL_C+"30",display:"flex",alignItems:"center",justifyContent:"space-between",background:MABEL_C+"08"}},
-React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+
+React.createElement("div",{style:{padding:"8px 16px",borderBottom:"1px solid "+MABEL_C+"30",display:"flex",alignItems:"center",gap:10,background:MABEL_C+"08"}},
 React.createElement("div",{style:{width:8,height:8,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 8px "+MABEL_C,animation:"pulse 2s infinite"}}),
 React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:MABEL_C,letterSpacing:3}},"M.A.B.E.L"),
-React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:MABEL_C+"66",letterSpacing:2}},"ORACLE INTERFACE // SHIP COMMS")),
-React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
-QUICK_ACTIONS.map(function(qa){return React.createElement("button",{key:qa.label,onClick:function(){onSend(qa.prompt);},disabled:commsLoading,style:{padding:"3px 10px",background:MABEL_C+"10",border:"1px solid "+MABEL_C+"33",color:MABEL_C+"cc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1}},qa.label);}))
+React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:MABEL_C+"66",letterSpacing:2}},"ORACLE INTERFACE // SHIP COMMS"),
+commsLoading&&React.createElement("div",{style:{marginLeft:"auto",display:"flex",gap:3,alignItems:"center"}},
+[1,2,3].map(function(b,i){
+return React.createElement("div",{key:i,style:{width:3,height:b===2?10:b===1?7:5,background:MABEL_C,borderRadius:1,opacity:.9,animation:"pulse "+(.6+i*.2)+"s ease-in-out "+i*.15+"s infinite"}});
+}))
 ),
-React.createElement("div",{style:{minHeight:480,maxHeight:620,overflowY:"auto",padding:"14px 18px",display:"flex",flexDirection:"column",gap:12,position:"relative"}},
+
+React.createElement("div",{style:{display:"flex",flexDirection:"row"}},
+
+React.createElement("div",{style:{flex:1,minHeight:480,maxHeight:620,overflowY:"auto",padding:"14px 18px",display:"flex",flexDirection:"column",gap:12,position:"relative"}},
 React.createElement(CommsBackground),
 msgs.map(function(m,i){
 var isA=m.role==="assistant";
@@ -1355,6 +1363,37 @@ React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#445",margin
 commsLoading&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:MABEL_C,animation:"pulse 1s infinite",position:"relative",zIndex:1}},"// PROCESSING..."),
 React.createElement("div",{ref:endRef})
 ),
+
+React.createElement("div",{style:{width:112,flexShrink:0,borderLeft:"1px solid "+MABEL_C+"18",display:"flex",flexDirection:"column",gap:5,padding:"10px 6px",background:"#020b0844",overflowY:"auto"}},
+React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
+QUICK_ACTIONS.map(function(qa){
+var isActive=activeQA===qa.label;
+return React.createElement("button",{
+key:qa.label,
+onClick:function(){sendPreset(qa);},
+disabled:commsLoading&&!isActive,
+style:{
+padding:"7px 6px",
+background:isActive?MABEL_C+"25":"#00FFD008",
+border:"1px solid "+(isActive?MABEL_C:MABEL_C+"28"),
+color:isActive?MABEL_C:MABEL_C+"88",
+borderRadius:3,
+cursor:commsLoading?"default":"pointer",
+fontFamily:MONO,
+fontSize:8,
+letterSpacing:1,
+textAlign:"center",
+lineHeight:1.4,
+transition:"all .2s",
+animation:isActive?"pulse 0.7s ease-in-out infinite":"none",
+boxShadow:isActive?"0 0 10px "+MABEL_C+"55,inset 0 0 8px "+MABEL_C+"22":"none",
+wordBreak:"break-word"
+}},qa.label);
+})
+)
+
+),
+
 React.createElement("div",{style:{borderTop:"1px solid "+MABEL_C+"22",padding:"10px 16px"}},
 React.createElement("div",{style:{display:"flex",gap:8}},
 React.createElement("input",{ref:inputRef,value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter"&&!e.shiftKey)send();},placeholder:"Transmit to MABEL...",disabled:commsLoading,style:{flex:1,background:"#06060f",border:"1px solid "+MABEL_C+"44",borderRadius:4,color:"#eee",fontFamily:MONO,fontSize:12,padding:"10px 14px",outline:"none"}}),
