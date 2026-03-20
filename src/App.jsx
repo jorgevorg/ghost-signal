@@ -1320,6 +1320,54 @@ function MABELPortrait(props){
   );
 }
 
+function MABELPortrait(props){
+  var loading=props.loading,MABEL_C="#00FFD0";
+  var anim=loading
+    ?"flarePulse 0.55s ease-in-out infinite"
+    :"flarePulse 3.8s ease-in-out infinite";
+  var glow=loading
+    ?"0 0 24px "+MABEL_C+"cc, 0 0 8px "+MABEL_C+"88"
+    :"0 0 10px "+MABEL_C+"44";
+  return React.createElement("div",{style:{
+    display:"flex",flexDirection:"column",alignItems:"center",
+    padding:"10px 6px 6px 6px",
+    borderBottom:"1px solid "+MABEL_C+(loading?"55":"18"),
+    transition:"border-color .5s"
+  }},
+    React.createElement("div",{style:{
+      width:62,height:62,borderRadius:"50%",
+      border:"1.5px solid "+MABEL_C+(loading?"bb":"33"),
+      display:"flex",alignItems:"center",justifyContent:"center",
+      background:"#020d0a",
+      boxShadow:glow,
+      overflow:"hidden",
+      transition:"box-shadow .5s, border-color .5s",
+      animation:anim
+    }},
+      React.createElement("svg",{
+        viewBox:"80 50 355 430",
+        width:42,height:42,
+        style:{display:"block",overflow:"visible"}
+      },
+        React.createElement("path",{
+          fill:MABEL_C,
+          fillOpacity:loading?0.92:0.68,
+          style:{transition:"fill-opacity .5s"},
+          d:"M212.103,408.644c28.22,9.692,59.575,9.692,87.795,0v56.725h-87.795V408.644z M208.967,394.106 c-46.748-19.098-76.963-63.851-76.963-114.875v-62.426c78.959-27.935,110.884-70.977,123.141-93.781 c10.262,23.659,40.192,67.271,124.567,94.351l-0.855,72.972h-31.926l-19.668-19.668c-6.151-5.467-14.706,2.968-8.837,8.837 l21.664,21.379c2.974,2.974,3.835,1.183,37.056,1.71c-2.565,14.538-7.696,27.935-15.108,40.192h-39.052 c-3.438,0-3.134,0.569-21.662,19.097c-2.722,2.722-4.362,6.959-1.613,9.708c4.607,4.607,9.308-0.014,9.308-0.014l16.533-16.533 h27.935C319.761,399.044,260.951,415.194,208.967,394.106z M214.098,214.811H166.78c-3.421,0-6.271,2.851-6.271,6.271 c0,3.42,2.85,6.271,6.271,6.271h11.402c-1.425,2.565-2.565,4.846-2.565,7.981c0,7.696,6.271,13.967,13.967,13.967 c9.784,0,18.276-10.95,11.402-21.949h13.682C223.074,227.353,221.842,214.811,214.098,214.811z M285.075,332.536 c0-3.421-2.85-6.271-6.271-6.271h-45.608c-3.421,0-6.271,2.85-6.271,6.271c0,3.706,2.85,6.271,6.271,6.271h45.608 C282.225,338.807,285.075,336.241,285.075,332.536z M296.762,227.353h11.402c-1.425,2.565-2.565,4.846-2.565,7.981 c0,7.696,6.271,13.967,13.968,13.967c9.784,0,18.276-10.95,11.402-21.949h13.682c8.406,0,7.174-12.542-0.57-12.542h-47.318 c-3.421,0-6.271,2.851-6.271,6.271C290.491,224.502,293.341,227.353,296.762,227.353z M120.602,291.489h-15.108l-5.986,173.595 H199.56v-62.141C154.808,382.989,125.163,340.517,120.602,291.489z M406.769,291.508l-15.656-0.019 c-0.26,5.709-0.953,11.396-2.184,16.977c-3.349,15.193-9.336,29.646-17.2,42.598c-0.285,0.285-0.285,0.57-0.57,0.855 c-13.967,21.949-33.921,39.907-58.72,51.024v62.141h100.052L406.769,291.508z M248.404,107.023c0.827-2.165,2.218-4.068,4.006-5.542 l0.01-0.009c1.919-1.582,4.713-1.497,6.532,0.198l0,0c1.823,1.698,3.144,3.859,3.808,6.26 c3.905,14.131,25.354,68.351,124.077,98.613h19.098c0.285-3.706,0-9.122-0.285-13.682c0-70.972-29.388-123.117-97.487-139.959 c-26.935-6.966-50.951-6.188-52.449-6.271c-80.403,0-136.037,35.46-147.94,114.02c-0.57,3.135-1.995,33.066-2.28,45.893h18.813 C217.018,174.395,243.27,120.455,248.404,107.023z M102.359,279.517h17.673v-60.43h-17.673c-16.533,0-30.215,13.682-30.215,30.215 C72.144,265.834,85.826,279.517,102.359,279.517z M391.968,279.517h17.673c16.533,0,30.215-13.682,30.215-30.215 c0-16.533-13.397-30.215-30.215-30.215h-17.673V279.517z"
+        })
+      )
+    ),
+    React.createElement("div",{style:{
+      fontFamily:"'Share Tech Mono',monospace",
+      fontSize:7,letterSpacing:2,
+      color:MABEL_C,
+      opacity:loading?0.95:0.38,
+      marginTop:5,textAlign:"center",
+      transition:"opacity .5s"
+    }},loading?"THINKING...":"M.A.B.E.L.")
+  );
+}
+
 function CommsBackground(){
   var canvasRef=React.useRef(null);
   React.useEffect(function(){
@@ -1413,7 +1461,7 @@ React.createElement("div",{ref:endRef})
 ),
 
 React.createElement("div",{style:{width:112,flexShrink:0,borderLeft:"1px solid "+MABEL_C+"18",display:"flex",flexDirection:"column",gap:5,padding:"10px 6px",background:"#020b0844",overflowY:"auto"}},
-React.createElement(MABELPortrait,{loading:commsLoading}),React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
+React.createElement(MABELPortrait,{loading:commsLoading}),React.createElement(MABELPortrait,{loading:commsLoading}),React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
 QUICK_ACTIONS.map(function(qa){
 var isActive=activeQA===qa.label;
 return React.createElement("button",{
