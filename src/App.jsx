@@ -128,7 +128,7 @@ const MOON_PALETTE=["#aaaacc","#bbaadd","#ccbbaa","#aabbcc","#bbccaa"];
 const getPlanetColor=function(hexId,offset){if(offset==null)offset=0;return PLANET_PALETTE[(hexId*7+offset*3)%PLANET_PALETTE.length];};
 const getMoonColor=function(hexId){return MOON_PALETTE[hexId%MOON_PALETTE.length];};
 
-const CB_NODE="#FF2060",CB_NORM="#00FFD0",CB_ACC="#c8d0ff";
+const CB_NODE="#FF2060",CB_NORM="#00FFD0",CB_ACC="#c8d0ff",CB_GREEN="#00FF90";
 const CYBER_MAPS=[
   ["N","X","A","X","N","X","A","X","N"],
   ["X","N","X","N","A","N","X","N","X"],
