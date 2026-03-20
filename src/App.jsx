@@ -1705,6 +1705,28 @@ setLogs(function(prev){return prev.map(function(e,ei){return ei===i?{t:e.t,s:e.s
     )
   );
 }
+function CyberEye(props){
+var C=props.color||"#00FFD0",C2=props.color2||"#FF2060",sz=props.size||70;
+var dl=["0s","0.5s","1.0s","1.5s","2.0s","2.5s","3.0s","3.5s"];
+return React.createElement("svg",{viewBox:"0 0 100 100",width:sz,height:sz,style:{display:"block",overflow:"visible",animation:props.noAnim?undefined:"cyberEyeBob 4s ease-in-out infinite"}},
+React.createElement("circle",{cx:50,cy:50,r:44,fill:"none",stroke:C,strokeWidth:0.4,opacity:0.3}),
+React.createElement("circle",{cx:50,cy:50,r:36,fill:"none",stroke:C2,strokeWidth:0.3,opacity:0.15}),
+React.createElement("line",{x1:50,y1:3,x2:50,y2:21,stroke:C,strokeWidth:1.2,style:{animation:"traceGlow 3.2s "+dl[0]+" ease-in-out infinite"}}),React.createElement("circle",{cx:50,cy:3,r:2.5,fill:C2,style:{animation:"traceGlow 3.2s "+dl[0]+" ease-in-out infinite"}}),
+React.createElement("line",{x1:80,y1:20,x2:68,y2:32,stroke:C,strokeWidth:1.2,style:{animation:"traceGlow 3.2s "+dl[1]+" ease-in-out infinite"}}),React.createElement("circle",{cx:80,cy:20,r:2.5,fill:C,style:{animation:"traceGlow 3.2s "+dl[1]+" ease-in-out infinite"}}),
+React.createElement("line",{x1:97,y1:50,x2:79,y2:50,stroke:C,strokeWidth:1.2,style:{animation:"traceGlow 3.2s "+dl[2]+" ease-in-out infinite"}}),React.createElement("circle",{cx:97,cy:50,r:2.5,fill:C2,style:{animation:"traceGlow 3.2s "+dl[2]+" ease-in-out infinite"}}),
+React.createElement("line",{x1:80,y1:80,x2:68,y2:68,stroke:C,strokeWidth:1.2,style:{animation:"traceGlow 3.2s "+dl[3]+" ease-in-out infinite"}}),React.createElement("circle",{cx:80,cy:80,r:2.5,fill:C,style:{animation:"traceGlow 3.2s "+dl[3]+" ease-in-out infinite"}}),
+React.createElement("line",{x1:50,y1:97,x2:50,y2:79,stroke:C,strokeWidth:1.2,style:{animation:"traceGlow 3.2s "+dl[4]+" ease-in-out infinite"}}),React.createElement("circle",{cx:50,cy:97,r:2.5,fill:C2,style:{animation:"traceGlow 3.2s "+dl[4]+" ease-in-out infinite"}}),
+React.createElement("line",{x1:20,y1:80,x2:32,y2:68,stroke:C,strokeWidth:1.2,style:{animation:"traceGlow 3.2s "+dl[5]+" ease-in-out infinite"}}),React.createElement("circle",{cx:20,cy:80,r:2.5,fill:C,style:{animation:"traceGlow 3.2s "+dl[5]+" ease-in-out infinite"}}),
+React.createElement("line",{x1:3,y1:50,x2:21,y2:50,stroke:C,strokeWidth:1.2,style:{animation:"traceGlow 3.2s "+dl[6]+" ease-in-out infinite"}}),React.createElement("circle",{cx:3,cy:50,r:2.5,fill:C2,style:{animation:"traceGlow 3.2s "+dl[6]+" ease-in-out infinite"}}),
+React.createElement("line",{x1:20,y1:20,x2:32,y2:32,stroke:C,strokeWidth:1.2,style:{animation:"traceGlow 3.2s "+dl[7]+" ease-in-out infinite"}}),React.createElement("circle",{cx:20,cy:20,r:2.5,fill:C,style:{animation:"traceGlow 3.2s "+dl[7]+" ease-in-out infinite"}}),
+React.createElement("circle",{cx:50,cy:50,r:23,fill:"#020b0a",stroke:C,strokeWidth:1.5,opacity:0.98}),
+React.createElement("ellipse",{cx:50,cy:50,rx:15,ry:19,fill:"none",stroke:C,strokeWidth:1.2,opacity:0.85}),
+React.createElement("circle",{cx:50,cy:50,r:9,fill:"none",stroke:C,strokeWidth:0.8,opacity:0.5}),
+React.createElement("circle",{cx:50,cy:50,r:5,fill:C,style:{transformOrigin:"50px 50px",animation:"pupilPulse 2.5s ease-in-out infinite"}}),
+React.createElement("line",{x1:27,y1:50,x2:73,y2:50,stroke:C,strokeWidth:0.4,opacity:0.2}),
+React.createElement("line",{x1:50,y1:27,x2:50,y2:73,stroke:C,strokeWidth:0.4,opacity:0.2})
+);}
+var EXTRA_CYBER_CSS="@keyframes cyberEyeBob{0%,100%{transform:translateY(0px)}50%{transform:translateY(-5px)}}@keyframes traceGlow{0%,100%{opacity:0.08}50%{opacity:0.95}}@keyframes pupilPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.7);opacity:0.6}}@keyframes diagScroll{from{background-position:0 0,0 0}to{background-position:54px 54px,-54px 54px}}";
 function CybersphereTab(props){
   var gs=props.gs,cyberSess=props.cyberSess,setCyberSess=props.setCyberSess;
   var glitchS=React.useState(false),setGlitch=glitchS[1];var glitch=glitchS[0];
@@ -1755,11 +1777,11 @@ function CybersphereTab(props){
     return "#1a1a30";
   };
   return React.createElement("div",{style:{background:"#060a06",position:"absolute",inset:0,display:"flex",flexDirection:"column",fontFamily:MONO,color:CB_NORM,overflow:"hidden",border:"1px solid "+frameColor+(danger?"99":"33"),boxSizing:"border-box",transition:"border-color .4s"}},
-    React.createElement("style",null,CYBER_CSS),
-    React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,backgroundImage:"linear-gradient("+CB_GREEN+"09 1px,transparent 1px),linear-gradient(90deg,"+CB_GREEN+"09 1px,transparent 1px)",backgroundSize:"28px 28px",animation:"gridPulse 4s ease-in-out infinite",zIndex:0}}),
+    React.createElement("style",null,CYBER_CSS+EXTRA_CYBER_CSS),
+    React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(45deg,transparent 0,transparent 25px,"+CB_NORM+"0d 25px,"+CB_NORM+"0d 26px),repeating-linear-gradient(-45deg,transparent 0,transparent 25px,"+CB_NODE+"09 25px,"+CB_NODE+"09 26px)",backgroundSize:"52px 52px",animation:"diagScroll 14s linear infinite",zIndex:0}}),
     React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(0,255,208,.01) 3px,rgba(0,255,208,.01) 4px)",animation:"cyberScan .2s linear infinite",zIndex:1}}),
     React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"radial-gradient(ellipse at center,transparent 40%,#000 100%)",zIndex:2}}),
-    React.createElement(CornerBracket,{pos:"tl",color:frameColor}),
+    React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,opacity:0.08}},React.createElement(CyberEye,{size:280,color:CB_NORM,color2:CB_NODE})),React.createElement(CornerBracket,{pos:"tl",color:frameColor}),
     React.createElement(CornerBracket,{pos:"tr",color:frameColor}),
     React.createElement(CornerBracket,{pos:"bl",color:frameColor}),
     React.createElement(CornerBracket,{pos:"br",color:frameColor}),
