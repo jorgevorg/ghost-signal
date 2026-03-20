@@ -2083,7 +2083,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
   React.createElement("div",{className:"gs-vig"}),
   React.createElement("div",{className:"gs-scan"}),
   // MABEL Mini — globally visible on all tabs
-  !boot&&tab!=="comms"&&React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
+  !boot&&tab!=="COMMS"&&React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
   React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box"}},
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #222230",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
      TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);}),React.createElement("button",{onClick:function(){setSmOpen(true);},style:{marginLeft:6,padding:"5px 13px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"SAVE")
