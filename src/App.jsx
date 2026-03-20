@@ -1744,20 +1744,20 @@ var memItems=(charData.memory||[]).filter(function(m){return m;});
 var cyberItems=(charData.cybertech||[]).filter(function(c){return c;});
 return React.createElement("div",{style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",zIndex:10,display:"flex",alignItems:"stretch",pointerEvents:"auto"}},
 React.createElement("div",{onClick:function(){setOpen(!open);},style:{writingMode:"vertical-rl",background:accent+"11",border:"1px solid "+accent+"44",borderRight:open?"none":"1px solid "+accent+"44",color:accent,fontFamily:ORB,fontSize:8,letterSpacing:3,padding:"12px 6px",cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",textShadow:"0 0 6px "+accent+"66"}},hacker.label+(open?" ▸":" ◂")),
-open&&React.createElement("div",{style:{width:190,background:"#06080ef5",border:"1px solid "+CB_NORM+"22",padding:"14px 12px",display:"flex",flexDirection:"column",gap:0}},
-React.createElement("div",{style:{fontFamily:MONO,fontSize:6.5,letterSpacing:2,color:accent,textShadow:"0 0 6px "+accent+"66",paddingBottom:8,marginBottom:8,borderBottom:"1px solid "+CB_NORM+"22"}},hacker.label),
+open&&React.createElement("div",{style:{width:190,background:"#03080cf8",border:"1px solid "+accent+"aa",padding:"14px 12px",display:"flex",flexDirection:"column",gap:0,boxShadow:"inset 0 0 40px "+accent+"0a,-6px 0 24px "+accent+"14"}},
+React.createElement("div",{style:{fontFamily:MONO,fontSize:6.5,letterSpacing:2,color:accent,textShadow:"0 0 10px "+accent+",0 0 22px "+accent+"55",paddingBottom:8,marginBottom:8,borderBottom:"1px solid "+CB_NORM+"66"}},hacker.label),
 ["hp","en"].map(function(key){
 var label=key==="hp"?"HEALTH":"ENERGY";
 var val=charData[key]||0;var max=charData[key+"Max"]||20;
 var pct=Math.min(100,Math.round(100*val/max));
 return React.createElement("div",{key:key,style:{marginBottom:7}},
-React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontFamily:MONO,fontSize:6.5,color:accent,marginBottom:3,letterSpacing:2}},React.createElement("span",null,label),React.createElement("span",null,val+"/"+max)),
-React.createElement("div",{style:{height:3,background:accent+"1a",borderRadius:2,overflow:"hidden",marginBottom:5}},React.createElement("div",{style:{height:"100%",width:pct+"%",background:accent,boxShadow:"0 0 4px "+accent,borderRadius:2,transition:"width .3s"}})),
-React.createElement("div",{style:{display:"flex",gap:3}},[-5,-1,1,5].map(function(d){return React.createElement("button",{key:d,onClick:function(){adj(key,d);},style:{flex:1,padding:"3px 0",background:"transparent",border:"1px solid "+CB_NORM+"22",color:accent+"99",fontFamily:MONO,fontSize:9,cursor:"pointer",borderRadius:2,transition:"all .15s"}},d>0?"+"+d:d);})));}),
-memItems.length>0&&React.createElement("div",{style:{borderTop:"1px solid "+CB_NORM+"22",paddingTop:8,marginTop:2}},
+React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontFamily:MONO,fontSize:6.5,color:key==="hp"?CB_NORM:CB_ACC,marginBottom:3,letterSpacing:2,textShadow:"0 0 6px "+(key==="hp"?CB_NORM:CB_ACC)+"99"}},React.createElement("span",null,label),React.createElement("span",null,val+"/"+max)),
+React.createElement("div",{style:{height:3,background:accent+"1a",borderRadius:2,overflow:"hidden",marginBottom:5}},React.createElement("div",{style:{height:"100%",width:pct+"%",background:key==="hp"?CB_NORM:CB_ACC,boxShadow:"0 0 8px "+(key==="hp"?CB_NORM:CB_ACC)+",0 0 18px "+(key==="hp"?CB_NORM:CB_ACC)+"55",borderRadius:2,transition:"width .3s"}})),
+React.createElement("div",{style:{display:"flex",gap:3}},[-5,-1,1,5].map(function(d){return React.createElement("button",{key:d,onClick:function(){adj(key,d);},style:{flex:1,padding:"3px 0",background:"transparent",border:"1px solid "+accent+"66",color:accent,fontFamily:MONO,fontSize:9,cursor:"pointer",borderRadius:2,transition:"all .15s",textShadow:"0 0 5px "+accent+"99"}},d>0?"+"+d:d);})));}),
+memItems.length>0&&React.createElement("div",{style:{borderTop:"1px solid "+CB_NORM+"55",paddingTop:8,marginTop:2}},
 React.createElement("div",{style:{fontFamily:MONO,fontSize:6.5,letterSpacing:2,color:accent,marginBottom:5}},"MEMORY"),
 React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:2}},memItems.map(function(m,i){var short=m.indexOf(" — ")>-1?m.split(" — ")[0]:m;return React.createElement("div",{key:i,style:{fontFamily:MONO,fontSize:8,color:accent+"99",lineHeight:1.5}},short);}))),
-cyberItems.length>0&&React.createElement("div",{style:{borderTop:"1px solid "+CB_NORM+"22",paddingTop:8,marginTop:2}},
+cyberItems.length>0&&React.createElement("div",{style:{borderTop:"1px solid "+CB_NORM+"55",paddingTop:8,marginTop:2}},
 React.createElement("div",{style:{fontFamily:MONO,fontSize:6.5,letterSpacing:2,color:"#cc88ff",marginBottom:5}},"CYBERTECH"),
 React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:2}},cyberItems.map(function(c,i){var short=c.indexOf(" — ")>-1?c.split(" — ")[0]:c;return React.createElement("div",{key:i,style:{fontFamily:MONO,fontSize:8,color:"#cc88ff99",lineHeight:1.5}},short);})))
 ));}
@@ -1877,7 +1877,7 @@ React.createElement(CyberRunnerPanel,{hacker:hacker,charData:gs[hackerSel]||gs.v
               React.createElement("div",{style:{color:inSession&&danger?"#FF2060":inSession&&warn?"#FFD166":CB_NORM,letterSpacing:2,marginBottom:2,fontSize:6.5}},"MEMORY CLOCK"),
               "12 moves max. +1 per tile entry or {CLOCK+N} event. Abyssal Scar at limit."
             ),
-            React.createElement("div",{style:{borderTop:"1px solid "+CB_NORM+"22",paddingTop:6}},
+            React.createElement("div",{style:{borderTop:"1px solid "+CB_NORM+"55",paddingTop:6}},
               React.createElement("div",{style:{color:CB_NODE,letterSpacing:2,marginBottom:2,fontSize:6.5}},"◆  MATRIX NODES"),
               React.createElement("div",{style:{marginBottom:5}},"d66 reward. High clock cost."),
               React.createElement("div",{style:{color:CB_NORM,letterSpacing:2,marginBottom:2,fontSize:6.5}},"◇  NORMAL TILES"),
