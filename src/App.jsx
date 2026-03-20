@@ -1387,7 +1387,7 @@ function ContextMenu(props){
 function MABELPortrait(props){
   var loading=props.loading,isTalking=!!props.isTalking,MABEL_C="#00FFD0";
   var anim=loading
-    ?"glitch 0.25s ease-in-out infinite"
+    ?"none"
     :"none";
   var glow=loading
     ?"0 0 24px "+MABEL_C+"cc, 0 0 8px "+MABEL_C+"88"
