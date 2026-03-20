@@ -1537,7 +1537,7 @@ React.createElement("div",{ref:endRef})
 ),
 
 React.createElement("div",{style:{width:156,flexShrink:0,borderLeft:"1px solid "+MABEL_C+"18",display:"flex",flexDirection:"column",gap:5,padding:"10px 6px",background:"#020b0844",overflowY:"auto"}},
-React.createElement(MABELPortrait,{loading:commsLoading,isTalking:comms.some(function(m){return m.typing;})}),React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
+React.createElement(MABELPortrait,{loading:commsLoading,isTalking:msgs.some(function(m){return m.typing;})}),React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
 QUICK_ACTIONS.map(function(qa){
 var isActive=activeQA===qa.label;
 return React.createElement("button",{
