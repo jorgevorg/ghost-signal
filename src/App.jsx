@@ -1736,8 +1736,34 @@ React.createElement("line",{x1:27,y1:50,x2:73,y2:50,stroke:C,strokeWidth:0.4,opa
 React.createElement("line",{x1:50,y1:27,x2:50,y2:73,stroke:C,strokeWidth:0.4,opacity:0.2})
 );}
 var EXTRA_CYBER_CSS="@keyframes cyberEyeBob{0%,100%{transform:translateY(0px)}50%{transform:translateY(-5px)}}@keyframes traceGlow{0%,100%{opacity:0.08}50%{opacity:0.95}}@keyframes pupilPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.7);opacity:0.6}}@keyframes diagScroll{from{background-position:0 0,0 0}to{background-position:54px 54px,-54px 54px}}";
+function CyberRunnerPanel(props){
+var hacker=props.hacker,charData=props.charData,onChg=props.onChange,accent=props.accent||CB_NORM;
+var openS=React.useState(true),setOpen=openS[1];var open=openS[0];
+var adj=function(key,d){if(!onChg)return;var cur=charData[key]||0;var max=charData[key+"Max"]||20;onChg(key,Math.max(0,Math.min(max,cur+d)));};
+var memItems=(charData.memory||[]).filter(function(m){return m;});
+var cyberItems=(charData.cybertech||[]).filter(function(c){return c;});
+return React.createElement("div",{style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",zIndex:10,display:"flex",alignItems:"stretch",pointerEvents:"auto"}},
+React.createElement("div",{onClick:function(){setOpen(!open);},style:{writingMode:"vertical-rl",background:accent+"11",border:"1px solid "+accent+"44",borderRight:open?"none":"1px solid "+accent+"44",color:accent,fontFamily:ORB,fontSize:8,letterSpacing:3,padding:"12px 6px",cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",textShadow:"0 0 6px "+accent+"66"}},hacker.label+(open?" ▸":" ◂")),
+open&&React.createElement("div",{style:{width:190,background:"#06080eee",border:"1px solid "+accent+"55",padding:"14px 12px",display:"flex",flexDirection:"column",gap:10}},
+React.createElement("div",{style:{fontFamily:ORB,fontSize:8,letterSpacing:3,color:accent,textShadow:"0 0 8px "+accent+"88",paddingBottom:8,borderBottom:"1px solid "+accent+"22"}},hacker.label),
+["hp","en"].map(function(key){
+var label=key==="hp"?"HEALTH":"ENERGY";
+var val=charData[key]||0;var max=charData[key+"Max"]||20;
+var pct=Math.min(100,Math.round(100*val/max));
+return React.createElement("div",{key:key},
+React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontFamily:MONO,fontSize:8,color:accent+"99",marginBottom:3,letterSpacing:1}},React.createElement("span",null,label),React.createElement("span",null,val+"/"+max)),
+React.createElement("div",{style:{height:4,background:accent+"1a",borderRadius:2,overflow:"hidden",marginBottom:5}},React.createElement("div",{style:{height:"100%",width:pct+"%",background:accent,boxShadow:"0 0 4px "+accent,borderRadius:2,transition:"width .3s"}})),
+React.createElement("div",{style:{display:"flex",gap:3}},[-5,-1,1,5].map(function(d){return React.createElement("button",{key:d,onClick:function(){adj(key,d);},style:{flex:1,padding:"3px 0",background:"transparent",border:"1px solid "+accent+"33",color:accent+"99",fontFamily:MONO,fontSize:9,cursor:"pointer",borderRadius:2,transition:"all .15s"}},d>0?"+"+d:d);})));}),
+memItems.length>0&&React.createElement("div",null,
+React.createElement("div",{style:{fontFamily:MONO,fontSize:7,letterSpacing:2,color:accent+"55",marginBottom:5}},"MEMORY"),
+React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:3}},memItems.map(function(m,i){var short=m.indexOf(" — ")>-1?m.split(" — ")[0]:m;return React.createElement("div",{key:i,style:{fontFamily:MONO,fontSize:8,color:accent+"bb",background:accent+"0d",border:"1px solid "+accent+"22",borderRadius:2,padding:"3px 7px",lineHeight:1.4}},short);}))),
+cyberItems.length>0&&React.createElement("div",null,
+React.createElement("div",{style:{fontFamily:MONO,fontSize:7,letterSpacing:2,color:"#cc88ff55",marginBottom:5}},"CYBERTECH"),
+React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:3}},cyberItems.map(function(c,i){var short=c.indexOf(" — ")>-1?c.split(" — ")[0]:c;return React.createElement("div",{key:i,style:{fontFamily:MONO,fontSize:8,color:"#cc88ffaa",background:"#cc88ff0d",border:"1px solid #cc88ff22",borderRadius:2,padding:"3px 7px",lineHeight:1.4}},short);})))
+));}
 function CybersphereTab(props){
   var gs=props.gs,cyberSess=props.cyberSess,setCyberSess=props.setCyberSess;
+var onCharChange=props.onCharChange;
   var glitchS=React.useState(false),setGlitch=glitchS[1];var glitch=glitchS[0];
   var selectedMapS=React.useState(0),setSelectedMap=selectedMapS[1];var selectedMap=selectedMapS[0];
   var runStatsS=React.useState(null),setRunStats=runStatsS[1];var runStats=runStatsS[0];
@@ -1794,6 +1820,7 @@ function CybersphereTab(props){
     React.createElement(CornerBracket,{pos:"tr",color:frameColor}),
     React.createElement(CornerBracket,{pos:"bl",color:frameColor}),
     React.createElement(CornerBracket,{pos:"br",color:frameColor}),
+React.createElement(CyberRunnerPanel,{hacker:hacker,charData:gs[hackerSel]||gs.vela,onChange:function(k,v){if(onCharChange)onCharChange(hackerSel,k,v);},accent:hacker.color}),
     React.createElement("div",{style:{position:"relative",zIndex:3,flex:"0 0 auto",overflowY:"auto",padding:"14px 16px 8px"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid "+CB_NORM+"33",paddingBottom:10,marginBottom:10}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
@@ -2430,7 +2457,7 @@ var sendToMabel=async function(userMsg){
       })
      ),
      tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel}),
-    tab==="CYBER"&&React.createElement(CybersphereTab,{gs:gs,cyberSess:cyberSess,setCyberSess:setCyberSess})
+    tab==="CYBER"&&React.createElement(CybersphereTab,{gs:gs,cyberSess:cyberSess,setCyberSess:setCyberSess,onCharChange:upC})
     )
    ),
    !boot&&React.createElement(DiceRoller,{gameState:gs})
