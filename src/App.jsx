@@ -2258,7 +2258,7 @@ useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}ca
   return "You are MABEL — the ship intelligence aboard "+gs.ship.name+". Precise. Dry. Darkly witty. Loyal. No asterisk actions. Address user as Commander.\n\nFRAMING: Rules → 'Querying tactical database.' / 'End query.' | Rolls → 'Calculating...' | Lore → 'Archival record retrieved.' | Unknown → '[RECORD FRAGMENTED]'\n\n"+memBlock+cmBlock+RULES_DB+"\nMISSION STATE:\nSession: "+gs.session+"\nVessel: "+gs.ship.name+" Hull:"+gs.ship.hull+"/"+gs.ship.hullMax+" Fuel:"+gs.ship.fuel+"/"+gs.ship.fuelMax+" Scraps:"+gs.ship.scraps+"\nCole: HP "+gs.cole.hp+"/"+gs.cole.hpMax+" EN "+gs.cole.en+"/"+gs.cole.enMax+" VIG:"+gs.cole.vigor+" GRA:"+gs.cole.grace+" MIN:"+gs.cole.mind+" TEC:"+gs.cole.tech+"\nVela: HP "+gs.vela.hp+"/"+gs.vela.hpMax+" EN "+gs.vela.en+"/"+gs.vela.enMax+" VIG:"+gs.vela.vigor+" GRA:"+gs.vela.grace+" MIN:"+gs.vela.mind+" TEC:"+gs.vela.tech;
  };
 
- var var twSpeedS=useState(function(){return parseInt(localStorage.getItem("gs_twSpeed")||"12");}),setTwSpeed=twSpeedS[1];var twSpeed=twSpeedS[0];
+ var twSpeedS=useState(function(){return parseInt(localStorage.getItem("gs_twSpeed")||"12");}),setTwSpeed=twSpeedS[1];var twSpeed=twSpeedS[0];
 var twRef=useRef(null);
 useEffect(function(){localStorage.setItem("gs_twSpeed",String(twSpeed));},[twSpeed]);
 useEffect(function(){
