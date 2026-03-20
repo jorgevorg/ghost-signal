@@ -1275,151 +1275,96 @@ function ContextMenu(props){
 function CommsBackground(){
   var canvasRef=React.useRef(null);
   React.useEffect(function(){
-    var canvas=canvasRef.current;
-    if(!canvas)return;
+    var canvas=canvasRef.current;if(!canvas)return;
     var ctx=canvas.getContext("2d");
-    var W=canvas.offsetWidth||700,H=canvas.offsetHeight||700;
+    var W=canvas.offsetWidth||320,H=canvas.offsetHeight||500;
     canvas.width=W;canvas.height=H;
-    var chars="0123456789ABCDEF";
-    var COLS=10;var colW=W/COLS;
-    var drops=Array.from({length:COLS},function(){return Math.floor(Math.random()*-H);});
-    var pings=[];var lastPing=-9999;
-    var animId;
-    function frame(t){
+    var cols=10,cw=Math.floor(W/cols),ch=18;
+    var drops=Array.from({length:cols},function(){return Math.floor(Math.random()*H/ch)*-1;});
+    var pingPhase=0,pingActive=false,pingTimer=0;
+    var id=setInterval(function(){
       ctx.fillStyle="rgba(3,8,13,0.18)";
       ctx.fillRect(0,0,W,H);
-      ctx.font="11px 'Share Tech Mono',monospace";
-      ctx.textAlign="center";
-      drops.forEach(function(y,i){
-        var x=i*colW+colW/2;
-        var ch=chars[Math.floor(Math.random()*chars.length)];
-        var glitch=Math.random()<0.025;
-        ctx.fillStyle=glitch?"#FF206077":"#00FFD033";
-        ctx.fillText("0x"+ch,x,y);
-        drops[i]=y>H?Math.floor(Math.random()*-H*0.5):y+13;
-      });
-      if(t-lastPing>4000){pings.push({r:0,a:0.55});lastPing=t;}
-      pings=pings.filter(function(p){return p.a>0.008;});
-      pings.forEach(function(p){
-        p.r+=1.6;p.a*=0.972;
-        ctx.beginPath();
-        ctx.arc(W/2,H/2,p.r,0,Math.PI*2);
-        ctx.strokeStyle="rgba(0,255,208,"+p.a.toFixed(3)+")";
+      for(var i=0;i<cols;i++){
+        var glitch=Math.random()<0.004;
+        ctx.fillStyle=glitch?"#FF206088":"#00FFD033";
+        ctx.font=ch+"px 'Share Tech Mono',monospace";
+        var hex="0x"+Math.floor(Math.random()*256).toString(16).padStart(2,"0").toUpperCase();
+        ctx.fillText(hex,i*cw,drops[i]*ch);
+        if(drops[i]*ch>H&&Math.random()>0.96)drops[i]=0;
+        else drops[i]+=0.6;
+      }
+      pingTimer++;
+      if(pingTimer>260){pingTimer=0;pingActive=true;pingPhase=0;}
+      if(pingActive){
+        var r=pingPhase*3;
+        ctx.beginPath();ctx.arc(W/2,H/2,r,0,Math.PI*2);
+        ctx.strokeStyle="rgba(0,255,208,"+(0.4*(1-pingPhase/80))+")";
         ctx.lineWidth=1.5;ctx.stroke();
-      });
-      animId=requestAnimationFrame(frame);
-    }
-    animId=requestAnimationFrame(frame);
-    return function(){cancelAnimationFrame(animId);};
-  },[]);
-  return React.createElement("canvas",{ref:canvasRef,style:{position:"absolute",top:0,left:0,width:"100%",height:"100%",opacity:.6,pointerEvents:"none",zIndex:0,borderRadius:6}});
-}
-
-function OracleSidebar(props){
-  var gameState=props.gameState;
-  var gaugeS=React.useState(0.8);var gauge=gaugeS[0];var setGauge=gaugeS[1];
-  React.useEffect(function(){
-    var start=Date.now();
-    var id=setInterval(function(){
-      var t=(Date.now()-start)/1000;
-      setGauge(0.8+Math.sin(t*0.4)*0.1);
-    },80);
+        pingPhase++;if(pingPhase>80)pingActive=false;
+      }
+    },60);
     return function(){clearInterval(id);};
   },[]);
-  return React.createElement("div",{style:{
-    width:58,flexShrink:0,display:"flex",flexDirection:"column",
-    alignItems:"center",justifyContent:"center",gap:10,
-    borderLeft:"1px solid #00FFD022",padding:"10px 4px",
-    position:"relative",zIndex:1
-  }},
-    React.createElement(OrreryRings,{size:46,color:"#00FFD0",opacity:.5}),
-    React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:"#00FFD055",letterSpacing:2,textAlign:"center"}},"UPLINK"),
-    React.createElement(CPGaugeArc,{size:46,color:"#00FFD0",value:gauge,label:Math.round(gauge*100)+"%"}),
-    React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:"#00FFD055",letterSpacing:1,textAlign:"center"}},"SIGNAL")
-  );
+  return React.createElement("canvas",{ref:canvasRef,style:{position:"absolute",inset:0,width:"100%",height:"100%",opacity:.55,pointerEvents:"none",zIndex:0,display:"block"}});
 }
 
 function CommsTab(props){
- var gameState=props.gameState,msgs=props.msgs,setMsgs=props.setMsgs,commsLoading=props.commsLoading,onSend=props.onSend;
- var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
- var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
- var recapTextS=useState(""),setRecapText=recapTextS[1];var recapText=recapTextS[0];
- var recapLoadingS=useState(false),setRecapLoading=recapLoadingS[1];var recapLoading=recapLoadingS[0];
- var endRef=useRef(null),inputRef=useRef(null);
- useEffect(function(){try{var rm=localStorage.getItem("gs_mabel_memory");if(rm)setMemory(rm);}catch(e){};},[]);
- useEffect(function(){if(endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs]);
+var gameState=props.gameState,msgs=props.msgs,setMsgs=props.setMsgs,commsLoading=props.commsLoading,onSend=props.onSend;
+var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
+var memoryS=useState(""),setMemory=memoryS[1];var memory=memoryS[0];
+var recapTextS=useState(""),setRecapText=recapTextS[1];var recapText=recapTextS[0];
+var recapLoadingS=useState(false),setRecapLoading=recapLoadingS[1];var recapLoading=recapLoadingS[0];
+var endRef=useRef(null),inputRef=useRef(null);
+useEffect(function(){try{var rm=localStorage.getItem("gs_mabel_memory");if(rm)setMemory(rm);}catch(e){};},[]);
+useEffect(function(){if(endRef.current)endRef.current.parentElement.scrollTop=99999;},[msgs]);
 
- var genRecap=async function(){
-  setRecapLoading(true);setRecapText("");
-  try{
-   var res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:600,system:"You are MABEL. Write a concise session recap log entry. Terse, atmospheric, first person. Include: what happened, key decisions, resource changes, status. Under 300 words.",messages:[{role:"user",content:"Game state: "+JSON.stringify({session:gameState.session,cole:{hp:gameState.cole.hp,en:gameState.cole.en},vela:{hp:gameState.vela.hp,en:gameState.vela.en},ship:{hull:gameState.ship.hull,fuel:gameState.ship.fuel,scraps:gameState.ship.scraps}})+"\nRecent comms:\n"+msgs.slice(-10).map(function(m){return m.role+": "+m.content;}).join("\n")+"\nGenerate session log entry."}]})});
-   var data=await res.json();
-   var txt=(data.content&&data.content.find(function(b){return b.type==="text";}))||{text:""};
-   setRecapText(txt.text||"");
-  }catch(e){setRecapText("[GENERATION ERROR]");}
-  setRecapLoading(false);
- };
+var genRecap=async function(){
+setRecapLoading(true);setRecapText("");
+try{
+var res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:600,system:"You are MABEL. Write a concise session recap log entry. Terse, atmospheric, first person. Include: what happened, key decisions, resource changes, status. Under 300 words.",messages:[{role:"user",content:"Game state: "+JSON.stringify({session:gameState.session,cole:{hp:gameState.cole.hp,en:gameState.cole.en},vela:{hp:gameState.vela.hp,en:gameState.vela.en},ship:{hull:gameState.ship.hull,fuel:gameState.ship.fuel,scraps:gameState.ship.scraps}})+"\nRecent comms:\n"+msgs.slice(-10).map(function(m){return m.role+": "+m.content;}).join("\n")+"\nGenerate session log entry."}]})});
+var data=await res.json();
+var txt=(data.content&&data.content.find(function(b){return b.type==="text";}))||{text:""};
+setRecapText(txt.text||"");
+}catch(e){setRecapText("[GENERATION ERROR]");}
+setRecapLoading(false);
+};
 
- var send=function(){if(!input.trim()||commsLoading)return;onSend(input.trim());setInput("");};
+var send=function(){if(!input.trim()||commsLoading)return;onSend(input.trim());setInput("");};
 
- return React.createElement("div",{style:{width:"100%",boxSizing:"border-box",position:"relative"}},
+return React.createElement("div",{style:{width:"100%",boxSizing:"border-box"}},
+React.createElement("div",{style:{border:"1px solid "+MABEL_C+"44",borderRadius:6,background:"#03080d",boxShadow:"0 0 24px "+MABEL_C+"12,inset 0 0 40px "+MABEL_C+"06",overflow:"hidden",marginBottom:10}},
+React.createElement("div",{style:{padding:"8px 16px",borderBottom:"1px solid "+MABEL_C+"30",display:"flex",alignItems:"center",justifyContent:"space-between",background:MABEL_C+"08"}},
+React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+React.createElement("div",{style:{width:8,height:8,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 8px "+MABEL_C,animation:"pulse 2s infinite"}}),
+React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:MABEL_C,letterSpacing:3}},"M.A.B.E.L"),
+React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:MABEL_C+"66",letterSpacing:2}},"ORACLE INTERFACE // SHIP COMMS")),
+React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
+QUICK_ACTIONS.map(function(qa){return React.createElement("button",{key:qa.label,onClick:function(){onSend(qa.prompt);},disabled:commsLoading,style:{padding:"3px 10px",background:MABEL_C+"10",border:"1px solid "+MABEL_C+"33",color:MABEL_C+"cc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1}},qa.label);}))
+),
+React.createElement("div",{style:{minHeight:480,maxHeight:620,overflowY:"auto",padding:"14px 18px",display:"flex",flexDirection:"column",gap:12,position:"relative"}},
 React.createElement(CommsBackground),
-React.createElement("div",{style:{display:"flex",gap:0,position:"relative",zIndex:1}},
- React.createElement("div",{style:{border:"1px solid "+MABEL_C+"44",borderRadius:6,flex:1,background:"#03080d22",boxShadow:"0 0 24px "+MABEL_C+"12,inset 0 0 40px "+MABEL_C+"06",overflow:"hidden",marginBottom:10}},
-  React.createElement("div",{style:{padding:"8px 16px",borderBottom:"1px solid "+MABEL_C+"30",display:"flex",alignItems:"center",justifyContent:"space-between",background:MABEL_C+"08"}},
-   React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
-    React.createElement("div",{style:{width:8,height:8,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 8px "+MABEL_C,animation:"pulse 2s infinite"}}),
-    React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:MABEL_C,letterSpacing:3}},"M.A.B.E.L"),
-    React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:MABEL_C+"66",letterSpacing:2}},"ORACLE INTERFACE // SHIP COMMS")),
-   React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
-    QUICK_ACTIONS.map(function(qa){return React.createElement("button",{key:qa.label,onClick:function(){onSend(qa.prompt);},disabled:commsLoading,style:{padding:"3px 10px",background:MABEL_C+"10",border:"1px solid "+MABEL_C+"33",color:MABEL_C+"cc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1}},qa.label);}))
-  ),
-  React.createElement("div",{style:{minHeight:480,maxHeight:620,overflowY:"auto",padding:"14px 18px",display:"flex",flexDirection:"column",gap:12}},
-   msgs.map(function(m,i){
-    var isA=m.role==="assistant";
-    return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end",animation:"in .2s ease"}},
-     React.createElement("div",{style:{maxWidth:"88%",padding:"10px 14px",borderRadius:4,background:isA?MABEL_C+"10":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"44":"#ffffff1a"),fontFamily:isA?MONO:RAJ,fontSize:isA?11:14,color:isA?MABEL_C:"#ddd",lineHeight:1.75,whiteSpace:"pre-wrap",wordBreak:"break-word"}},
-      isA?React.createElement(MadText,{text:m.content}):m.content),
-     React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#445",marginTop:2,letterSpacing:1}},isA?"MABEL":"COMMANDER")
-    );
-   }),
-   commsLoading&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:MABEL_C,animation:"pulse 1s infinite"}},"// PROCESSING..."),
-   React.createElement("div",{ref:endRef})
-  ),
-  React.createElement("div",{style:{borderTop:"1px solid "+MABEL_C+"22",padding:"10px 16px"}},
-   React.createElement("div",{style:{display:"flex",gap:8}},
-    React.createElement("input",{ref:inputRef,value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter"&&!e.shiftKey)send();},placeholder:"Transmit to MABEL...",disabled:commsLoading,style:{flex:1,background:"#06060f",border:"1px solid "+MABEL_C+"44",borderRadius:4,color:"#eee",fontFamily:MONO,fontSize:12,padding:"10px 14px",outline:"none"}}),
-    React.createElement("button",{onClick:send,disabled:commsLoading||!input.trim(),style:{padding:"10px 20px",background:MABEL_C+"18",border:"1px solid "+MABEL_C+"55",color:MABEL_C,borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:11}},commsLoading?"...":"SEND"))
-  )
- ),
- React.createElement("div",{style:{borderTop:"1px solid "+B2,paddingTop:12,marginTop:4}},
-  React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
-   React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2}},"SESSION RECAP LOG"),
-   React.createElement("button",{onClick:genRecap,disabled:recapLoading,style:{padding:"5px 14px",background:"#88BBFF12",border:"1px solid #88BBFF44",color:MABEL_C,borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},recapLoading?"COMPOSING...":"GENERATE")),
-  React.createElement(OracleSidebar,{gameState:gameState})
+msgs.map(function(m,i){
+var isA=m.role==="assistant";
+return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end",animation:"in .2s ease",position:"relative",zIndex:1}},
+React.createElement("div",{style:{maxWidth:"88%",padding:"10px 14px",borderRadius:4,background:isA?MABEL_C+"10":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"44":"#ffffff1a"),fontFamily:isA?MONO:RAJ,fontSize:isA?11:14,color:isA?MABEL_C:"#ddd",lineHeight:1.75,whiteSpace:"pre-wrap",wordBreak:"break-word"}},
+isA?React.createElement(MadText,{text:m.content}):m.content),
+React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#445",marginTop:2,letterSpacing:1}},isA?"MABEL":"COMMANDER")
+);
+}),
+commsLoading&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:MABEL_C,animation:"pulse 1s infinite",position:"relative",zIndex:1}},"// PROCESSING..."),
+React.createElement("div",{ref:endRef})
+),
+React.createElement("div",{style:{borderTop:"1px solid "+MABEL_C+"22",padding:"10px 16px"}},
+React.createElement("div",{style:{display:"flex",gap:8}},
+React.createElement("input",{ref:inputRef,value:input,onChange:function(e){setInput(e.target.value);},onKeyDown:function(e){if(e.key==="Enter"&&!e.shiftKey)send();},placeholder:"Transmit to MABEL...",disabled:commsLoading,style:{flex:1,background:"#06060f",border:"1px solid "+MABEL_C+"44",borderRadius:4,color:"#eee",fontFamily:MONO,fontSize:12,padding:"10px 14px",outline:"none"}}),
+React.createElement("button",{onClick:send,disabled:commsLoading||!input.trim(),style:{padding:"10px 20px",background:MABEL_C+"15",border:"1px solid "+MABEL_C+"44",color:MABEL_C,borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:11,letterSpacing:2}},"SEND")
+))
 ),
 React.createElement(CopyBox,{text:recapText,loading:recapLoading})
- )
 );
 }
 
-
-
-
-// ── CYBERSPHERE ──────────────────────────────────────────────────────────────
-var CB_GREEN="#39ff14";
-var CYBER_CSS=`
-@keyframes cyberGlitch{0%,92%,100%{transform:translateX(0) skewX(0)}93%{transform:translateX(-4px) skewX(-2deg)}95%{transform:translateX(4px) skewX(2deg)}97%{transform:translateX(-2px) skewX(1deg)}}
-@keyframes tileAdj{0%,100%{opacity:.65}50%{opacity:1}}
-@keyframes runnerGlitch{0%,88%,100%{transform:translateX(0)}90%{transform:translateX(-5px)}93%{transform:translateX(5px)}96%{transform:translateX(-2px)}}
-@keyframes gridPulse{0%,100%{opacity:.025}50%{opacity:.06}}
-@keyframes cyberScan{0%{background-position:0 0}100%{background-position:0 8px}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-@keyframes termScroll{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-@keyframes cornerPulse{0%,100%{opacity:.35}50%{opacity:.85}}
-@keyframes dangerFlicker{0%,100%{opacity:1}45%{opacity:.5}50%{opacity:1}55%{opacity:.6}}
-@keyframes clockDanger{0%,100%{text-shadow:0 0 6px #FF2060}50%{text-shadow:0 0 16px #FF2060,0 0 30px #FF206088}}
-`;
 function RunningMan(props){
   var c=props.color||CB_NODE,s=props.size||22,g=props.glitch;
   return React.createElement("svg",{width:s,height:s,viewBox:"0 0 100 100",style:{filter:"drop-shadow(0 0 6px "+c+")",animation:g?"runnerGlitch .4s ease":"none",display:"block",overflow:"visible"}},
