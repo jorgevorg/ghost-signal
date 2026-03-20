@@ -1272,6 +1272,73 @@ function ContextMenu(props){
 }
 
 // ── HEX MAP (Batch 1) ──────────────────────────────────────────────────────
+function CommsBackground(){
+  var canvasRef=React.useRef(null);
+  React.useEffect(function(){
+    var canvas=canvasRef.current;
+    if(!canvas)return;
+    var ctx=canvas.getContext("2d");
+    var W=canvas.offsetWidth||700,H=canvas.offsetHeight||700;
+    canvas.width=W;canvas.height=H;
+    var chars="0123456789ABCDEF";
+    var COLS=10;var colW=W/COLS;
+    var drops=Array.from({length:COLS},function(){return Math.floor(Math.random()*-H);});
+    var pings=[];var lastPing=-9999;
+    var animId;
+    function frame(t){
+      ctx.fillStyle="rgba(3,8,13,0.18)";
+      ctx.fillRect(0,0,W,H);
+      ctx.font="11px 'Share Tech Mono',monospace";
+      ctx.textAlign="center";
+      drops.forEach(function(y,i){
+        var x=i*colW+colW/2;
+        var ch=chars[Math.floor(Math.random()*chars.length)];
+        var glitch=Math.random()<0.025;
+        ctx.fillStyle=glitch?"#FF206077":"#00FFD033";
+        ctx.fillText("0x"+ch,x,y);
+        drops[i]=y>H?Math.floor(Math.random()*-H*0.5):y+13;
+      });
+      if(t-lastPing>4000){pings.push({r:0,a:0.55});lastPing=t;}
+      pings=pings.filter(function(p){return p.a>0.008;});
+      pings.forEach(function(p){
+        p.r+=1.6;p.a*=0.972;
+        ctx.beginPath();
+        ctx.arc(W/2,H/2,p.r,0,Math.PI*2);
+        ctx.strokeStyle="rgba(0,255,208,"+p.a.toFixed(3)+")";
+        ctx.lineWidth=1.5;ctx.stroke();
+      });
+      animId=requestAnimationFrame(frame);
+    }
+    animId=requestAnimationFrame(frame);
+    return function(){cancelAnimationFrame(animId);};
+  },[]);
+  return React.createElement("canvas",{ref:canvasRef,style:{position:"absolute",top:0,left:0,width:"100%",height:"100%",opacity:.6,pointerEvents:"none",zIndex:0,borderRadius:6}});
+}
+
+function OracleSidebar(props){
+  var gameState=props.gameState;
+  var gaugeS=React.useState(0.8);var gauge=gaugeS[0];var setGauge=gaugeS[1];
+  React.useEffect(function(){
+    var start=Date.now();
+    var id=setInterval(function(){
+      var t=(Date.now()-start)/1000;
+      setGauge(0.8+Math.sin(t*0.4)*0.1);
+    },80);
+    return function(){clearInterval(id);};
+  },[]);
+  return React.createElement("div",{style:{
+    width:58,flexShrink:0,display:"flex",flexDirection:"column",
+    alignItems:"center",justifyContent:"center",gap:10,
+    borderLeft:"1px solid #00FFD022",padding:"10px 4px",
+    position:"relative",zIndex:1
+  }},
+    React.createElement(OrreryRings,{size:46,color:"#00FFD0",opacity:.5}),
+    React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:"#00FFD055",letterSpacing:2,textAlign:"center"}},"UPLINK"),
+    React.createElement(CPGaugeArc,{size:46,color:"#00FFD0",value:gauge,label:Math.round(gauge*100)+"%"}),
+    React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:"#00FFD055",letterSpacing:1,textAlign:"center"}},"SIGNAL")
+  );
+}
+
 function CommsTab(props){
  var gameState=props.gameState,msgs=props.msgs,setMsgs=props.setMsgs,commsLoading=props.commsLoading,onSend=props.onSend;
  var inputS=useState(""),setInput=inputS[1];var input=inputS[0];
@@ -1295,8 +1362,10 @@ function CommsTab(props){
 
  var send=function(){if(!input.trim()||commsLoading)return;onSend(input.trim());setInput("");};
 
- return React.createElement("div",{style:{width:"100%",boxSizing:"border-box"}},
- React.createElement("div",{style:{border:"1px solid "+MABEL_C+"44",borderRadius:6,background:"#03080d",boxShadow:"0 0 24px "+MABEL_C+"12,inset 0 0 40px "+MABEL_C+"06",overflow:"hidden",marginBottom:10}},
+ return React.createElement("div",{style:{width:"100%",boxSizing:"border-box",position:"relative"}},
+React.createElement(CommsBackground),
+React.createElement("div",{style:{display:"flex",gap:0,position:"relative",zIndex:1}},
+ React.createElement("div",{style:{border:"1px solid "+MABEL_C+"44",borderRadius:6,flex:1,background:"#03080d22",boxShadow:"0 0 24px "+MABEL_C+"12,inset 0 0 40px "+MABEL_C+"06",overflow:"hidden",marginBottom:10}},
   React.createElement("div",{style:{padding:"8px 16px",borderBottom:"1px solid "+MABEL_C+"30",display:"flex",alignItems:"center",justifyContent:"space-between",background:MABEL_C+"08"}},
    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
     React.createElement("div",{style:{width:8,height:8,borderRadius:"50%",background:MABEL_C,boxShadow:"0 0 8px "+MABEL_C,animation:"pulse 2s infinite"}}),
@@ -1327,7 +1396,9 @@ function CommsTab(props){
   React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
    React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",letterSpacing:2}},"SESSION RECAP LOG"),
    React.createElement("button",{onClick:genRecap,disabled:recapLoading,style:{padding:"5px 14px",background:"#88BBFF12",border:"1px solid #88BBFF44",color:MABEL_C,borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1}},recapLoading?"COMPOSING...":"GENERATE")),
-  React.createElement(CopyBox,{text:recapText,loading:recapLoading})
+  React.createElement(OracleSidebar,{gameState:gameState})
+),
+React.createElement(CopyBox,{text:recapText,loading:recapLoading})
  )
 );
 }
