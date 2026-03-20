@@ -2278,7 +2278,7 @@ else if(!hasTyping&&twRef.current){clearInterval(twRef.current);twRef.current=nu
 return function(){if(twRef.current){clearInterval(twRef.current);twRef.current=null;}};
 },[comms,twSpeed]);
 var isTalking=comms.some(function(m){return m.typing;});
-sendToMabel=async function(userMsg){
+var sendToMabel=async function(userMsg){
   if(!userMsg.trim()||commsLoading)return;
   setCommsLoading(true);
   var userMsgObj={role:"user",content:userMsg};
