@@ -1275,8 +1275,8 @@ function ContextMenu(props){
 function MABELPortrait(props){
   var loading=props.loading,MABEL_C="#00FFD0";
   var anim=loading
-    ?"flarePulse 0.55s ease-in-out infinite"
-    :"flarePulse 3.8s ease-in-out infinite";
+    ?"glitch 0.25s ease-in-out infinite"
+    :"sigPredator 5.5s ease-in-out infinite";
   var glow=loading
     ?"0 0 24px "+MABEL_C+"cc, 0 0 8px "+MABEL_C+"88"
     :"0 0 10px "+MABEL_C+"44";
@@ -1415,7 +1415,7 @@ React.createElement("div",{ref:endRef})
 ),
 
 React.createElement("div",{style:{width:112,flexShrink:0,borderLeft:"1px solid "+MABEL_C+"18",display:"flex",flexDirection:"column",gap:5,padding:"10px 6px",background:"#020b0844",overflowY:"auto"}},
-React.createElement(MABELPortrait,{loading:commsLoading}),React.createElement(MABELPortrait,{loading:commsLoading}),React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
+React.createElement(MABELPortrait,{loading:commsLoading}),React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:MABEL_C+"55",letterSpacing:2,textAlign:"center",marginBottom:4,paddingBottom:4,borderBottom:"1px solid "+MABEL_C+"18"}},"QUICK TX"),
 QUICK_ACTIONS.map(function(qa){
 var isActive=activeQA===qa.label;
 return React.createElement("button",{
