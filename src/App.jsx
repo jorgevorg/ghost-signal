@@ -1763,7 +1763,7 @@ function CybersphereTab(props){
   var warn=inSession&&cyberSess.clock>=6&&cyberSess.clock<9;
   var frameColor=danger?"#FF2060":warn?"#FFD166":CB_GREEN;
   var handleClick=function(idx){
-    if(!cyberSess){
+    if(!inSession){
       if(activeMap[idx-1]!=="A")return;
       setCyberSess({mapId:selectedMap+1,hackerPos:idx,clock:0,explored:[idx],active:true,entryPort:idx});
       setGlitch(true);setTimeout(function(){setGlitch(false);},450);
@@ -2400,12 +2400,12 @@ var sendToMabel=async function(userMsg){
        ),
        React.createElement("div",{style:{marginTop:18}},
         React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"MODULES"),
-        (gs.ship.modules||[]).map(function(m,i){return React.createElement("input",{key:i,value:m||"",onChange:function(e){upS("modules."+i,e.target.value);},placeholder:"Module slot "+(i+1),style:Object.assign({},tS("#cc88ff",false),{marginBottom:6,display:"block"})});})
+        (gs.ship.modules||[]).map(function(m,i){return React.createElement(SlotSelect,{key:i,value:m||"",onChange:function(val){upS("modules."+i,val);},options:["","G.R.E. Missiles — Deal 8 damage (5-6)","Particle Cannons — Deal 3 damage, stacks (3-5)","Shield Generator — Absorb 3 damage per combat","Jump Drive — Escape any hex without fuel cost","EMP Array — Disable enemy systems (3-5)","Repair Drones — Restore 2 hull per turn","Cloaking Field — Avoid first detection roll","Cargo Expander — +2 cargo slots","Tractor Beam — Retrieve floating salvage","Point Defense — Negate one missile per turn"],color:"#cc88ff",marginTop:i===0?0:6});})
        ),
        React.createElement("div",{style:{marginTop:18}},
         React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"CARGO"),
         React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}},
-         (gs.ship.cargo||Array(6).fill("")).map(function(v,i){return React.createElement("input",{key:i,value:v||"",onChange:function(e){upS("cargo."+i,e.target.value);},placeholder:"Cargo "+(i+1),style:tS("#aaa",false)});})
+         (gs.ship.cargo||Array(6).fill("")).map(function(v,i){return React.createElement(SlotSelect,{key:i,value:v||"",onChange:function(val){upS("cargo."+i,val);},options:INV_OPTS,color:"#aaa"});})
         )
        )
       )
