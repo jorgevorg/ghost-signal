@@ -129,6 +129,17 @@ const getPlanetColor=function(hexId,offset){if(offset==null)offset=0;return PLAN
 const getMoonColor=function(hexId){return MOON_PALETTE[hexId%MOON_PALETTE.length];};
 
 const CB_NODE="#FF2060",CB_NORM="#00FFD0",CB_ACC="#c8d0ff",CB_GREEN="#00FF90";
+const CYBER_CSS=`
+@keyframes cyberGlitch{0%,88%,100%{transform:translateX(0)}90%{transform:translateX(-3px)}92%{transform:translateX(3px)}94%{transform:translateX(-2px)}96%{transform:translateX(2px)}}
+@keyframes cyberScan{0%{background-position:0 0}100%{background-position:0 4px}}
+@keyframes gridPulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes dangerFlicker{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes clockDanger{0%,100%{opacity:1;text-shadow:0 0 8px #FF2060}50%{opacity:.6;text-shadow:0 0 20px #FF2060,0 0 40px #FF206066}}
+@keyframes tileAdj{0%,100%{box-shadow:0 0 8px #00FFD077}50%{box-shadow:0 0 18px #00FFD0cc,0 0 32px #00FFD044}}
+@keyframes cornerPulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes runnerGlitch{0%,80%,100%{transform:translateX(0)}85%{transform:translateX(-2px)}90%{transform:translateX(2px)}}
+@keyframes termScroll{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+`;
 const CYBER_MAPS=[
   ["N","X","A","X","N","X","A","X","N"],
   ["X","N","X","N","A","N","X","N","X"],
