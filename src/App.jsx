@@ -251,32 +251,8 @@ const CYBER_TABLES = {
 
 // ══════════════════════════════════════════════════════════════════
 // GHOST SIGNAL — SVG CHROME COMPONENTS
-function PurgeConfirmModal(props){
-  var onConfirm=props.onConfirm,onAbort=props.onAbort;
-  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#000000ee",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999}},
-    React.createElement("div",{style:{background:"#080010",border:"2px solid #FF2060",boxShadow:"0 0 32px #FF206088,0 0 8px #FF206033",padding:"28px 32px",maxWidth:400,width:"90%",fontFamily:MONO,textAlign:"center"}},
-      React.createElement("div",{style:{fontSize:11,letterSpacing:3,color:"#FF2060",marginBottom:10}},"⚠  PURGE SEQUENCE INITIATED"),
-      React.createElement("div",{style:{fontSize:10,color:CB_NORM+"99",marginBottom:22,lineHeight:1.7}},"All run progress, acquired items, and bonuses will be wiped from the netrunner profile. This cannot be undone."),
-      React.createElement("div",{style:{display:"flex",gap:14,justifyContent:"center"}},
-        React.createElement("button",{onClick:onConfirm,style:{background:"#FF206022",border:"1px solid #FF2060",color:"#FF2060",fontFamily:MONO,fontSize:10,letterSpacing:2,padding:"7px 18px",cursor:"pointer",transition:"background .2s"}},"CONFIRM PURGE"),
-        React.createElement("button",{onClick:onAbort,style:{background:"transparent",border:"1px solid "+CB_NORM+"44",color:CB_NORM+"77",fontFamily:MONO,fontSize:10,letterSpacing:2,padding:"7px 18px",cursor:"pointer"}},"ABORT")
-      )
-    )
-  );
-}
-function JackOutConfirmModal(props){
-  var onConfirm=props.onConfirm,onAbort=props.onAbort;
-  return React.createElement("div",{style:{position:"fixed",inset:0,background:"#000000ee",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999}},
-    React.createElement("div",{style:{background:"#080010",border:"2px solid #FF2060",boxShadow:"0 0 32px #FF206088,0 0 8px #FF206033",padding:"28px 32px",maxWidth:400,width:"90%",fontFamily:MONO,textAlign:"center"}},
-      React.createElement("div",{style:{fontSize:11,letterSpacing:3,color:"#FF2060",marginBottom:10}},"⚡  EMERGENCY DISCONNECT"),
-      React.createElement("div",{style:{fontSize:10,color:CB_NORM+"99",marginBottom:22,lineHeight:1.7}},"Jacking out will terminate your active Cybersphere session. All unsaved progress will be lost."),
-      React.createElement("div",{style:{display:"flex",gap:14,justifyContent:"center"}},
-        React.createElement("button",{onClick:onConfirm,style:{background:"#FF206022",border:"1px solid #FF2060",color:"#FF2060",fontFamily:MONO,fontSize:10,letterSpacing:2,padding:"7px 18px",cursor:"pointer",transition:"background .2s"}},"JACK OUT"),
-        React.createElement("button",{onClick:onAbort,style:{background:"transparent",border:"1px solid "+CB_NORM+"44",color:CB_NORM+"77",fontFamily:MONO,fontSize:10,letterSpacing:2,padding:"7px 18px",cursor:"pointer"}},"STAY IN")
-      )
-    )
-  );
-}
+function PurgeConfirmModal(props){var onConfirm=props.onConfirm,onAbort=props.onAbort;var _m=React.createElement("div",{style:{position:"fixed",inset:0,background:"#000000ee",display:"flex",alignItems:"center",justifyContent:"center",zIndex:99999}},React.createElement("div",{style:{background:"#080010",border:"2px solid #FF2060",boxShadow:"0 0 32px #FF206088",padding:"28px 32px",maxWidth:400,width:"90%",fontFamily:MONO,textAlign:"center"}},React.createElement("div",{style:{fontSize:11,letterSpacing:3,color:"#FF2060",marginBottom:10}},"⚠  PURGE SEQUENCE INITIATED"),React.createElement("div",{style:{fontSize:10,color:CB_NORM+"99",marginBottom:22,lineHeight:1.7}},"All run progress, acquired items, and bonuses will be wiped from the netrunner profile. This cannot be undone."),React.createElement("div",{style:{display:"flex",gap:14,justifyContent:"center"}},React.createElement("button",{onClick:onConfirm,style:{background:"#FF206022",border:"1px solid #FF2060",color:"#FF2060",fontFamily:MONO,fontSize:10,letterSpacing:2,padding:"7px 18px",cursor:"pointer",transition:"background .2s"}},"CONFIRM PURGE"),React.createElement("button",{onClick:onAbort,style:{background:"transparent",border:"1px solid "+CB_NORM+"44",color:CB_NORM+"77",fontFamily:MONO,fontSize:10,letterSpacing:2,padding:"7px 18px",cursor:"pointer"}},"ABORT"))));return ReactDOM.createPortal(_m,document.body);}
+function JackOutConfirmModal(props){var onConfirm=props.onConfirm,onAbort=props.onAbort;var _m=React.createElement("div",{style:{position:"fixed",inset:0,background:"#000000ee",display:"flex",alignItems:"center",justifyContent:"center",zIndex:99999}},React.createElement("div",{style:{background:"#080010",border:"2px solid #FF2060",boxShadow:"0 0 32px #FF206088",padding:"28px 32px",maxWidth:400,width:"90%",fontFamily:MONO,textAlign:"center"}},React.createElement("div",{style:{fontSize:11,letterSpacing:3,color:"#FF2060",marginBottom:10}},"⚡  EMERGENCY DISCONNECT"),React.createElement("div",{style:{fontSize:10,color:CB_NORM+"99",marginBottom:22,lineHeight:1.7}},"Jacking out will terminate your active Cybersphere session. All unsaved progress will be lost."),React.createElement("div",{style:{display:"flex",gap:14,justifyContent:"center"}},React.createElement("button",{onClick:onConfirm,style:{background:"#FF206022",border:"1px solid #FF2060",color:"#FF2060",fontFamily:MONO,fontSize:10,letterSpacing:2,padding:"7px 18px",cursor:"pointer",transition:"background .2s"}},"JACK OUT"),React.createElement("button",{onClick:onAbort,style:{background:"transparent",border:"1px solid "+CB_NORM+"44",color:CB_NORM+"77",fontFamily:MONO,fontSize:10,letterSpacing:2,padding:"7px 18px",cursor:"pointer"}},"STAY IN"))));return ReactDOM.createPortal(_m,document.body);}
 function JackOutButton(props){
   var onJackOut=props.onJackOut;
   var confirmS=React.useState(false),confirm=confirmS[0],setConfirm=confirmS[1];
@@ -1732,7 +1708,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
       setLoading(false);
     });
   };
-  return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",minHeight:0,background:"#020c02",borderTop:"1px solid "+CB_GREEN+"2a"}},
+  return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",minHeight:0,overflow:"hidden",background:"#020c02",borderTop:"1px solid "+CB_GREEN+"2a"}},
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"5px 14px",borderBottom:"1px solid "+CB_GREEN+"1a",flexShrink:0}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
         React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",flexShrink:0,background:cyberSess&&cyberSess.active?"#FF2060":"#333",boxShadow:cyberSess&&cyberSess.active?"0 0 6px #FF2060":undefined,animation:cyberSess&&cyberSess.active?"dangerFlicker 2s ease-in-out infinite":"none"}}),
@@ -1740,7 +1716,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
       ),
       React.createElement("span",{style:{fontFamily:MONO,fontSize:9,letterSpacing:1,color:"#FF206055"}},"UNAUTHORIZED ACCESS")
     ),
-    React.createElement("div",{ref:scrollRef,style:{flex:1,overflowY:"auto",maxHeight:"calc(100vh - 260px)",padding:"8px 12px",fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,minHeight:0}},
+    React.createElement("div",{ref:scrollRef,style:{flex:1,overflowY:"auto",maxHeight:"calc(100vh - 200px)",padding:"8px 12px",fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,minHeight:0}},
       logs.length===0&&React.createElement("div",{style:{color:CB_GREEN+"88"}},"// jack in to establish terminal link"),
       logs.map(function(l,i){return React.createElement("div",{key:i,style:{color:lineColor(l.t),animation:"termScroll .12s ease",textShadow:lineGlow(l.t)}},...(typeof l.s==="string"?(function(){var parts=l.s.split(/(roll?\s+d\d+)/gi);if(parts.length===1)return [React.createElement(ScrambleText,{key:"s"+i+(l.s||"").slice(0,4),text:l.s,spd:32})];return parts.map(function(part,pi){var m=part.match(/^roll?\s+d(\d+)$/i);if(!m)return part;var sides=parseInt(m[1],10);var clr=lineColor(l.t)||"#FF0066";return React.createElement("span",{key:pi,onClick:function(){var roll;if(sides===66){var t=Math.floor(Math.random()*6)+1;var u=Math.floor(Math.random()*6)+1;roll=t*10+u;}else{roll=Math.floor(Math.random()*sides)+1;}var note="[OS ROLL: d"+sides+" -> "+roll+"]";
 var tileType=cyberSess?CYBER_MAPS[cyberSess.mapId-1][cyberSess.hackerPos-1]:null;var tableResult=sides===66?(tileType==="X"?CYBER_TABLES.nodeRewards[roll]:CYBER_TABLES.encounters[roll]):sides===10?(CYBER_TABLES.missions[roll].location+" — "+CYBER_TABLES.missions[roll].reward):sides===6?CYBER_TABLES.oracle[roll]:null;var osMabelLine=tableResult?"  >> "+tableResult:"d"+sides+" -> "+roll+".";
