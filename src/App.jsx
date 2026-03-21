@@ -1668,7 +1668,8 @@ function CyberTerminal(props){
         t==="X"?{t:"warn",s:"  !! encrypted fragment — roll d66 on Matrix Node table"}:
         t==="A"?{t:"acc",s:"  ◈ access port — authorized exit available"}:
                 {t:"sys",s:"  ◇ encounter check required — roll d66"}
-      ]);});
+      ,{t:"mabel",s:(function(){var _c=cyberSess?cyberSess.clock:0;var _n=[["node contact. something breathes here.","network synapse. careful.","junction point. i feel it."],["node. clock climbing.","junction. don't linger."],["NODE. CLOCK CRITICAL."],["no."]][_c<=4?0:_c<=7?1:_c<=10?2:3];var _a=[["clear path. for now.","null space. keep moving.","quiet here. don't trust it."],["moving. clock's counting.","dead sector. keep pace."],["MOVE. CLOCK CRITICAL."],["..."]][_c<=4?0:_c<=7?1:_c<=10?2:3];var _x=[["node contact. something breathes here.","network synapse. careful.","junction. i feel it."],["node. clock climbing.","junction. don't linger."],["NODE. CLOCK CRITICAL."],["no."]][_c<=4?0:_c<=7?1:_c<=10?2:3];var pool=t==="X"?_x:t==="A"?_a:_n;return pool[Math.floor(Math.random()*pool.length)];}())}
+      ]);});;
     }
   },[cyberSess?cyberSess.hackerPos:null]);
   var lineColor=function(t){return t==="user"?CB_GREEN:t==="mabel"?"#b0baff":t==="warn"?"#FFD166":t==="acc"?CB_ACC:t==="breach"?"#FF2060":t==="err"?"#FF2060":CB_GREEN+"aa";};
