@@ -1651,12 +1651,82 @@ function JackOutModal(props){
   );
 }
 var ScrambleText=function(props){var text=props.text||"";var spd=props.spd||32;var _sd=React.useState(text);var disp=_sd[0];var setDisp=_sd[1];React.useEffect(function(){var chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*[]{}|<>";var arr=text.split("").map(function(c){return{target:c,frame:0,max:Math.floor(Math.random()*10)+3,done:false};});var id=setInterval(function(){var done=true;arr=arr.map(function(c){if(c.done)return c;done=false;c.frame++;if(c.frame>=c.max){c.done=true;return c;}return c;});setDisp(arr.map(function(c){return c.done?c.target:chars[Math.floor(Math.random()*chars.length)];}).join(""));if(done)clearInterval(id);},spd);return function(){clearInterval(id);};},[text]);return React.createElement("span",null,disp);};
+
+function RunFailedModal({cyberSess,onFail}){
+  const credits=(cyberSess&&cyberSess.credits)||0;
+  return createPortal(
+    React.createElement("div",{
+      style:{position:"fixed",top:0,left:0,width:"100vw",height:"100vh",
+             background:"#000000cc",display:"flex",alignItems:"center",
+             justifyContent:"center",zIndex:10000}
+    },
+      React.createElement("div",{
+        style:{background:"#080004",border:"2px solid #FF2060",
+               boxShadow:"0 0 60px #FF206055,0 0 120px #FF206022,inset 0 0 40px #FF206008",
+               padding:"40px 48px",maxWidth:"480px",width:"90%",
+               fontFamily:"'Share Tech Mono',monospace",color:"#FF2060",
+               textAlign:"center"}
+      },
+        React.createElement("svg",{
+          width:"80",height:"80",viewBox:"0 0 100 100",
+          style:{display:"block",margin:"0 auto 20px",filter:"drop-shadow(0 0 16px #FF2060)"}
+        },
+          React.createElement("ellipse",{cx:"50",cy:"42",rx:"34",ry:"32",fill:"#FF2060",opacity:"0.15",stroke:"#FF2060",strokeWidth:"2"}),
+          React.createElement("ellipse",{cx:"50",cy:"42",rx:"34",ry:"32",fill:"none",stroke:"#FF2060",strokeWidth:"2.5"}),
+          React.createElement("circle",{cx:"36",cy:"40",r:"9",fill:"#080004",stroke:"#FF2060",strokeWidth:"2"}),
+          React.createElement("circle",{cx:"64",cy:"40",r:"9",fill:"#080004",stroke:"#FF2060",strokeWidth:"2"}),
+          React.createElement("rect",{x:"38",y:"68",width:"7",height:"10",rx:"1",fill:"#FF2060",opacity:"0.7"}),
+          React.createElement("rect",{x:"48",y:"66",width:"7",height:"12",rx:"1",fill:"#FF2060",opacity:"0.7"}),
+          React.createElement("rect",{x:"58",y:"68",width:"7",height:"10",rx:"1",fill:"#FF2060",opacity:"0.7"}),
+          React.createElement("rect",{x:"43",y:"76",width:"7",height:"6",rx:"1",fill:"#FF2060",opacity:"0.5"}),
+          React.createElement("rect",{x:"53",y:"76",width:"7",height:"6",rx:"1",fill:"#FF2060",opacity:"0.5"}),
+          React.createElement("line",{x1:"18",y1:"10",x2:"82",y2:"90",stroke:"#FF2060",strokeWidth:"3",opacity:"0.5"}),
+          React.createElement("line",{x1:"82",y1:"10",x2:"18",y2:"90",stroke:"#FF2060",strokeWidth:"3",opacity:"0.5"})
+        ),
+        React.createElement("div",{
+          style:{fontSize:"24px",fontWeight:"bold",letterSpacing:"0.2em",
+                 marginBottom:"6px",textTransform:"uppercase",
+                 textShadow:"0 0 20px #FF2060"}
+        },"TRACE COMPLETE"),
+        React.createElement("div",{
+          style:{fontSize:"11px",color:"#FF206077",letterSpacing:"0.12em",marginBottom:"28px"}
+        },"// MEMORY CLOCK OVERFLOW \u2014 SIGNAL LOST"),
+        React.createElement("div",{
+          style:{fontSize:"12px",color:"#c8d0ff",lineHeight:1.9,marginBottom:"28px",
+                 textAlign:"left",borderTop:"1px solid #FF206033",
+                 borderBottom:"1px solid #FF206033",padding:"18px 4px"}
+        },
+          React.createElement("div",{style:{color:"#FF2060",letterSpacing:"0.1em",marginBottom:"10px",fontSize:"11px"}},"[ DAMAGE REPORT ]"),
+          React.createElement("div",null,"\u25b8  All cyberware acquired this run \u2014 PURGED"),
+          React.createElement("div",null,"\u25b8  All items and weapon mods \u2014 CONFISCATED"),
+          React.createElement("div",null,"\u25b8  "+(credits>0?credits+"\u3011 gained this run":"Credits gained")+" \u2014 SEIZED BY ICE"),
+          React.createElement("div",null,"\u25b8  Encounter completion bonuses \u2014 FORFEIT"),
+          React.createElement("div",{
+            style:{marginTop:"14px",color:"#FF206066",fontSize:"11px",fontStyle:"italic"}
+          },"Your runner jacked out. Alive. That\u2019s all.")
+        ),
+        React.createElement("button",{
+          onClick:onFail,
+          style:{background:"#FF2060",color:"#000",border:"none",
+                 padding:"13px 36px",fontFamily:"'Share Tech Mono',monospace",
+                 fontSize:"12px",letterSpacing:"0.18em",cursor:"pointer",
+                 textTransform:"uppercase",fontWeight:"bold",
+                 boxShadow:"0 0 24px #FF206088",display:"block",margin:"0 auto"}
+        },"[ DISCONNECT ]")
+      )
+    ),
+    document.body
+  );
+}
+
 function CyberTerminal(props){
   var gs=props.gs,cyberSess=props.cyberSess;
   var logsS=React.useState([]),setLogs=logsS[1];var logs=logsS[0];
   var inputS=React.useState(""),setInput=inputS[1];var input=inputS[0];
   var loadingS=React.useState(false),setLoading=loadingS[1];var loading=loadingS[0];
   var bootedRef=React.useRef(false),prevPosRef=React.useRef(null),scrollRef=React.useRef(null);
+const [runFailed,setRunFailed]=React.useState(false);const [wipeActive,setWipeActive]=React.useState(false);const [displayClock,setDisplayClock]=React.useState(0);const prevActiveRef2=React.useRef(false);React.useEffect(()=>{if(cyberSess&&cyberSess.clock>=12)setRunFailed(true);},[cyberSess]);React.useEffect(()=>{const wasActive=prevActiveRef2.current;const isActive=!!(cyberSess&&cyberSess.active);prevActiveRef2.current=isActive;if(wasActive&&!isActive&&!runFailed){setWipeActive(true);setLogs([]);for(let sq=12;sq>=0;sq--){setTimeout(()=>setDisplayClock(sq),(12-sq)*110);}const WL=[{t:'err',s:'// SESSION TERMINATED'},{t:'err',s:'// PURGING INTRUSION TRACES...'},{t:'oracle',s:'MABEL: Jack-out confirmed. Erasing footprint.'},{t:'err',s:'// NEUROVEIL COLLAPSE DETECTED'},{t:'err',s:'// MEMORY BUFFER FLUSHING...'},{t:'oracle',s:'MABEL: Ghost Signal silent. Stay low.'},{t:'err',s:'// RUN ENDED'},];WL.forEach((ln,i)=>setTimeout(()=>setLogs(p=>[...p,{...ln,id:Date.now()+i}]),i*220));setTimeout(()=>setWipeActive(false),WL.length*220+300);}if(isActive)setDisplayClock(cyberSess.clock);},[cyberSess,runFailed]);
+React.useEffect(()=>{if(cyberSess&&cyberSess.active&&typeof cyberSess.clock==="number"&&cyberSess.clock>=12&&!runFailed){setRunFailed(true);}},[cyberSess]);
   React.useEffect(function(){if(scrollRef.current)scrollRef.current.scrollTop=scrollRef.current.scrollHeight;},[logs,loading]);
   React.useEffect(function(){
     if(cyberSess&&cyberSess.active&&!bootedRef.current){
@@ -1804,6 +1874,7 @@ var onCharChange=props.onCharChange;
   var activeMap=cyberSess?CYBER_MAPS[cyberSess.mapId-1]:CYBER_MAPS[selectedMap];
   var mapIdx=cyberSess?cyberSess.mapId-1:selectedMap;
   var inSession=!!(cyberSess&&cyberSess.active);
+  function handleRunFail(){setRunFailed(false);if(typeof gs==="function"){gs(prev=>{if(!prev||!prev.cyberSess)return prev;return {...prev,cyberSess:{...prev.cyberSess,active:false}};});}};
   var danger=inSession&&cyberSess.clock>=9;
   var warn=inSession&&cyberSess.clock>=6&&cyberSess.clock<9;
   var frameColor=danger?"#FF2060":warn?"#FFD166":CB_GREEN;
@@ -1874,7 +1945,7 @@ React.createElement(CyberRunnerPanel,{hacker:hacker,charData:gs[hackerSel]||gs.v
         }),
         React.createElement("button",{onClick:function(){if(!inSession)setSelectedMap(Math.floor(Math.random()*6));},style:{marginLeft:"auto",background:"transparent",border:"1px solid "+CB_NORM+"55",color:CB_NORM+"99",fontFamily:ORB,fontSize:9,letterSpacing:2,padding:"5px 10px",cursor:inSession?"default":"pointer",borderRadius:1}},"↺")
         ,inSession&&React.createElement("div",{style:{display:"flex",gap:5,marginLeft:8}},
-          React.createElement(ResetRunButton,{onReset:function(){setCyberSess({mapId:selectedMap+1,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});}}),
+          (runFailed&&React.createElement(RunFailedModal,{cyberSess:cyberSess,onFail:handleRunFail})),React.createElement(ResetRunButton,{onReset:function(){setCyberSess({mapId:selectedMap+1,hackerPos:null,clock:0,explored:[],active:false,entryPort:null});}}),
           React.createElement(JackOutButton,{onJackOut:function(){jackOut("clean");}})
         )
       ),
@@ -1938,7 +2009,7 @@ React.createElement(CyberRunnerPanel,{hacker:hacker,charData:gs[hackerSel]||gs.v
           React.createElement("div",{style:{fontFamily:ORB,fontSize:9,letterSpacing:2,marginBottom:5,color:danger?"#FF2060":warn?"#FFD166":CB_NORM,animation:danger?"clockDanger 1s ease-in-out infinite":"none"}},"MEMORY CLOCK  "+(inSession?cyberSess.clock:0)+"/12"),
           React.createElement("div",{style:{display:"flex",gap:2}},
             Array.from({length:12},function(_,i){
-              var filled=inSession&&i<cyberSess.clock,d=i>=9,w=i>=6&&i<9;
+              var filled=inSession&&i<displayClock,d=i>=9,w=i>=6&&i<9;
               return React.createElement("div",{key:i,style:{flex:1,height:10,borderRadius:1,background:filled?(d?"#FF2060":w?"#FFD166":CB_NORM):(d?"#2a0a0a":w?"#1e1808":"#0d1f0d"),border:"1px solid "+(filled?(d?"#FF2060":w?"#FFD166":CB_NORM):(d?"#FF206066":w?"#FFD16655":CB_NORM+"55")),boxShadow:filled?(d?"0 0 5px #FF2060aa":w?"0 0 4px #FFD16699":"0 0 4px "+CB_NORM+"77"):undefined,transition:"all .3s"}});
             })
           )
