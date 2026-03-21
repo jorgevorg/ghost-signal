@@ -295,7 +295,8 @@ function ResetRunButton(props){
   function handleClick(){
     setConfirm(true);
   }
-  return React.createElement(React.Fragment,null,confirm&&React.createElement(PurgeConfirmModal,{onConfirm:doReset,onAbort:function(){setConfirm(false);}}),React.createElement("button",{onClick:handleClick,style:Object.assign({background:"transparent",border:"1px solid "+CB_NORM+(flash?"ff":"55"),color:CB_NORM+(flash?"ff":"88"),fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"5px 10px",cursor:"pointer",borderRadius:1,transition:"all .2s",boxShadow:flash?"0 0 8px "+CB_NORM+"88":undefined},style)},"↺ RESET RUN");
+  function doReset(){setConfirm(false);setFlash(true);setTimeout(function(){setFlash(false);},800);onReset&&onReset();}
+  return React.createElement(React.Fragment,null,confirm&&React.createElement(PurgeConfirmModal,{onConfirm:doReset,onAbort:function(){setConfirm(false);}}),React.createElement("button",{onClick:handleClick,style:Object.assign({background:"transparent",border:"1px solid "+CB_NORM+(flash?"ff":"55"),color:CB_NORM+(flash?"ff":"88"),fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"5px 10px",cursor:"pointer",borderRadius:1,transition:"all .2s",boxShadow:flash?"0 0 8px "+CB_NORM+"88":undefined},style)},"↺ RESET RUN"));
 }
 
 // Paste this entire block directly above: function Toast(props){
