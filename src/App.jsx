@@ -1796,7 +1796,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
       ),
       React.createElement("span",{style:{fontFamily:MONO,fontSize:9,letterSpacing:1,color:"#FF206055"}},"UNAUTHORIZED ACCESS")
     ),
-    React.createElement("div",{ref:scrollRef,style:{flex:1,overflowY:"auto",maxHeight:"calc(100vh / 1.3225 - 560px)",padding:"8px 12px",fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,minHeight:0}},
+    React.createElement("div",{ref:scrollRef,style:{flex:1,overflowY:"auto",maxHeight:"calc(100vh / 1.3225 - 620px)",padding:"8px 12px",fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,minHeight:0}},
       logs.length===0&&React.createElement("div",{style:{color:CB_GREEN+"88"}},"// jack in to establish terminal link"),
       logs.map(function(l,i){
   if(l.t==="mabel"&&!l.chosen&&l.s&&l.s.indexOf("  >> ")===0&&l.s.indexOf(" or ")>=0){
