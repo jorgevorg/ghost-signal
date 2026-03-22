@@ -2437,7 +2437,7 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
     ? (open ? (activeTab==="netrunner"?hacker.label:"⚔ TACTICAL") + " ▸" : "⊕ ◂")
     : (open ? (combatActive ? ("⚔ R"+round) : "⚔ TACTICAL") + " ▸" : "⚔ ◂");
 
-  return React.createElement("div",{style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",zIndex:20,display:"flex",alignItems:"stretch",pointerEvents:"auto"}},
+  return React.createElement("div",{style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",zIndex:20,display:"flex",alignItems:"flex-start",pointerEvents:"auto"}},
 
     // ── collapse toggle bar ────────────────────────────────────
     React.createElement("div",{
@@ -2446,7 +2446,7 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
     },labelTxt),
 
     // ── expanded panel ────────────────────────────────────────
-    open&&React.createElement("div",{style:{width:214,height:430,background:"#03070cfa",border:"1px solid "+panelAcc+"cc",borderLeft:"none",display:"flex",flexDirection:"column",boxShadow:"inset 0 0 50px "+panelAcc+"0d, -4px 0 20px "+panelAcc+"22",transition:"border-color .3s",overflow:"hidden"}},
+    open&&React.createElement("div",{style:{width:252,height:430,background:"#03070cfa",border:"1px solid "+panelAcc+"cc",borderLeft:"none",display:"flex",flexDirection:"column",boxShadow:"inset 0 0 50px "+panelAcc+"0d, -4px 0 20px "+panelAcc+"22",transition:"border-color .3s",overflow:"hidden"}},
 
       // ── tab selector (CYBER only) ──────────────────────────
       showNetrunner&&React.createElement("div",{style:{display:"flex",borderBottom:"1px solid "+panelAcc+"44",flexShrink:0}},
