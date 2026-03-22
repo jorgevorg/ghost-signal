@@ -2420,7 +2420,7 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
 
   const hackerData={
     vela:{name:(gs.vela&&gs.vela.name)||"VELA",en:gs.vela.en||0,enMax:gs.vela.enMax||20,hp:gs.vela.hp||0,hpMax:gs.vela.hpMax||20,color:CB_NODE,label:"VELA // NETRUNNER"},
-    cole:{name:(gs.cole&&gs.cole.name)||"COLE",en:gs.cole.en||0,enMax:gs.cole.enMax||20,hp:gs.cole.hp||0,hpMax:gs.cole.hpMax||20,color:CB_ACC,label:"COLE // MUSCLE"}
+    cole:{name:(gs.cole&&gs.cole.name)||"COLE",en:gs.cole.en||0,enMax:gs.cole.enMax||20,hp:gs.cole.hp||0,hpMax:gs.cole.hpMax||20,color:"#FFD166",label:"COLE // MUSCLE"}
   };
   const hacker=hackerData[hackerSel]||hackerData.vela;
   const charData=gs[hackerSel]||gs.vela;
@@ -2442,11 +2442,11 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
     // ── collapse toggle bar ────────────────────────────────────
     React.createElement("div",{
       onClick:()=>setOpen(!open),
-      style:{writingMode:"vertical-rl",background:panelAcc+"22",border:"1px solid "+panelAcc+(combatActive?"cc":"88"),borderRight:open?"none":"1px solid "+panelAcc+(combatActive?"cc":"88"),color:panelAcc,fontFamily:ORB,fontSize:7,letterSpacing:3,padding:"14px 7px",cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",justifyContent:"center",textShadow:"0 0 8px "+panelAcc+(combatActive?"cc":"88"),boxShadow:combatActive?"-2px 0 12px "+panelAcc+"44":"none",transition:"all .3s"}
+      style:{writingMode:"vertical-rl",background:panelAcc+"22",border:"1px solid "+panelAcc+(combatActive?"cc":"88"),borderRight:open?"none":"1px solid "+panelAcc+(combatActive?"cc":"88"),color:panelAcc,fontFamily:ORB,fontSize:7,letterSpacing:3,padding:"14px 7px",cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",justifyContent:"center",boxSizing:"border-box",textShadow:"0 0 8px "+panelAcc+(combatActive?"cc":"88"),boxShadow:combatActive?"-2px 0 12px "+panelAcc+"44":"none",transition:"all .3s"}
     },labelTxt),
 
     // ── expanded panel ────────────────────────────────────────
-    open&&React.createElement("div",{style:{width:252,height:430,background:"#03070cfa",border:"1px solid "+panelAcc+"cc",borderLeft:"none",display:"flex",flexDirection:"column",boxShadow:"inset 0 0 50px "+panelAcc+"0d, -4px 0 20px "+panelAcc+"22",transition:"border-color .3s",overflow:"hidden"}},
+    open&&React.createElement("div",{style:{width:252,height:430,boxSizing:"border-box",background:"#03070cfa",border:"1px solid "+panelAcc+"cc",borderLeft:"none",display:"flex",flexDirection:"column",boxShadow:"inset 0 0 50px "+panelAcc+"0d, -4px 0 20px "+panelAcc+"22",transition:"border-color .3s",overflow:"hidden"}},
 
       // ── tab selector (CYBER only) ──────────────────────────
       showNetrunner&&React.createElement("div",{style:{display:"flex",borderBottom:"1px solid "+panelAcc+"44",flexShrink:0}},
