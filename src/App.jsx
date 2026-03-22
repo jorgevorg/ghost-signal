@@ -1719,8 +1719,17 @@ function RunFailedModal({cyberSess,onFail}){
   );
 }
 
+function applyNetrunReward(reward,gs,onCharChange){
+  if(!reward||!onCharChange||reward.indexOf(" or ")>=0)return;
+  var hm=reward.match(/\b(HACK_\w+|DRONE_\w+)\b/g);
+  if(hm){hm.forEach(function(item){var mem=(gs.vela&&gs.vela.memory)?gs.vela.memory.slice():Array(6).fill("");var ei=mem.findIndex(function(m){return !m;});if(ei>=0)onCharChange("vela","memory."+ei,item);});}
+  var em=reward.match(/(\d+)\s*EXP/);
+  if(em){onCharChange("vela","exp",((gs.vela&&gs.vela.exp)||0)+parseInt(em[1]));}
+  var sm=reward.match(/\+(\d+)\s*(MIN|TEC|VIG|GRA)/i);
+  if(sm){var smap={MIN:"mind",TEC:"tech",VIG:"vigor",GRA:"grace"};var sk=smap[sm[2].toUpperCase()];if(sk)onCharChange("vela",sk,((gs.vela&&gs.vela[sk])||0)+parseInt(sm[1]));}
+}
 function CyberTerminal(props){
-  var gs=props.gs,cyberSess=props.cyberSess;
+  var gs=props.gs,cyberSess=props.cyberSess,onCharChange=props.onCharChange;
   var logsS=React.useState([]),setLogs=logsS[1];var logs=logsS[0];
   var inputS=React.useState(""),setInput=inputS[1];var input=inputS[0];
   var loadingS=React.useState(false),setLoading=loadingS[1];var loading=loadingS[0];
@@ -1789,8 +1798,23 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
     ),
     React.createElement("div",{ref:scrollRef,style:{flex:1,overflowY:"auto",maxHeight:"calc(100vh - 200px)",padding:"8px 12px",fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,minHeight:0}},
       logs.length===0&&React.createElement("div",{style:{color:CB_GREEN+"88"}},"// jack in to establish terminal link"),
-      logs.map(function(l,i){return React.createElement("div",{key:i,style:{color:lineColor(l.t),animation:"termScroll .12s ease",textShadow:lineGlow(l.t)}},...(typeof l.s==="string"?(function(){var parts=l.s.split(/(roll?\s+d\d+)/gi);if(parts.length===1)return [React.createElement(ScrambleText,{key:"s"+i+(l.s||"").slice(0,4),text:l.s,spd:32})];return parts.map(function(part,pi){var m=part.match(/^roll?\s+d(\d+)$/i);if(!m)return part;var sides=parseInt(m[1],10);var clr=lineColor(l.t)||"#FF0066";return React.createElement("span",{key:pi,onClick:function(){var roll;if(sides===66){var t=Math.floor(Math.random()*6)+1;var u=Math.floor(Math.random()*6)+1;roll=t*10+u;}else{roll=Math.floor(Math.random()*sides)+1;}var note="[OS ROLL: d"+sides+" -> "+roll+"]";
-var tileType=cyberSess?CYBER_MAPS[cyberSess.mapId-1][cyberSess.hackerPos-1]:null;var tableResult=sides===66?(tileType==="X"?CYBER_TABLES.nodeRewards[roll]:CYBER_TABLES.encounters[roll]):sides===10?(CYBER_TABLES.missions[roll].location+" — "+CYBER_TABLES.missions[roll].reward):sides===6?CYBER_TABLES.oracle[roll]:null;var osMabelLine=tableResult?"  >> "+tableResult:"d"+sides+" -> "+roll+".";
+      logs.map(function(l,i){
+  if(l.t==="mabel"&&!l.chosen&&l.s&&l.s.indexOf("  >> ")===0&&l.s.indexOf(" or ")>=0){
+    var opts=l.s.replace("  >> ","").split(" or ").map(function(x){return x.trim();});
+    return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",gap:6,padding:"8px 0",animation:"termScroll .12s ease"}},
+      React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:CB_ACC,letterSpacing:2}},">> SELECT REWARD:"),
+      React.createElement("div",{style:{display:"flex",gap:8,flexWrap:"wrap",marginTop:4}},opts.map(function(ch,ci){
+        return React.createElement("button",{key:ci,onClick:function(){
+          var isHack=/^(HACK_|DRONE_)/.test(ch);
+          if(isHack&&onCharChange){var mem=(gs.vela&&gs.vela.memory)?gs.vela.memory.slice():Array(6).fill("");var ei=mem.findIndex(function(m){return !m;});if(ei>=0)onCharChange("vela","memory."+ei,ch);}
+          else if(onCharChange){var inv=(gs.vela&&gs.vela.inventory)?gs.vela.inventory.slice():Array(8).fill("");var ii=inv.findIndex(function(v){return !v;});if(ii>=0)onCharChange("vela","inventory."+ii,ch);}
+          setLogs(function(p){return p.map(function(e,ei2){return ei2===i?Object.assign({},e,{chosen:true,s:"  >> ACQUIRED: "+ch}):e;});});
+        },style:{padding:"6px 14px",background:CB_ACC+"18",border:"1px solid "+CB_ACC+"66",color:CB_ACC,fontFamily:MONO,fontSize:10,cursor:"pointer",borderRadius:3,letterSpacing:1}},ch);
+      }))
+    );
+  }
+  return React.createElement("div",{key:i,style:{color:lineColor(l.t),animation:"termScroll .12s ease",textShadow:lineGlow(l.t)}},...(typeof l.s==="string"?(function(){var parts=l.s.split(/(roll?\s+d\d+)/gi);if(parts.length===1)return [React.createElement(ScrambleText,{key:"s"+i+(l.s||"").slice(0,4),text:l.s,spd:32})];return parts.map(function(part,pi){var m=part.match(/^roll?\s+d(\d+)$/i);if(!m)return part;var sides=parseInt(m[1],10);var clr=lineColor(l.t)||"#FF0066";return React.createElement("span",{key:pi,onClick:function(){var roll;if(sides===66){var t=Math.floor(Math.random()*6)+1;var u=Math.floor(Math.random()*6)+1;roll=t*10+u;}else{roll=Math.floor(Math.random()*sides)+1;}var note="[OS ROLL: d"+sides+" -> "+roll+"]";
+var tileType=cyberSess?CYBER_MAPS[cyberSess.mapId-1][cyberSess.hackerPos-1]:null;var tableResult=sides===66?(tileType==="X"?CYBER_TABLES.nodeRewards[roll]:CYBER_TABLES.encounters[roll]):sides===10?(CYBER_TABLES.missions[roll].location+" — "+CYBER_TABLES.missions[roll].reward):sides===6?CYBER_TABLES.oracle[roll]:null;var osMabelLine=tableResult?"  >> "+tableResult:"d"+sides+" -> "+roll+".";if(tableResult&&tableResult.indexOf(" or ")<0){applyNetrunReward(tableResult,gs,onCharChange);}
 setLogs(function(prev){return prev.map(function(e,ei){return ei===i?{t:e.t,s:e.s.replace(part,"d"+sides+" -> "+roll)}:e;}).concat([{t:"system",s:note},{t:"mabel",s:osMabelLine}]);});
 var _mSys="You are MABEL, ship AI oracle. The operator just rolled d"+sides+" in the Cybersphere and got "+roll+". Table result: "+(tableResult||"no table entry")+". Write ONE terse atmospheric sentence narrating what this means in-world. No rules text. Pure narrative. Under 20 words.";
 fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:80,system:_mSys,messages:[{role:"user",content:"narrate"}]})}).then(function(r){return r.json();}).then(function(d){var txt=(d.content&&d.content.find(function(b){return b.type==="text";}));if(txt&&txt.text){setLogs(function(prev){return prev.concat([{t:"oracle",s:"  ◈ MABEL: "+txt.text.trim()}]);});}}).catch(function(){var _eLines=["Something hostile just triangulated your position.","Roll for initiative — this sector bites back.","NEXUS countermeasure deployed. Source: automated.","Encounter flagged. Recommend evasive routing.","You walked into something. Figure it out.","The node doesn't want you here.","Ice just got thicker. Good luck.","MABEL: I'm reading weapons-grade ICE on this one.","This encounter was logged before you arrived.","The grid always wins eventually."];setLogs(function(prev){return prev.concat([{t:"oracle",s:"  ◈ "+_eLines[Math.floor(Math.random()*_eLines.length)]}]);});});},style:{display:"inline-block",fontFamily:MONO,fontSize:"0.82em",letterSpacing:2,color:clr,border:"1px solid "+clr,borderRadius:2,padding:"1px 7px",margin:"0 3px",cursor:"pointer",verticalAlign:"middle",userSelect:"none",background:clr+"16"}},part);});})():[l.s]));}),
@@ -2021,7 +2045,7 @@ React.createElement(CyberRunnerPanel,{hacker:hacker,charData:gs[hackerSel]||gs.v
       )
     ),
     React.createElement("div",{style:{position:"relative",zIndex:3,flex:1,display:"flex",flexDirection:"column",minHeight:0,margin:"0 6px 6px"}},
-      React.createElement(CyberTerminal,{gs:gs,cyberSess:cyberSess})
+      React.createElement(CyberTerminal,{gs:gs,cyberSess:cyberSess,onCharChange:onCharChange})
     ),
     React.createElement(JackOutModal,{stats:runStats,onClose:function(){setRunStats(null);}})
   );
@@ -2453,7 +2477,7 @@ var sendToMabel=async function(userMsg){
   setCommsLoading(false);
  };
 
- var upC=function(who,key,val){setGs(function(p){var char=Object.assign({},p[who]);var keys=key.split(".");if(keys.length===1){char[key]=val;}else if(keys.length>=2&&keys[0]==="fav"){char.fav=Object.assign({},char.fav);char.fav[keys[1]]=val;}else if(keys.length===3){var arr=char[keys[0]].slice();if(keys[2])arr[parseInt(keys[1])]=Object.assign({},arr[parseInt(keys[1])],{[keys[2]]:val});else arr[parseInt(keys[1])]=val;char[keys[0]]=arr;}return Object.assign({},p,{[who]:char});});};
+ var upC=function(who,key,val){setGs(function(p){var char=Object.assign({},p[who]);var keys=key.split(".");if(keys.length===1){char[key]=val;}else if(keys.length>=2&&keys[0]==="fav"){char.fav=Object.assign({},char.fav);char.fav[keys[1]]=val;}else if(keys.length===2&&keys[0]!=="fav"){var arr2=char[keys[0]].slice();arr2[parseInt(keys[1])]=val;char[keys[0]]=arr2;}else if(keys.length===3){var arr=char[keys[0]].slice();if(keys[2])arr[parseInt(keys[1])]=Object.assign({},arr[parseInt(keys[1])],{[keys[2]]:val});else arr[parseInt(keys[1])]=val;char[keys[0]]=arr;}return Object.assign({},p,{[who]:char});});};
  var upS=function(key,val){setGs(function(p){var ship=Object.assign({},p.ship);var keys=key.split(".");if(keys.length===1){ship[key]=val;}else{var arr=ship[keys[0]].slice();arr[parseInt(keys[1])]=val;ship[keys[0]]=arr;}return Object.assign({},p,{ship:ship});});};
  var upCrew=function(idx,key,val){setGs(function(p){var crew=p.crew.slice();crew[idx]=Object.assign({},crew[idx]);crew[idx][key]=val;return Object.assign({},p,{crew:crew});});};
  var upHex=function(newMap){setGs(function(p){return Object.assign({},p,{hexMap:newMap});});};
