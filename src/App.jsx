@@ -1767,7 +1767,7 @@ React.useEffect(()=>{if(cyberSess&&cyberSess.active&&typeof cyberSess.clock==="n
 if(cyberSess&&cyberSess.explored&&cyberSess.explored.length===1){var _oLines=["The network knows you're here.","Something is moving in this sector.","NEXUS: anomaly detected. origin: unknown.","Signal breach logged. Countermeasures cycling.","You feel the weight of dead code watching.","Clock ticking. Every tile costs.","The ice is thin here. Proceed carefully.","MABEL whispers: I don't like this node.","Intrusion protocol active. They know.","This grid has seen hackers before. None finished."];var _oMsg=_oLines[Math.floor(Math.random()*_oLines.length)];setTimeout(function(){setLogs(function(prev){return prev.concat([{t:"oracle",s:"  ◈ "+_oMsg}]);});},950);};
     }
   },[cyberSess?cyberSess.hackerPos:null]);
-  var lineColor=function(t){return t==="user"?CB_GREEN:t==="mabel"?"#b0baff":t==="warn"?"#FFD166":t==="acc"?CB_ACC:t==="breach"?"#FF2060":t==="err"?"#FF2060":t==="oracle"?CB_ACC:CB_GREEN+"aa";};var lineWrap=function(t){return(t==="mabel"||t==="oracle")?{whiteSpace:"pre-wrap",wordBreak:"break-word",maxWidth:"100%",lineHeight:1.6}:{whiteSpace:"pre-wrap",wordBreak:"break-word"};};
+  var lineColor=function(t){return t==="user"?CB_GREEN:t==="mabel"?"#b0baff":t==="warn"?"#FFD166":t==="acc"?CB_ACC:t==="breach"?"#FF2060":t==="err"?"#FF2060":t==="oracle"?CB_ACC:CB_GREEN+"aa";};var lineWrap=function(t){return(t==="mabel"||t==="oracle")?{whiteSpace:"pre-wrap",wordBreak:"break-word",maxWidth:"72%",lineHeight:1.6,display:"block"}:{whiteSpace:"pre-wrap",wordBreak:"break-word"};};
   var lineGlow=function(t){return t==="mabel"?"0 0 5px #b0baff33":t==="user"?"0 0 3px "+CB_GREEN+"55":t==="breach"?"0 0 8px #FF2060,0 0 16px #FF206066":t==="oracle"?"0 0 6px #c8d0ff88":undefined;};
   var send=function(){
     var msg=input.trim();if(!msg||loading)return;
@@ -1796,7 +1796,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
       ),
       React.createElement("span",{style:{fontFamily:MONO,fontSize:9,letterSpacing:1,color:"#FF206055"}},"UNAUTHORIZED ACCESS")
     ),
-    React.createElement("div",{ref:scrollRef,style:{flex:1,overflowY:"auto",maxHeight:"calc(100vh - 200px)",padding:"8px 12px",fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,minHeight:0}},
+    React.createElement("div",{ref:scrollRef,style:{flex:1,overflowY:"auto",maxHeight:"calc(100vh / 1.3225 - 420px)",padding:"8px 12px",fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,minHeight:0}},
       logs.length===0&&React.createElement("div",{style:{color:CB_GREEN+"88"}},"// jack in to establish terminal link"),
       logs.map(function(l,i){
   if(l.t==="mabel"&&!l.chosen&&l.s&&l.s.indexOf("  >> ")===0&&l.s.indexOf(" or ")>=0){
@@ -1806,8 +1806,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
       React.createElement("div",{style:{display:"flex",gap:8,flexWrap:"wrap",marginTop:4}},opts.map(function(ch,ci){
         return React.createElement("button",{key:ci,onClick:function(){
           var isHack=/^(HACK_|DRONE_)/.test(ch);
-          if(isHack&&onCharChange){var mem=(gs.vela&&gs.vela.memory)?gs.vela.memory.slice():Array(6).fill("");var ei=mem.findIndex(function(m){return !m;});if(ei>=0)onCharChange("vela","memory."+ei,ch);}
-          else if(onCharChange){var inv=(gs.vela&&gs.vela.inventory)?gs.vela.inventory.slice():Array(8).fill("");var ii=inv.findIndex(function(v){return !v;});if(ii>=0)onCharChange("vela","inventory."+ii,ch);}
+          if(onCharChange){if(isHack){var mem=(gs.vela&&gs.vela.memory)?gs.vela.memory.slice():Array(6).fill("");var ei=mem.findIndex(function(m){return !m;});if(ei>=0){onCharChange("vela","memory."+ei,ch);}else{onCharChange("vela","memory.0",ch);}}else{var inv=(gs.vela&&gs.vela.inventory)?gs.vela.inventory.slice():Array(8).fill("");var ii=inv.findIndex(function(v){return !v;});if(ii>=0){onCharChange("vela","inventory."+ii,ch);}else{onCharChange("vela","inventory.0",ch);}}}
           setLogs(function(p){return p.map(function(e,ei2){return ei2===i?Object.assign({},e,{chosen:true,s:"  >> ACQUIRED: "+ch}):e;});});
         },style:{padding:"6px 14px",background:CB_ACC+"18",border:"1px solid "+CB_ACC+"66",color:CB_ACC,fontFamily:MONO,fontSize:10,cursor:"pointer",borderRadius:3,letterSpacing:1}},ch);
       }))
