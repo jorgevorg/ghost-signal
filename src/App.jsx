@@ -1729,7 +1729,7 @@ function applyNetrunReward(reward,gs,onCharChange){
   if(sm){var smap={MIN:"mind",TEC:"tech",VIG:"vigor",GRA:"grace"};var sk=smap[sm[2].toUpperCase()];if(sk)onCharChange("vela",sk,((gs.vela&&gs.vela[sk])||0)+parseInt(sm[1]));}
 }
 function CyberTerminal(props){
-  var gs=props.gs,cyberSess=props.cyberSess,onCharChange=props.onCharChange;
+  var gs=props.gs,cyberSess=props.cyberSess,onCharChange=props.onCharChange,onMabelSend=props.onMabelSend;
   var logsS=React.useState([]),setLogs=logsS[1];var logs=logsS[0];
   var inputS=React.useState(""),setInput=inputS[1];var input=inputS[0];
   var loadingS=React.useState(false),setLoading=loadingS[1];var loading=loadingS[0];
@@ -1767,7 +1767,7 @@ React.useEffect(()=>{if(cyberSess&&cyberSess.active&&typeof cyberSess.clock==="n
 if(cyberSess&&cyberSess.explored&&cyberSess.explored.length===1){var _oLines=["The network knows you're here.","Something is moving in this sector.","NEXUS: anomaly detected. origin: unknown.","Signal breach logged. Countermeasures cycling.","You feel the weight of dead code watching.","Clock ticking. Every tile costs.","The ice is thin here. Proceed carefully.","MABEL whispers: I don't like this node.","Intrusion protocol active. They know.","This grid has seen hackers before. None finished."];var _oMsg=_oLines[Math.floor(Math.random()*_oLines.length)];setTimeout(function(){setLogs(function(prev){return prev.concat([{t:"oracle",s:"  ◈ "+_oMsg}]);});},950);};
     }
   },[cyberSess?cyberSess.hackerPos:null]);
-  var lineColor=function(t){return t==="user"?CB_GREEN:t==="mabel"?"#b0baff":t==="warn"?"#FFD166":t==="acc"?CB_ACC:t==="breach"?"#FF2060":t==="err"?"#FF2060":t==="oracle"?CB_ACC:CB_GREEN+"aa";};
+  var lineColor=function(t){return t==="user"?CB_GREEN:t==="mabel"?"#b0baff":t==="warn"?"#FFD166":t==="acc"?CB_ACC:t==="breach"?"#FF2060":t==="err"?"#FF2060":t==="oracle"?CB_ACC:CB_GREEN+"aa";};var lineWrap=function(t){return(t==="mabel"||t==="oracle")?{whiteSpace:"pre-wrap",wordBreak:"break-word",maxWidth:"100%",lineHeight:1.6}:{whiteSpace:"pre-wrap",wordBreak:"break-word"};};
   var lineGlow=function(t){return t==="mabel"?"0 0 5px #b0baff33":t==="user"?"0 0 3px "+CB_GREEN+"55":t==="breach"?"0 0 8px #FF2060,0 0 16px #FF206066":t==="oracle"?"0 0 6px #c8d0ff88":undefined;};
   var send=function(){
     var msg=input.trim();if(!msg||loading)return;
@@ -1781,7 +1781,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
     .then(function(r){return r.json();})
     .then(function(d){
       var reply=(d.content||d.message||d.reply||"... [SIGNAL LOST]").trim();
-      setLogs(function(p){return p.concat(reply.split(/\n/).filter(Boolean).map(function(l){return{t:"mabel",s:l};}));});
+      var replyLines=reply.split(/\n/).filter(Boolean);setLogs(function(p){return p.concat(replyLines.map(function(l){return{t:"mabel",s:l};}));});if(onMabelSend)onMabelSend("[NEXUS] "+reply.trim());
       setLoading(false);
     }).catch(function(){
       setLogs(function(p){return p.concat([{t:"err",s:"[CONNECTION ERROR] packet lost"}]);});
@@ -1813,7 +1813,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
       }))
     );
   }
-  return React.createElement("div",{key:i,style:{color:lineColor(l.t),animation:"termScroll .12s ease",textShadow:lineGlow(l.t)}},...(typeof l.s==="string"?(function(){var parts=l.s.split(/(roll?\s+d\d+)/gi);if(parts.length===1)return [React.createElement(ScrambleText,{key:"s"+i+(l.s||"").slice(0,4),text:l.s,spd:32})];return parts.map(function(part,pi){var m=part.match(/^roll?\s+d(\d+)$/i);if(!m)return part;var sides=parseInt(m[1],10);var clr=lineColor(l.t)||"#FF0066";return React.createElement("span",{key:pi,onClick:function(){var roll;if(sides===66){var t=Math.floor(Math.random()*6)+1;var u=Math.floor(Math.random()*6)+1;roll=t*10+u;}else{roll=Math.floor(Math.random()*sides)+1;}var note="[OS ROLL: d"+sides+" -> "+roll+"]";
+  return React.createElement("div",{key:i,style:Object.assign({color:lineColor(l.t),animation:"termScroll .12s ease",textShadow:lineGlow(l.t)},lineWrap(l.t))},...(typeof l.s==="string"?(function(){var parts=l.s.split(/(roll?\s+d\d+)/gi);if(parts.length===1)return [React.createElement(ScrambleText,{key:"s"+i+(l.s||"").slice(0,4),text:l.s,spd:32})];return parts.map(function(part,pi){var m=part.match(/^roll?\s+d(\d+)$/i);if(!m)return part;var sides=parseInt(m[1],10);var clr=lineColor(l.t)||"#FF0066";return React.createElement("span",{key:pi,onClick:function(){var roll;if(sides===66){var t=Math.floor(Math.random()*6)+1;var u=Math.floor(Math.random()*6)+1;roll=t*10+u;}else{roll=Math.floor(Math.random()*sides)+1;}var note="[OS ROLL: d"+sides+" -> "+roll+"]";
 var tileType=cyberSess?CYBER_MAPS[cyberSess.mapId-1][cyberSess.hackerPos-1]:null;var tableResult=sides===66?(tileType==="X"?CYBER_TABLES.nodeRewards[roll]:CYBER_TABLES.encounters[roll]):sides===10?(CYBER_TABLES.missions[roll].location+" — "+CYBER_TABLES.missions[roll].reward):sides===6?CYBER_TABLES.oracle[roll]:null;var osMabelLine=tableResult?"  >> "+tableResult:"d"+sides+" -> "+roll+".";if(tableResult&&tableResult.indexOf(" or ")<0){applyNetrunReward(tableResult,gs,onCharChange);}
 setLogs(function(prev){return prev.map(function(e,ei){return ei===i?{t:e.t,s:e.s.replace(part,"d"+sides+" -> "+roll)}:e;}).concat([{t:"system",s:note},{t:"mabel",s:osMabelLine}]);});
 var _mSys="You are MABEL, ship AI oracle. The operator just rolled d"+sides+" in the Cybersphere and got "+roll+". Table result: "+(tableResult||"no table entry")+". Write ONE terse atmospheric sentence narrating what this means in-world. No rules text. Pure narrative. Under 20 words.";
@@ -2037,7 +2037,7 @@ React.createElement(CyberRunnerPanel,{hacker:hacker,charData:gs[hackerSel]||gs.v
           React.createElement("div",{style:{fontFamily:ORB,fontSize:9,letterSpacing:2,marginBottom:5,color:danger?"#FF2060":warn?"#FFD166":CB_NORM,animation:danger?"clockDanger 1s ease-in-out infinite":"none"}},"MEMORY CLOCK  "+(inSession?cyberSess.clock:0)+"/12"),
           React.createElement("div",{style:{display:"flex",gap:2}},
             Array.from({length:12},function(_,i){
-              var filled=inSession&&i<displayClock,d=i>=9,w=i>=6&&i<9;
+              var filled=inSession&&i<(cyberSess?cyberSess.clock:displayClock),d=i>=9,w=i>=6&&i<9;
               return React.createElement("div",{key:i,style:{flex:1,height:10,borderRadius:1,background:filled?(d?"#FF2060":w?"#FFD166":CB_NORM):(d?"#2a0a0a":w?"#1e1808":"#0d1f0d"),border:"1px solid "+(filled?(d?"#FF2060":w?"#FFD166":CB_NORM):(d?"#FF206066":w?"#FFD16655":CB_NORM+"55")),boxShadow:filled?(d?"0 0 5px #FF2060aa":w?"0 0 4px #FFD16699":"0 0 4px "+CB_NORM+"77"):undefined,transition:"all .3s"}});
             })
           )
@@ -2045,7 +2045,7 @@ React.createElement(CyberRunnerPanel,{hacker:hacker,charData:gs[hackerSel]||gs.v
       )
     ),
     React.createElement("div",{style:{position:"relative",zIndex:3,flex:1,display:"flex",flexDirection:"column",minHeight:0,margin:"0 6px 6px"}},
-      React.createElement(CyberTerminal,{gs:gs,cyberSess:cyberSess,onCharChange:onCharChange})
+      React.createElement(CyberTerminal,{gs:gs,cyberSess:cyberSess,onCharChange:onCharChange,onMabelSend:props.onMabelSend})
     ),
     React.createElement(JackOutModal,{stats:runStats,onClose:function(){setRunStats(null);}})
   );
@@ -2575,7 +2575,7 @@ var sendToMabel=async function(userMsg){
       })
      ),
      tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel}),
-    tab==="CYBER"&&React.createElement(CybersphereTab,{gs:gs,cyberSess:cyberSess,setCyberSess:setCyberSess,onCharChange:upC})
+    tab==="CYBER"&&React.createElement(CybersphereTab,{gs:gs,cyberSess:cyberSess,setCyberSess:setCyberSess,onCharChange:upC,onMabelSend:sendToMabel})
     )
    ),
    !boot&&React.createElement(DiceRoller,{gameState:gs})
