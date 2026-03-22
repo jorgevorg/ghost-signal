@@ -1794,7 +1794,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
     });
   };
   return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",minHeight:0,overflow:"hidden",background:"#020c02",borderTop:"1px solid "+CB_GREEN+"55"}},
-    React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"5px 14px",borderBottom:"1px solid "+CB_GREEN+"44",flexShrink:0}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"5px 14px",background:"#031203",borderBottom:"1px solid "+CB_GREEN+"77",flexShrink:0}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
         React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",flexShrink:0,background:cyberSess&&cyberSess.active?"#FF2060":"#333",boxShadow:cyberSess&&cyberSess.active?"0 0 6px #FF2060":undefined,animation:cyberSess&&cyberSess.active?"dangerFlicker 2s ease-in-out infinite":"none"}}),
         React.createElement("span",{style:{fontFamily:MONO,fontSize:10,letterSpacing:2,color:"#FFD700",border:"1px solid #FFD700",borderRadius:3,padding:"1px 5px",cursor:"pointer",textShadow:"0 0 6px #FFD700"}},"NEXUS-OS  //  INTRUSION MONITOR")
@@ -1952,20 +1952,20 @@ var onCharChange=props.onCharChange;
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
           ["vela","cole"].map(function(key){
             var hd=hackerData[key],active=hackerSel===key;
-            return React.createElement("button",{key:key,onClick:function(){if(!inSession)setHackerSel(key);},style:{background:active?hd.color+"22":"transparent",border:"1px solid "+(active?hd.color:hd.color+"44"),color:active?hd.color:hd.color+"88",fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"3px 9px",cursor:inSession?"default":"pointer",borderRadius:1,boxShadow:active?"0 0 8px "+hd.color+"33":undefined,transition:"all .2s"}},hd.name);
+            return React.createElement("button",{key:key,onClick:function(){if(!inSession)setHackerSel(key);},style:{background:active?hd.color+"22":"transparent",border:"1px solid "+(active?hd.color:hd.color+"44"),color:active?hd.color:hd.color+"cc",fontFamily:ORB,fontSize:8,letterSpacing:2,padding:"3px 9px",cursor:inSession?"default":"pointer",borderRadius:1,boxShadow:active?"0 0 8px "+hd.color+"33":undefined,transition:"all .2s"}},hd.name);
           }),
         )
       ),
-      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,background:hacker.color+"0d",border:"1px solid "+hacker.color+"33",borderRadius:2,padding:"7px 12px",marginBottom:10,transition:"background .3s,border-color .3s"}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,background:hacker.color+"14",border:"1px solid "+hacker.color+"99",borderRadius:2,padding:"7px 12px",marginBottom:10,transition:"background .3s,border-color .3s"}},
         React.createElement("div",{style:{fontFamily:ORB,fontSize:9,letterSpacing:3,color:hacker.color,textShadow:"0 0 6px "+hacker.color+"88",flexShrink:0}},hacker.label),
-        React.createElement("div",{style:{width:1,height:16,background:hacker.color+"33",flexShrink:0}}),
+        React.createElement("div",{style:{width:1,height:16,background:hacker.color+"99",flexShrink:0}}),
         ["EN","HP"].map(function(stat){
           var val=hacker[stat.toLowerCase()],max=hacker[stat.toLowerCase()+"Max"];
           var pct=val==="?"?50:Math.min(100,Math.round(100*val/max));
           return React.createElement("div",{key:stat,style:{flex:1}},
-            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontFamily:MONO,fontSize:8,color:hacker.color+"99",marginBottom:3,letterSpacing:1}},
+            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontFamily:MONO,fontSize:8,color:hacker.color+"cc",marginBottom:3,letterSpacing:1}},
               React.createElement("span",null,stat),React.createElement("span",null,val+"/"+max)),
-            React.createElement("div",{style:{height:4,background:hacker.color+"1a",borderRadius:2,overflow:"hidden"}},
+            React.createElement("div",{style:{height:4,background:hacker.color+"33",borderRadius:2,overflow:"hidden"}},
               React.createElement("div",{style:{height:"100%",borderRadius:2,width:pct+"%",background:hacker.color,boxShadow:"0 0 4px "+hacker.color,transition:"width .4s"}}))
           );
         })
@@ -2437,12 +2437,12 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
     ? (open ? (activeTab==="netrunner"?hacker.label:"⚔ TACTICAL") + " ▸" : "⊕ ◂")
     : (open ? (combatActive ? ("⚔ R"+round) : "⚔ TACTICAL") + " ▸" : "⚔ ◂");
 
-  return React.createElement("div",{style:{position:"absolute",right:0,top:"50%",transform:"translateY(-50%)",zIndex:20,display:"flex",alignItems:"flex-start",pointerEvents:"auto"}},
+  return React.createElement("div",{style:{position:"fixed",right:"max(0px, calc((100vw - 1100px) / 2))",top:"50%",transform:"translateY(-50%)",zIndex:20,display:"flex",alignItems:"stretch",pointerEvents:"auto"}},
 
     // ── collapse toggle bar ────────────────────────────────────
     React.createElement("div",{
       onClick:()=>setOpen(!open),
-      style:{writingMode:"vertical-rl",background:panelAcc+"22",border:"1px solid "+panelAcc+(combatActive?"cc":"88"),borderRight:open?"none":"1px solid "+panelAcc+(combatActive?"cc":"88"),color:panelAcc,fontFamily:ORB,fontSize:7,letterSpacing:3,padding:"14px 7px",cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",justifyContent:"center",height:430,boxSizing:"border-box",textShadow:"0 0 8px "+panelAcc+(combatActive?"cc":"88"),boxShadow:combatActive?"-2px 0 12px "+panelAcc+"44":"none",transition:"all .3s"}
+      style:{writingMode:"vertical-rl",background:panelAcc+"22",border:"1px solid "+panelAcc+(combatActive?"cc":"88"),borderRight:open?"none":"1px solid "+panelAcc+(combatActive?"cc":"88"),color:panelAcc,fontFamily:ORB,fontSize:7,letterSpacing:3,padding:"14px 7px",cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",justifyContent:"center",textShadow:"0 0 8px "+panelAcc+(combatActive?"cc":"88"),boxShadow:combatActive?"-2px 0 12px "+panelAcc+"44":"none",transition:"all .3s"}
     },labelTxt),
 
     // ── expanded panel ────────────────────────────────────────
