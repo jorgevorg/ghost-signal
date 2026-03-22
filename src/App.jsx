@@ -2437,7 +2437,7 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
     ? (open ? (activeTab==="netrunner"?hacker.label:"⚔ TACTICAL") + " ▸" : "⊕ ◂")
     : (open ? (combatActive ? ("⚔ R"+round) : "⚔ TACTICAL") + " ▸" : "⚔ ◂");
 
-  return React.createElement("div",{style:{position:"fixed",right:"max(0px, calc((100vw - 1100px) / 2))",top:"50%",transform:"translateY(-50%)",zIndex:20,display:"flex",alignItems:"stretch",pointerEvents:"auto"}},
+  return React.createElement("div",{style:{position:"fixed",right:0,top:"50%",transform:"translateY(-50%)",zIndex:20,display:"flex",alignItems:"stretch",pointerEvents:"auto"}},
 
     // ── collapse toggle bar ────────────────────────────────────
     React.createElement("div",{
