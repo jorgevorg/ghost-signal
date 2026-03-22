@@ -2442,11 +2442,11 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
     // ── collapse toggle bar ────────────────────────────────────
     React.createElement("div",{
       onClick:()=>setOpen(!open),
-      style:{writingMode:"vertical-rl",background:panelAcc+"22",border:"1px solid "+panelAcc+(combatActive?"cc":"88"),borderRight:open?"none":"1px solid "+panelAcc+(combatActive?"cc":"88"),color:panelAcc,fontFamily:ORB,fontSize:7,letterSpacing:3,padding:"14px 7px",cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",textShadow:"0 0 8px "+panelAcc+(combatActive?"cc":"88"),boxShadow:combatActive?"-2px 0 12px "+panelAcc+"44":"none",transition:"all .3s"}
+      style:{writingMode:"vertical-rl",background:panelAcc+"22",border:"1px solid "+panelAcc+(combatActive?"cc":"88"),borderRight:open?"none":"1px solid "+panelAcc+(combatActive?"cc":"88"),color:panelAcc,fontFamily:ORB,fontSize:7,letterSpacing:3,padding:"14px 7px",cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",justifyContent:"center",height:430,boxSizing:"border-box",textShadow:"0 0 8px "+panelAcc+(combatActive?"cc":"88"),boxShadow:combatActive?"-2px 0 12px "+panelAcc+"44":"none",transition:"all .3s"}
     },labelTxt),
 
     // ── expanded panel ────────────────────────────────────────
-    open&&React.createElement("div",{style:{width:214,background:"#03070cfa",border:"1px solid "+panelAcc+"cc",borderLeft:"none",display:"flex",flexDirection:"column",boxShadow:"inset 0 0 50px "+panelAcc+"0d, -4px 0 20px "+panelAcc+"22",transition:"border-color .3s"}},
+    open&&React.createElement("div",{style:{width:214,height:430,background:"#03070cfa",border:"1px solid "+panelAcc+"cc",borderLeft:"none",display:"flex",flexDirection:"column",boxShadow:"inset 0 0 50px "+panelAcc+"0d, -4px 0 20px "+panelAcc+"22",transition:"border-color .3s",overflow:"hidden"}},
 
       // ── tab selector (CYBER only) ──────────────────────────
       showNetrunner&&React.createElement("div",{style:{display:"flex",borderBottom:"1px solid "+panelAcc+"44",flexShrink:0}},
@@ -2458,7 +2458,7 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
       ),
 
       // ── NETRUNNER pane ────────────────────────────────────
-      (activeTab==="netrunner"&&showNetrunner)&&React.createElement("div",{style:{padding:"10px 12px",flex:1,overflowY:"auto"}},
+      (activeTab==="netrunner"&&showNetrunner)&&React.createElement("div",{style:{padding:"10px 12px",flex:1,overflowY:"auto",minHeight:0}},
         // hacker selector
         React.createElement("div",{style:{display:"flex",gap:4,marginBottom:10}},
           ["vela","cole"].map(k=>{
@@ -2499,7 +2499,7 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
       ),
 
       // ── TACTICAL pane ────────────────────────────────────
-      (activeTab==="tactical"||(activeTab==="netrunner"&&!showNetrunner)||(!showNetrunner))&&React.createElement("div",{style:{padding:"10px 12px",flex:1,overflowY:"auto"}},
+      (activeTab==="tactical"||(activeTab==="netrunner"&&!showNetrunner)||(!showNetrunner))&&React.createElement("div",{style:{padding:"10px 12px",flex:1,overflowY:"auto",minHeight:0}},
         // header
         React.createElement("div",{style:{fontFamily:MONO,fontSize:7,letterSpacing:2,color:CT_ACC,textShadow:combatActive?"0 0 10px "+CT_ACC+",0 0 22px "+CT_ACC+"55":"none",paddingBottom:8,marginBottom:8,borderBottom:"1px solid "+CT_ACC+"55",display:"flex",justifyContent:"space-between",alignItems:"center"}},
           React.createElement("span",null,combatActive?("⚔ ROUND "+round):"⚔ TACTICAL"),
@@ -3054,10 +3054,10 @@ var sendToMabel=async function(userMsg){
      tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel}),
     tab==="CYBER"&&React.createElement(CybersphereTab,{gs:gs,cyberSess:cyberSess,setCyberSess:setCyberSess,onCharChange:upC,onStatBoost:upCStat,onMabelSend:sendToMabel,onNetrunMemory:appendNetrunMemory}),
     tab==="COMBAT"&&React.createElement("div",{style:{position:"relative",background:"#06080e",border:"1px solid #FF6B3555",minHeight:"calc(100vh / 1.15 - 120px)",overflow:"hidden",boxSizing:"border-box"}},React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(0deg,transparent 0,transparent 39px,#FF6B3508 39px,#FF6B3508 40px),repeating-linear-gradient(90deg,transparent 0,transparent 39px,#FF6B3508 39px,#FF6B3508 40px)",zIndex:0}}),React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(255,107,53,.012) 3px,rgba(255,107,53,.012) 4px)",animation:"tactScan .18s linear infinite",zIndex:1}}),React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"radial-gradient(ellipse at center,transparent 50%,#000 100%)",zIndex:2}}),React.createElement(CornerBracket,{pos:"tl",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"tr",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"bl",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"br",color:"#FF6B35"}),React.createElement("div",{style:{position:"relative",zIndex:3,padding:"16px 18px",overflowY:"auto",maxHeight:"calc(100vh / 1.15 - 120px)"}},React.createElement(CombatTracker,{gs:gs,onCharChange:upC,onShipChange:upS,onCtUpdate:setCtBrief})))
-    )
-   ),
-   !boot&&React.createElement(DiceRoller,{gameState:gs}),
+    ),
    !boot&&React.createElement(SidePanelDual,{gs:gs,tab:tab,ctBrief:ctBrief,onCharChange:upC})
+   ),
+   !boot&&React.createElement(DiceRoller,{gameState:gs})
   );
  }
 
