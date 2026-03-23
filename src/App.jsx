@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import ReactDOM from "react-dom/client";
 import {createPortal} from "react-dom";
 import * as THREE from "three";
+import FactionIcon from './FactionIcon.jsx';
 
 const SAVES_KEY="gs_saves";
 const MONO="'Share Tech Mono',monospace",ORB="'Orbitron',sans-serif",RAJ="'Rajdhani',sans-serif",BG="#0a0a14";
@@ -939,7 +940,7 @@ function BootSequence(props){
   ),
   phase>=6&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:40,pointerEvents:"none",background:"rgba(10,10,20,0.75)",animation:"in 0.6s ease"}},
    React.createElement("div",{style:{fontFamily:ORB,fontSize:52,fontWeight:900,color:"#00FFD0",letterSpacing:18,textAlign:"center",textShadow:"-2px 0 0 #FF206066,2px 0 0 #88BBFF66,0 0 40px #00FFD0cc,0 0 80px #00FFD066,0 0 160px #00FFD022",minHeight:"1.2em",animation:"glitch 2.5s ease 1.5s infinite"}},titleText,React.createElement("span",{style:{animation:"blink 0.5s step-end infinite",color:"#00FFD0",textShadow:"none"}},"_")),
-   React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0aa",letterSpacing:8,marginTop:14,minHeight:"1em"}},subText,subText.length>0&&subText!=="ALL SYSTEMS NOMINAL"&&React.createElement("span",{style:{animation:"blink 0.5s step-end infinite"}},"_"))
+   React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0aa",letterSpacing:8,marginTop:14,minHeight:"1em"}},subText,subText.length>0&&subText!=="ALL SYSTEMS NOMINAL"&&React.createElement("span",{style:{animation:"blink 0.5s step-end infinite"}},"_")),React.createElement("div",{style:{display:"flex",justifyContent:"center",gap:10,marginTop:22,opacity:0.7}},["WARG","MEDUSA","CORSAIR","ISF"].map(function(fid){return React.createElement(FactionIcon,{key:fid,faction:fid,size:36});}))
   )
  );
 }
@@ -1079,7 +1080,7 @@ function CharCard(props){
   React.createElement(SHdr,{label:"INVENTORY",open:open.inv,onToggle:function(){tog("inv");},accent:accent}),
   open.inv&&React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:4}},(data.inventory||Array(8).fill("")).map(function(v,i){return React.createElement(SlotSelect,{key:i,value:v,onChange:function(val){onChange("inventory."+i,val);},options:INV_OPTS,color:"#aaa"});})),
   React.createElement(SHdr,{label:"FACTION FAVOR",open:open.fav,onToggle:function(){tog("fav");},accent:accent}),
-  open.fav&&React.createElement("div",{style:{marginTop:4}},FACTIONS.map(function(f){var val=fav[f.id]!=null?fav[f.id]:0;return React.createElement("div",{key:f.id,style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:11}},React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:f.c}},f.label),React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("button",{onClick:function(){onChange("fav."+f.id,Math.max(-3,val-1));},style:{width:20,height:20,background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:2,cursor:"pointer",fontSize:13,padding:0}},"−"),React.createElement(Dots,{v:val}),React.createElement("button",{onClick:function(){onChange("fav."+f.id,Math.min(3,val+1));},style:{width:20,height:20,background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:2,cursor:"pointer",fontSize:13,padding:0}},"+"))); }))
+  open.fav&&React.createElement("div",{style:{marginTop:4}},FACTIONS.map(function(f){var val=fav[f.id]!=null?fav[f.id]:0;return React.createElement("div",{key:f.id,style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:11}},React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},React.createElement(FactionIcon,{faction:f.id,size:26}),React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:f.c}},f.label)),React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("button",{onClick:function(){onChange("fav."+f.id,Math.max(-3,val-1));},style:{width:20,height:20,background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:2,cursor:"pointer",fontSize:13,padding:0}},"−"),React.createElement(Dots,{v:val}),React.createElement("button",{onClick:function(){onChange("fav."+f.id,Math.min(3,val+1));},style:{width:20,height:20,background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:2,cursor:"pointer",fontSize:13,padding:0}},"+"))); }))
  );
 }
 
@@ -1799,7 +1800,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
         React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",flexShrink:0,background:cyberSess&&cyberSess.active?"#FF2060":"#333",boxShadow:cyberSess&&cyberSess.active?"0 0 6px #FF2060":undefined,animation:cyberSess&&cyberSess.active?"dangerFlicker 2s ease-in-out infinite":"none"}}),
         React.createElement("span",{style:{fontFamily:MONO,fontSize:10,letterSpacing:2,color:"#FFD700",border:"1px solid #FFD700",borderRadius:3,padding:"1px 5px",cursor:"pointer",textShadow:"0 0 6px #FFD700"}},"NEXUS-OS  //  INTRUSION MONITOR")
       ),
-      React.createElement("span",{style:{fontFamily:MONO,fontSize:9,letterSpacing:1,color:"#FF2060cc",textShadow:"0 0 6px #FF206088",letterSpacing:2}},"UNAUTHORIZED ACCESS")
+      React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#FF2060cc",textShadow:"0 0 6px #FF206088",letterSpacing:2}},"UNAUTHORIZED ACCESS")
     ),
     React.createElement("div",{ref:scrollRef,style:{flex:1,overflowY:"auto",maxHeight:"calc(100vh / 1.3225 - 680px)",padding:"8px 12px",fontFamily:MONO,fontSize:13,lineHeight:1.7,letterSpacing:.2,minHeight:0}},
       logs.length===0&&React.createElement("div",{style:{color:CB_GREEN+"88"}},"// jack in to establish terminal link"),
