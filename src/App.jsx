@@ -2981,7 +2981,7 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
     React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#778",letterSpacing:2,marginBottom:10}},"QUICK ROLL"),
     React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}},
       React.createElement("div",{style:{display:"flex",gap:4}},
-        ["cole","vela"].map(c=>React.createElement("button",{key:c,onClick:()=>setRollChar(c),style:Object.assign({},btnBase,{padding:"5px 12px",background:rollChar===c?"#FFD16622":"transparent",borderColor:rollChar===c?"#FFD166":B1,color:rollChar===c?"#FFD166":"#778",fontSize:10})},c==="cole"?"COLE":"VELA"))
+        ["cole","vela"].map(c=>{var cc=c==="cole"?"#FFD166":"#cc88ff";return React.createElement("button",{key:c,onClick:()=>setRollChar(c),style:Object.assign({},btnBase,{padding:"5px 12px",background:rollChar===c?cc+"22":"transparent",borderColor:rollChar===c?cc:B1,color:rollChar===c?cc:"#778",fontSize:10})},c==="cole"?"COLE":"VELA");})
       ),
       React.createElement("div",{style:{display:"flex",gap:4}},
         [0,1].map(i=>{
