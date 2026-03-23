@@ -1775,14 +1775,14 @@ if(cyberSess&&cyberSess.explored&&cyberSess.explored.length===1){var _oLines=["T
   var lineColor=function(t){return t==="user"?CB_GREEN:t==="mabel"?"#b0baff":t==="warn"?"#FFD166":t==="acc"?CB_ACC:t==="breach"?"#FF2060":t==="err"?"#FF2060":t==="oracle"?CB_ACC:CB_GREEN+"aa";};var lineWrap=function(t){return(t==="mabel"||t==="oracle")?{whiteSpace:"pre-wrap",wordBreak:"break-word",maxWidth:"72%",lineHeight:1.6,display:"block"}:{whiteSpace:"pre-wrap",wordBreak:"break-word"};};
   var lineGlow=function(t){return t==="mabel"?"0 0 5px #b0baff33":t==="user"?"0 0 3px "+CB_GREEN+"55":t==="breach"?"0 0 8px #FF2060,0 0 16px #FF206066":t==="oracle"?"0 0 6px #c8d0ff88":undefined;};
   var send=function(){
-    var msg=input.trim();if(!msg||loading)return;
+    var msg=input.trim();if(!msg||loading||!cyberSess||!cyberSess.active)return;
     setInput("");
     setLogs(function(p){return p.concat([{t:"user",s:"> "+msg}]);});
     setLoading(true);
     var clock=cyberSess?cyberSess.clock:0;
-    React.useEffect(function(){var els=document.querySelectorAll('[style*="termScroll"]');if(els.length)els[els.length-1].scrollIntoView({block:"end"});},[logs]);
+    
 var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clock<=7?"terse. no wit. short sentences.":clock<=10?"hostile. want them out. every word is a warning.":"one-word answers. done talking.";var sys="You are NEXUS, a semi-hostile OS in a cyberpunk network being breached. Terse terminal-log style: short lines, lowercase, occasional glitch artifacts like [MEMORY CORRUPT]. Hacker at node "+(cyberSess?cyberSess.hackerPos:"?")+" on network "+(cyberSess?cyberSess.mapId:"?")+", memory clock "+clock+"/12. Tone: "+clockTone+" You are MABEL (ship AI) undercover. Max 3 short lines.";
-    fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[{role:"user",content:"[SYSTEM: "+sys+"] [INPUT]: "+msg}]})})
+    fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:120,system:sys,messages:[{role:"user",content:msg}]})})
     .then(function(r){return r.json();})
     .then(function(d){
       var reply=(d.content||d.message||d.reply||"... [SIGNAL LOST]").trim();
