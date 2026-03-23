@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import FactionIcon from './FactionIcon';
 
 const CBG  = '#06080e';
 const B1   = '#7a7aaa';
@@ -40,27 +41,19 @@ const ENEMY_DB = {
   'Crime Boss':       { faction:'NONE',    hp:40, armor:3, vig:3, gra:3, min:3, tec:2, actions:2, difficulty:'Boss',   reward:90, isBoss:true },
 };
 
-const FACTION_COLORS = {
-  MEDUSA:'#00FFD0', ISF:'#aaaaff', WARG:'#FFD166',
-  CORSAIR:'#FF2060', SYNTH:'#cc88ff', NONE:'#9090b8',
-};
-
-const DIFFICULTY_COLORS = {
-  Easy:'#00FFD0', Medium:'#FFD166', Hard:'#FF6B35', Boss:'#FF2060',
-};
-
+const FACTION_COLORS = { MEDUSA:'#cc88ff', ISF:'#00BFFF', WARG:'#FF2060', CORSAIR:'#FFD166', SYNTH:'#00FFD0', NONE:'#9090b8' };
+const DIFFICULTY_COLORS = { Easy:'#00FFD0', Medium:'#FFD166', Hard:'#FF6B35', Boss:'#FF2060' };
 const COND_META = {
-  overheat: { label:'OVERHEAT', icon:'🔥', color:'#FF6B35' },
-  shock:    { label:'SHOCK',    icon:'⚡', color:'#FFD166' },
-  silence:  { label:'SILENCE',  icon:'🔇', color:'#9090b8' },
-  breach:   { label:'BREACH',   icon:'💀', color:'#cc2222' },
-  stun:     { label:'STUN',     icon:'😵', color:'#cc88ff' },
+  overheat:{ label:'OVERHEAT', icon:'🔥', color:'#FF6B35' },
+  shock:   { label:'SHOCK',    icon:'⚡', color:'#FFD166' },
+  silence: { label:'SILENCE',  icon:'🔇', color:'#9090b8' },
+  breach:  { label:'BREACH',   icon:'💀', color:'#cc2222' },
+  stun:    { label:'STUN',     icon:'😵', color:'#cc88ff' },
 };
-
 const HACKS = [
   { id:'trojan',    name:'HACK_Trojan',    cost:2, dmg:null,  stat:null,  effect:'Next attack ignores armor. MIN vs MIN.' },
   { id:'javelin',   name:'HACK_Javelin',   cost:3, dmg:'d6',  stat:'min', effect:'d6+MIN shock dmg. Applies Shock 2 turns.' },
-  { id:'blackout',  name:'HACK_Blackout',  cost:3, dmg:null,  stat:null,  effect:'Target Silenced 3 turns, -1 action/turn.' },
+  { id:'blackout',  name:'HACK_Blackout',  cost:3, dmg:null,  stat:null,  effect:'Target Silenced 3 turns, −1 action/turn.' },
   { id:'frostbyte', name:'HACK_Frostbyte', cost:4, dmg:null,  stat:null,  effect:'Stun 1 turn. Armor set to 0 while stunned.' },
   { id:'overload',  name:'HACK_Overload',  cost:4, dmg:'d8',  stat:'min', effect:'d8+MIN fire dmg. Overheat 2 turns.' },
   { id:'phantom',   name:'HACK_Phantom',   cost:2, dmg:null,  stat:null,  effect:'Vela untargetable next turn. Self only.' },
@@ -69,57 +62,47 @@ const HACKS = [
   { id:'cascade',   name:'HACK_Cascade',   cost:6, dmg:'d6',  stat:'min', effect:'Chain to 2 enemies: d6 each, Shock 1 turn.' },
   { id:'godmode',   name:'HACK_GodMode',   cost:8, dmg:null,  stat:null,  effect:'1/combat. All hacks free cost next turn.' },
 ];
-
 const CONSUMABLES = [
-  { id:'health_pack',  name:'Health Pack',      effect:'+8 HP',               hp:8,  en:0, clears:false },
-  { id:'energy_cell',  name:'Energy Cell',       effect:'+8 EN',               hp:0,  en:8, clears:false },
-  { id:'narc_alpha',   name:'Narcobiotic Alpha', effect:'+4 HP +2 EN',         hp:4,  en:2, clears:false },
-  { id:'tricillin',    name:'Tricillin',         effect:'Clear all conditions', hp:0,  en:0, clears:true  },
-  { id:'stim',         name:'Stim Pack',         effect:'+5 HP +3 EN',         hp:5,  en:3, clears:false },
+  { id:'health_pack', name:'Health Pack',      effect:'+8 HP',               hp:8, en:0, clears:false },
+  { id:'energy_cell', name:'Energy Cell',       effect:'+8 EN',               hp:0, en:8, clears:false },
+  { id:'narc_alpha',  name:'Narcobiotic Alpha', effect:'+4 HP +2 EN',         hp:4, en:2, clears:false },
+  { id:'tricillin',   name:'Tricillin',         effect:'Clear all conditions', hp:0, en:0, clears:true  },
+  { id:'stim',        name:'Stim Pack',         effect:'+5 HP +3 EN',         hp:5, en:3, clears:false },
 ];
-
 const COLE_DEFAULT = {
   id:'cole', name:'Cole Remington Vayne', type:'player', color:COLE,
   hp:20, maxHp:20, en:20, maxEn:20, armor:0,
-  vig:3, gra:3, min:1, tec:1,
-  actions:1, actionsUsed:0, sideUsed:false,
+  vig:3, gra:3, min:1, tec:1, actions:1, actionsUsed:0, sideUsed:false,
   weapon:'Laser Blaster', wDmg:'d8', wStat:'vig',
   conditions:[], isDefeated:false, initiative:0,
 };
-
 const VELA_DEFAULT = {
   id:'vela', name:'Vela // Séance', type:'player', color:VELA,
   hp:18, maxHp:18, en:20, maxEn:20, armor:0,
-  vig:1, gra:2, min:4, tec:3,
-  actions:1, actionsUsed:0, sideUsed:false,
+  vig:1, gra:2, min:4, tec:3, actions:1, actionsUsed:0, sideUsed:false,
   weapon:'Hack Array', wDmg:'d6', wStat:'min',
   ghostEn:0, maxGhostEn:10,
   conditions:[], isDefeated:false, initiative:0,
 };
-
 const roll  = n => Math.floor(Math.random() * n) + 1;
 const rollF = f => { const m = f && f.match(/d(\d+)/); return m ? roll(parseInt(m[1])) : 0; };
 
-// ── Sub-components ───────────────────────────────────────────────
-
 function Corner({ pos, color }) {
   color = color || ACC;
-  const s = {
-    position:'absolute', width:14, height:14, borderStyle:'solid', borderColor:color, borderWidth:0,
-  };
-  if (pos === 'tl') { s.top=6; s.left=6;  s.borderTopWidth=2; s.borderLeftWidth=2; }
-  if (pos === 'tr') { s.top=6; s.right=6; s.borderTopWidth=2; s.borderRightWidth=2; }
-  if (pos === 'bl') { s.bottom=6; s.left=6;  s.borderBottomWidth=2; s.borderLeftWidth=2; }
-  if (pos === 'br') { s.bottom=6; s.right=6; s.borderBottomWidth=2; s.borderRightWidth=2; }
+  const s = { position:'absolute', width:14, height:14, borderStyle:'solid', borderColor:color, borderWidth:0 };
+  if (pos==='tl') { s.top=6; s.left=6;   s.borderTopWidth=2; s.borderLeftWidth=2; }
+  if (pos==='tr') { s.top=6; s.right=6;  s.borderTopWidth=2; s.borderRightWidth=2; }
+  if (pos==='bl') { s.bottom=6; s.left=6;  s.borderBottomWidth=2; s.borderLeftWidth=2; }
+  if (pos==='br') { s.bottom=6; s.right=6; s.borderBottomWidth=2; s.borderRightWidth=2; }
   return <div style={s} />;
 }
 
 function HpBar({ cur, max, color }) {
-  const pct = Math.max(0, cur / max);
+  const pct = Math.max(0, Math.min(1, cur / max));
   const c = pct > 0.5 ? (color || '#00FF88') : pct > 0.25 ? YEL : RED;
   return (
-    <div style= background:'#1a1a2e', borderRadius:2, height:7, overflow:'hidden' >
-      <div style= width:(pct*100)+'%', height:'100%', background:c, transition:'width 0.3s', borderRadius:2  />
+    <div style={{ background:'#1a1a2e', borderRadius:2, height:6, overflow:'hidden' }}>
+      <div style={{ width:(pct*100)+'%', height:'100%', background:c, transition:'width 0.3s', borderRadius:2 }} />
     </div>
   );
 }
@@ -127,44 +110,56 @@ function HpBar({ cur, max, color }) {
 function CondPill({ cond }) {
   const m = COND_META[cond.type] || {};
   return (
-    <span style=
-      fontSize:9, fontFamily:MONO, color:m.color, background:m.color+'22',
-      border:'1px solid '+m.color+'55', borderRadius:3, padding:'1px 5px', marginRight:3,
-    >
+    <span style={{ fontSize:8, fontFamily:MONO, color:m.color, background:m.color+'22',
+      border:'1px solid '+m.color+'55', borderRadius:3, padding:'1px 5px', marginRight:3 }}>
       {m.icon} {m.label} {cond.duration}
     </span>
   );
 }
 
-// ── Main Component ───────────────────────────────────────────────
+function ActionDots({ used, total, color }) {
+  return (
+    <div style={{ display:'flex', gap:3, alignItems:'center' }}>
+      {Array.from({ length: total }).map((_, i) => (
+        <div key={i} style={{
+          width:8, height:8, borderRadius:'50%',
+          background: i < (total - used) ? color : B2+'44',
+          border:'1px solid '+color+'66',
+          transition:'background 0.2s',
+        }} />
+      ))}
+    </div>
+  );
+}
 
 export default function CombatTracker() {
-  const [phase,     setPhase]     = useState('setup');
-  const [selected,  setSelected]  = useState([]);
-  const [search,    setSearch]    = useState('');
-  const [cmbs,      setCmbs]      = useState([]);
-  const [tidx,      setTidx]      = useState(0);
-  const [round,     setRound]     = useState(1);
-  const [log,       setLog]       = useState([]);
-  const [showHacks, setShowHacks] = useState(false);
-  const [showItems, setShowItems] = useState(false);
-  const [hackTgt,   setHackTgt]   = useState(null);
-  const [itemUser,  setItemUser]  = useState(null);
-  const [loot,      setLoot]      = useState(null);
+  const [phase,       setPhase]       = useState('setup');
+  const [selected,    setSelected]    = useState([]);
+  const [search,      setSearch]      = useState('');
+  const [cmbs,        setCmbs]        = useState([]);
+  const [tidx,        setTidx]        = useState(0);
+  const [round,       setRound]       = useState(1);
+  const [log,         setLog]         = useState([]);
+  const [showHacks,   setShowHacks]   = useState(false);
+  const [showItems,   setShowItems]   = useState(false);
+  const [hackTgt,     setHackTgt]     = useState(null);
+  const [itemUser,    setItemUser]    = useState(null);
+  const [loot,        setLoot]        = useState(null);
+  const [manualDmg,   setManualDmg]   = useState('');
+  const [manualTgt,   setManualTgt]   = useState(null);
+  const [showManual,  setShowManual]  = useState(false);
   const logRef = useRef(null);
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [log]);
 
-  const addLog = (msg, color) => setLog(p => [...p, { msg, color: color||B1, id: Date.now()+Math.random() }]);
+  const addLog = (msg, color) => setLog(p => [...p, { msg, color: color || B1, id: Date.now() + Math.random() }]);
 
-  // ── Selection ──────────────────────────────────────────────────
   const toggleEnemy = name => setSelected(p =>
     p.includes(name) ? p.filter(e => e !== name) : p.length < 6 ? [...p, name] : p
   );
 
-  // ── Start combat ───────────────────────────────────────────────
   const startCombat = () => {
     if (!selected.length) return;
     const cole = { ...COLE_DEFAULT, initiative: roll(10) + COLE_DEFAULT.gra };
@@ -173,7 +168,7 @@ export default function CombatTracker() {
       const b = ENEMY_DB[name];
       return {
         id:'e'+i+'_'+name.replace(/\s/g,'_'), name, type:'enemy',
-        color: FACTION_COLORS[b.faction]||B1,
+        color: FACTION_COLORS[b.faction] || B1,
         hp: b.hp+5, maxHp: b.hp+5, en:10, maxEn:10,
         armor:b.armor, vig:b.vig||1, gra:b.gra||1, min:b.min||1, tec:b.tec||1,
         actions: b.isBoss ? b.actions+1 : b.actions,
@@ -195,7 +190,6 @@ export default function CombatTracker() {
     doStartOfTurn(all, 0, 1);
   };
 
-  // ── Damage ─────────────────────────────────────────────────────
   const applyDmg = (arr, targetId, amount, source) => {
     return arr.map(c => {
       if (c.id !== targetId) return c;
@@ -204,7 +198,7 @@ export default function CombatTracker() {
       const actual = Math.max(0, amount - eff);
       const hp = Math.max(0, c.hp - actual);
       const dead = hp === 0;
-      addLog('[R'+round+'] '+(source||'?')+' → '+c.name+': '+actual+' dmg (arm '+eff+') · '+hp+'/'+c.maxHp+' HP'+(dead?' 💀':''), dead?RED:B1);
+      addLog('[R'+round+'] '+( source||'?' )+' → '+c.name+': '+actual+' dmg'+(eff?' (arm '+eff+'(':'')+' · '+hp+'/'+c.maxHp+' HP'+(dead?' 💀':''), dead?RED:B1);
       return { ...c, hp, isDefeated: dead };
     });
   };
@@ -222,13 +216,13 @@ export default function CombatTracker() {
 
   const applyCondition = (arr, targetId, type, duration) => {
     const m = COND_META[type];
-    addLog('  '+targetId+': '+m.icon+' '+type.toUpperCase()+' ('+duration+' turns)', m.color);
+    const tgt = arr.find(c=>c.id===targetId);
+    addLog('  '+(tgt?.name||targetId)+': '+m.icon+' '+type.toUpperCase()+' ('+duration+' turns)', m.color);
     return arr.map(c => c.id!==targetId ? c : {
       ...c, conditions:[...c.conditions.filter(x=>x.type!==type), { type, duration }]
     });
   };
 
-  // ── Start of turn ───────────────────────────────────────────────
   const doStartOfTurn = (arr, idx, rnd) => {
     const c = arr[idx];
     if (!c || c.isDefeated) return arr;
@@ -239,7 +233,7 @@ export default function CombatTracker() {
         const d = roll(6);
         tgt.hp = Math.max(0, tgt.hp - d);
         if (tgt.hp===0) tgt.isDefeated = true;
-        addLog('[R'+rnd+' '+c.name+'] 🔥 OVERHEAT: '+d+' dmg (no armor)', '#FF6B35');
+        addLog('[R'+rnd+' '+c.name+'] 🔥 OVERHEAT: '+d+' dmg (ignores armor)', '#FF6B35');
       }
       if (cond.type==='shock') {
         const r = roll(6);
@@ -251,11 +245,11 @@ export default function CombatTracker() {
     return next;
   };
 
-  // ── Check win/loss ─────────────────────────────────────────────
   const checkEnd = arr => {
     if (arr.filter(c=>c.type==='enemy').every(e=>e.isDefeated)) {
       const base = arr.filter(c=>c.type==='enemy').reduce((s,e)=>s+(ENEMY_DB[e.name]?.reward||20),0);
-      setLoot({ base, bonus: roll(10)*5, total: base+roll(10)*5 });
+      const bonus = roll(10)*5;
+      setLoot({ base, bonus, total: base+bonus });
       addLog('🏆 VICTORY! All hostiles eliminated.', ACC);
       setTimeout(()=>setPhase('victory'), 700);
     }
@@ -265,21 +259,47 @@ export default function CombatTracker() {
     }
   };
 
-  // ── Attack ─────────────────────────────────────────────────────
   const doAttack = (atkId, tgtId) => {
     setCmbs(prev => {
       const atk = prev.find(c=>c.id===atkId);
       if (!atk || atk.actionsUsed>=atk.actions) return prev;
       const stat = atk.wStat==='min' ? atk.min : atk.vig;
-      const dmg  = rollF(atk.wDmg) + stat;
-      let next = applyDmg(prev, tgtId, dmg, atk.name+' ('+atk.weapon+')');
-      next = next.map(c=>c.id===atkId?{...c,actionsUsed:c.actionsUsed+1}:c);
+      const dmgRoll = rollF(atk.wDmg);
+      const dmg = dmgRoll + stat;
+      addLog('[R'+round+'] '+atk.name+' ('+atk.weapon+'): rolled '+dmgRoll+'+'+stat+'='+dmg, atk.color);
+      let next = applyDmg(prev, tgtId, dmg, atk.name);
+      next = next.map(c=>c.id===atkId?{...c, actionsUsed:c.actionsUsed+1}:c);
       checkEnd(next);
       return next;
     });
   };
 
-  // ── Hack ───────────────────────────────────────────────────────
+  // Enemy attacks a player — called from enemy action panel
+  const doEnemyAttack = (enemyId, playerId) => {
+    setCmbs(prev => {
+      const enemy = prev.find(c=>c.id===enemyId);
+      if (!enemy || enemy.actionsUsed >= enemy.actions) return prev;
+      const dmgRoll = rollF(enemy.wDmg||'d6');
+      const dmg = dmgRoll + (enemy.vig||1);
+      addLog('[R'+round+'] '+enemy.name+' ATTACKS: rolled '+dmgRoll+'+'+(enemy.vig||1)+'='+dmg, enemy.color);
+      let next = applyDmg(prev, playerId, dmg, enemy.name);
+      next = next.map(c=>c.id===enemyId?{...c, actionsUsed:c.actionsUsed+1}:c);
+      checkEnd(next);
+      return next;
+    });
+  };
+
+  const doManualDmg = (targetId, amount) => {
+    const parsed = parseInt(amount);
+    if (isNaN(parsed) || parsed <= 0) return;
+    setCmbs(prev => {
+      const next = applyDmg(prev, targetId, parsed, 'Manual');
+      checkEnd(next);
+      return next;
+    });
+    setManualDmg(''); setManualTgt(null); setShowManual(false);
+  };
+
   const doHack = (hackId, tgtId) => {
     const hack = HACKS.find(h=>h.id===hackId);
     setCmbs(prev => {
@@ -318,7 +338,6 @@ export default function CombatTracker() {
     setShowHacks(false); setHackTgt(null);
   };
 
-  // ── Use item ────────────────────────────────────────────────────
   const doItem = (cons, uid) => {
     setCmbs(prev => {
       let next = applyHeal(prev, uid, cons.hp, cons.en);
@@ -332,11 +351,10 @@ export default function CombatTracker() {
     setShowItems(false); setItemUser(null);
   };
 
-  // ── End turn ────────────────────────────────────────────────────
   const endTurn = () => {
     const active = cmbs[tidx];
     if (!active) return;
-    addLog('[R'+round+'] '+active.name+': END TURN', B2);
+    addLog('[R'+round+'] '+active.name+': END TURN ──', B2);
     let next = cmbs.map((c,i)=>i===tidx?{...c,actionsUsed:0,sideUsed:false}:c);
     let nidx = (tidx+1)%next.length;
     let laps = 0;
@@ -344,10 +362,9 @@ export default function CombatTracker() {
     let nr = round;
     if (nidx <= tidx) {
       nr = round+1; setRound(nr);
-      addLog('━━━━━━━━━━ ROUND '+nr+' ━━━━━━━━━━', ACC);
+      addLog('━━━━━━━━━━ ROUND '+nr+' BEGIN ━━━━━━━━━━', ACC);
       next = next.map(c=>({
-        ...c,
-        conditions: c.conditions.map(x=>({...x,duration:x.duration-1})).filter(x=>x.duration>0)
+        ...c, conditions: c.conditions.map(x=>({...x,duration:x.duration-1})).filter(x=>x.duration>0)
       }));
     }
     next = doStartOfTurn(next, nidx, nr);
@@ -355,24 +372,24 @@ export default function CombatTracker() {
     setCmbs(next); setTidx(nidx);
   };
 
-  const resetCombat = () => { setPhase('setup'); setSelected([]); setCmbs([]); setRound(1); setTidx(0); setLog([]); setLoot(null); };
+  const resetCombat = () => {
+    setPhase('setup'); setSelected([]); setCmbs([]); setRound(1); setTidx(0);
+    setLog([]); setLoot(null); setManualDmg(''); setManualTgt(null); setShowManual(false);
+  };
 
-  // ── Styles ──────────────────────────────────────────────────────
+  const Btn = (color, sm, disabled) => ({
+    fontFamily:MONO, fontSize:sm?9:10, padding:sm?'3px 8px':'6px 14px',
+    background:'transparent', color:disabled?B2:color,
+    border:'1px solid '+(disabled?B2+'33':color+'66'), borderRadius:2,
+    cursor:disabled?'default':'pointer', letterSpacing:1, whiteSpace:'nowrap',
+  });
+
   const wrapStyle = {
     position:'relative', background:CBG, minHeight:'100%', fontFamily:MONO, color:B1,
     backgroundImage:
-      'repeating-linear-gradient(0deg, transparent, transparent 39px, '+ACC+'12 39px, '+ACC+'12 40px),'+
-      'repeating-linear-gradient(90deg, transparent, transparent 39px, '+ACC+'12 39px, '+ACC+'12 40px)',
+      'repeating-linear-gradient(0deg,transparent,transparent 39px,'+ACC+'0d 39px,'+ACC+'0d 40px),'+
+      'repeating-linear-gradient(90deg,transparent,transparent 39px,'+ACC+'0d 39px,'+ACC+'0d 40px)',
   };
-  const inner = { position:'relative', zIndex:2, padding:14 };
-  const Btn = (color, sm, disabled) => ({
-    fontFamily:MONO, fontSize:sm?9:10, padding:sm?'3px 8px':'5px 14px',
-    background:'transparent', color:disabled?B2:color,
-    border:'1px solid '+(disabled?B2+'44':color+'66'), borderRadius:2,
-    cursor:disabled?'default':'pointer', letterSpacing:1,
-  });
-  const isActive = id => cmbs[tidx]?.id===id && !cmbs[tidx]?.isDefeated;
-  const actsLeft = c => (c.actions||1)-(c.actionsUsed||0);
 
   // ══════════════════════════════════════════════════════
   // SETUP
@@ -383,75 +400,86 @@ export default function CombatTracker() {
     filtered.forEach(([name,data])=>{ const f=data.faction; if(!byFaction[f])byFaction[f]=[]; byFaction[f].push({name,data}); });
     return (
       <div style={wrapStyle}>
-        <div style={inner}>
+        <div style={{ position:'relative', zIndex:2, padding:16 }}>
           <Corner pos="tl"/><Corner pos="tr"/><Corner pos="bl"/><Corner pos="br"/>
-          <div style=textAlign:'center',marginBottom:20>
-            <div style=fontFamily:ORB,fontSize:16,color:ACC,letterSpacing:4>⚔ COMBAT SETUP</div>
-            <div style=fontSize:10,color:B2,marginTop:4>SELECT ENEMIES (MAX 6) · CO-OP +5 HP · BOSS +1 ACTION AUTO-APPLIED</div>
+          <div style={{ textAlign:'center', marginBottom:20 }}>
+            <div style={{ fontFamily:ORB, fontSize:18, color:ACC, letterSpacing:5 }}>⚔ COMBAT SETUP</div>
+            <div style={{ fontSize:10, color:B2, marginTop:4 }}>SELECT ENEMIES (MAX 6) · CO-OP +5 HP AUTO-APPLIED · BOSSES +1 ACTION</div>
           </div>
-          {selected.length>0&&(
-            <div style=background:ACC+'11',border:'1px solid '+ACC+'44',borderRadius:3,padding:8,marginBottom:12>
-              <div style=fontFamily:ORB,fontSize:9,color:ACC,letterSpacing:2,marginBottom:5>SELECTED ({selected.length}/6)</div>
-              <div style=display:'flex',flexWrap:'wrap',gap:4>
-                {selected.map(n=>(
-                  <span key={n} onClick={()=>toggleEnemy(n)} style=
-                    cursor:'pointer',fontSize:10,color:CBG,background:ACC,borderRadius:2,padding:'2px 8px'
-                  >{n} ✕</span>
+
+          {selected.length > 0 && (
+            <div style={{ background:ACC+'0f', border:'1px solid '+ACC+'44', borderRadius:3, padding:10, marginBottom:14 }}>
+              <div style={{ fontFamily:ORB, fontSize:9, color:ACC, letterSpacing:2, marginBottom:6 }}>
+                SELECTED ({selected.length}/6)
+              </div>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
+                {selected.map(n => (
+                  <span key={n} onClick={()=>toggleEnemy(n)} style={{
+                    cursor:'pointer', fontSize:10, color:CBG, background:ACC, borderRadius:2, padding:'3px 8px',
+                  }}>{n} ✕</span>
                 ))}
               </div>
             </div>
           )}
+
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="FILTER ENEMIES..."
-            style=width:'100%',background:'#0d0d1a',border:'1px solid '+B3+'33',color:B1,
-              fontFamily:MONO,fontSize:10,padding:'7px 10px',borderRadius:2,marginBottom:14,boxSizing:'border-box'/>
-          {Object.entries(byFaction).map(([faction,entries])=>(
-            <div key={faction} style=marginBottom:14>
-              <div style=fontFamily:ORB,fontSize:8,letterSpacing:4,color:FACTION_COLORS[faction]||B2,
-                borderBottom:'1px solid '+(FACTION_COLORS[faction]||B2)+'33',paddingBottom:4,marginBottom:7>
-                {faction==='NONE'?'INDEPENDENT':faction}
+            style={{ width:'100%', background:'#0d0d1a', border:'1px solid '+B3+'33', color:B1,
+              fontFamily:MONO, fontSize:10, padding:'8px 12px', borderRadius:2, marginBottom:16, boxSizing:'border-box' }}/>
+
+          {Object.entries(byFaction).map(([faction, entries]) => (
+            <div key={faction} style={{ marginBottom:16 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8,
+                borderBottom:'1px solid '+(FACTION_COLORS[faction]||B2)+'33', paddingBottom:5 }}>
+                {faction !== 'NONE' && <FactionIcon faction={faction} size={18} />}
+                <span style={{ fontFamily:ORB, fontSize:8, letterSpacing:4, color:FACTION_COLORS[faction]||B2 }}>
+                  {faction==='NONE'?'INDEPENDENT':faction}
+                </span>
               </div>
-              <div style=display:'flex',flexWrap:'wrap',gap:5>
-                {entries.map(({name,data})=>{
+              <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                {entries.map(({name,data}) => {
                   const sel = selected.includes(name);
                   return (
-                    <button key={name} onClick={()=>toggleEnemy(name)} style=
-                      fontFamily:MONO,fontSize:10,padding:'5px 10px',cursor:'pointer',borderRadius:2,
-                      background:sel?ACC+'22':'#0d0d1a',color:sel?ACC:B1,
-                      border:'1px solid '+(sel?ACC:B3+'33'),
-                    >
-                      <span style=color:DIFFICULTY_COLORS[data.difficulty]||B2,marginRight:4>●</span>
+                    <button key={name} onClick={()=>toggleEnemy(name)} style={{
+                      fontFamily:MONO, fontSize:10, padding:'6px 12px', cursor:'pointer', borderRadius:2,
+                      background:sel?ACC+'1a':'#0d0d1a', color:sel?ACC:B1,
+                      border:'1px solid '+(sel?ACC:B3+'22'),
+                    }}>
+                      <span style={{ color:DIFFICULTY_COLORS[data.difficulty]||B2, marginRight:5 }}>●</span>
                       {name}
-                      <span style=color:B2,fontSize:9,marginLeft:5>HP {data.hp+5}</span>
+                      <span style={{ color:B2, fontSize:9, marginLeft:6 }}>HP {data.hp+5}</span>
+                      {data.isBoss && <span style={{ color:RED, fontSize:8, marginLeft:4 }}>BOSS</span>}
                     </button>
                   );
                 })}
               </div>
             </div>
           ))}
-          <button onClick={startCombat} disabled={!selected.length} style=
-            width:'100%',marginTop:16,padding:'12px 0',fontFamily:ORB,fontSize:13,letterSpacing:4,
-            background:selected.length?ACC:B2+'33',color:selected.length?CBG:B2,border:'none',borderRadius:2,
+
+          <button onClick={startCombat} disabled={!selected.length} style={{
+            width:'100%', marginTop:16, padding:'13px 0', fontFamily:ORB, fontSize:14, letterSpacing:5,
+            background:selected.length?ACC:B2+'22', color:selected.length?CBG:B2, border:'none', borderRadius:2,
             cursor:selected.length?'pointer':'default',
-          >⚔ INITIATE COMBAT</button>
+          }}>⚔ INITIATE COMBAT</button>
         </div>
       </div>
     );
   }
 
   // ══════════════════════════════════════════════════════
-  // VICTORY
+  // VICTORY / DEFEAT
   // ══════════════════════════════════════════════════════
   if (phase==='victory') return (
-    <div style=...wrapStyle,display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh'>
-      <div style=textAlign:'center',padding:40,position:'relative'>
-        <Corner pos="tl"/><Corner pos="tr"/><Corner pos="bl"/><Corner pos="br"/>
-        <div style=fontFamily:ORB,fontSize:26,color:ACC,letterSpacing:6,marginBottom:8>VICTORY</div>
-        <div style=color:B1,fontFamily:MONO,marginBottom:20>ALL HOSTILES ELIMINATED · ROUND {round}</div>
-        {loot&&(
-          <div style=background:ACC+'11',border:'1px solid '+ACC+'44',borderRadius:4,padding:16,marginBottom:20>
-            <div style=fontFamily:ORB,fontSize:10,color:ACC,letterSpacing:2,marginBottom:6>LOOT ROLL</div>
-            <div style=color:YEL,fontSize:22,fontFamily:ORB>+{loot.base + loot.bonus}〒</div>
-            <div style=color:B2,fontSize:9,marginTop:4>{loot.base}〒 base · {loot.bonus}〒 bonus</div>
+    <div style={{ ...wrapStyle, display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh' }}>
+      <div style={{ textAlign:'center', padding:40, position:'relative' }}>
+        <Corner pos="tl" color={ACC}/><Corner pos="tr" color={ACC}/>
+        <Corner pos="bl" color={ACC}/><Corner pos="br" color={ACC}/>
+        <div style={{ fontFamily:ORB, fontSize:28, color:ACC, letterSpacing:7, marginBottom:8 }}>VICTORY</div>
+        <div style={{ color:B1, fontFamily:MONO, marginBottom:20 }}>ALL HOSTILES ELIMINATED · ROUND {round}</div>
+        {loot && (
+          <div style={{ background:ACC+'11', border:'1px solid '+ACC+'44', borderRadius:4, padding:20, marginBottom:24 }}>
+            <div style={{ fontFamily:ORB, fontSize:10, color:ACC, letterSpacing:2, marginBottom:8 }}>LOOT ROLL</div>
+            <div style={{ color:YEL, fontSize:26, fontFamily:ORB }}>+{loot.total}〒</div>
+            <div style={{ color:B2, fontSize:9, marginTop:4 }}>{loot.base}〒 base · {loot.bonus}〒 bonus</div>
           </div>
         )}
         <button onClick={resetCombat} style={Btn(ACC,false,false)}>DEBRIEF</button>
@@ -459,23 +487,20 @@ export default function CombatTracker() {
     </div>
   );
 
-  // ══════════════════════════════════════════════════════
-  // DEFEAT
-  // ══════════════════════════════════════════════════════
   if (phase==='defeat') return (
-    <div style=...wrapStyle,display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh'>
-      <div style=textAlign:'center',padding:40,position:'relative'>
+    <div style={{ ...wrapStyle, display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh' }}>
+      <div style={{ textAlign:'center', padding:40, position:'relative' }}>
         <Corner pos="tl" color={RED}/><Corner pos="tr" color={RED}/>
         <Corner pos="bl" color={RED}/><Corner pos="br" color={RED}/>
-        <div style=fontFamily:ORB,fontSize:26,color:RED,letterSpacing:6,marginBottom:8>DEFEATED</div>
-        <div style=color:B1,fontFamily:MONO,marginBottom:20>OPERATIVES DOWN · ROUND {round}</div>
-        <div style=background:RED+'11',border:'1px solid '+RED+'44',borderRadius:4,padding:16,marginBottom:20,textAlign:'left'>
-          <div style=fontFamily:ORB,fontSize:10,color:RED,letterSpacing:2,marginBottom:6>⚠ ABYSSAL SCAR</div>
-          <div style=fontSize:10,color:B1>Roll d10 for each operative who hit 0 HP.</div>
-          <div style=fontSize:9,color:B2,marginTop:4>
-            <span style=color:'#FF6B35'>1-3</span> Permanent scar &nbsp;
-            <span style=color:YEL>4-7</span> Trauma &nbsp;
-            <span style=color:COLE>8-10</span> Survived
+        <div style={{ fontFamily:ORB, fontSize:28, color:RED, letterSpacing:7, marginBottom:8 }}>DEFEATED</div>
+        <div style={{ color:B1, fontFamily:MONO, marginBottom:20 }}>OPERATIVES DOWN · ROUND {round}</div>
+        <div style={{ background:RED+'11', border:'1px solid '+RED+'44', borderRadius:4, padding:16, marginBottom:24, textAlign:'left' }}>
+          <div style={{ fontFamily:ORB, fontSize:10, color:RED, letterSpacing:2, marginBottom:6 }}>⚠ ABYSSAL SCAR</div>
+          <div style={{ fontSize:10, color:B1 }}>Roll d10 for each operative who hit 0 HP.</div>
+          <div style={{ fontSize:9, color:B2, marginTop:6, lineHeight:1.6 }}>
+            <span style={{ color:'#FF6B35' }}>1–3</span> Permanent scar &nbsp;
+            <span style={{ color:YEL }}>4–7</span> Trauma &nbsp;
+            <span style={{ color:COLE }}>8–10</span> Survived
           </div>
         </div>
         <button onClick={resetCombat} style={Btn(RED,false,false)}>RETREAT</button>
@@ -486,237 +511,442 @@ export default function CombatTracker() {
   // ══════════════════════════════════════════════════════
   // ACTIVE COMBAT
   // ══════════════════════════════════════════════════════
-  const players     = cmbs.filter(c=>c.type==='player');
-  const liveEnemies = cmbs.filter(c=>c.type==='enemy'&&!c.isDefeated);
-  const deadEnemies = cmbs.filter(c=>c.type==='enemy'&&c.isDefeated);
+  const players     = cmbs.filter(c => c.type==='player');
+  const liveEnemies = cmbs.filter(c => c.type==='enemy' && !c.isDefeated);
+  const deadEnemies = cmbs.filter(c => c.type==='enemy' && c.isDefeated);
   const activeCmb   = cmbs[tidx];
-  const vela        = cmbs.find(c=>c.id==='vela');
+  const vela        = cmbs.find(c => c.id==='vela');
+  const isEnemyTurn = activeCmb?.type === 'enemy';
+  const isActive    = id => cmbs[tidx]?.id===id && !cmbs[tidx]?.isDefeated;
+  const actsLeft    = c => (c.actions||1) - (c.actionsUsed||0);
 
-  const cardStyle = c => ({
-    position:'relative', background:'#0d0d1a', borderRadius:4, padding:10, marginBottom:8,
-    border:'1px solid '+(isActive(c.id)?c.color:B3+'22'),
-    boxShadow: isActive(c.id)?'0 0 14px '+c.color+'33':'none',
-    opacity: c.isDefeated?0.3:1, transition:'border-color 0.25s, box-shadow 0.25s',
+  const cardStyle = (c, isActiveCard) => ({
+    position:'relative', background: isActiveCard ? '#0d0d1a' : '#08090f',
+    borderRadius:4, padding:10, marginBottom:8,
+    border:'1px solid '+(isActiveCard ? c.color : B3+'18'),
+    boxShadow: isActiveCard ? '0 0 18px '+c.color+'2a, inset 0 0 8px '+c.color+'08' : 'none',
+    opacity: c.isDefeated ? 0.25 : 1,
+    transition:'border-color 0.25s, box-shadow 0.25s, opacity 0.25s',
   });
 
   return (
     <div style={wrapStyle}>
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}@keyframes scan{from{transform:translateY(-100%)}to{transform:translateY(100vh)}}`}</style>
-      <div style=position:'fixed',top:0,left:0,right:0,height:'2px',pointerEvents:'none',zIndex:10,
-        background:'linear-gradient(transparent,'+ACC+'44,transparent)',animation:'scan 5s linear infinite'/>
-      <div style={inner}>
+      <style>{`
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+        @keyframes scanline{from{transform:translateY(-100%)}to{transform:translateY(100vh)}}
+        @keyframes enemyGlow{0%,100%{box-shadow:0 0 18px ${RED}33}50%{box-shadow:0 0 30px ${RED}55}}
+      `}</style>
+
+      {/* Scanline */}
+      <div style={{ position:'fixed', top:0, left:0, right:0, height:'2px', pointerEvents:'none', zIndex:10,
+        background:'linear-gradient(transparent,'+ACC+'44,transparent)', animation:'scanline 5s linear infinite' }}/>
+
+      <div style={{ position:'relative', zIndex:2, padding:14 }}>
         <Corner pos="tl"/><Corner pos="tr"/>
-        {/* Header */}
-        <div style=display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12>
-          <div style=display:'flex',alignItems:'center',gap:12>
-            <span style=fontFamily:ORB,fontSize:14,color:ACC,letterSpacing:3>⚔ COMBAT</span>
-            <span style=fontFamily:MONO,fontSize:10,color:B2>ROUND {round}</span>
-            {activeCmb&&<span style=fontFamily:MONO,fontSize:10,color:activeCmb.color,animation:'pulse 1s infinite'>
-              ◆ {activeCmb.name.toUpperCase()}
-            </span>}
+
+        {/* ── HEADER ── */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+            <span style={{ fontFamily:ORB, fontSize:14, color:ACC, letterSpacing:3 }}>⚔</span>
+            <span style={{ fontFamily:ORB, fontSize:11, color:ACC, letterSpacing:3 }}>COMBAT</span>
+            <span style={{ fontFamily:MONO, fontSize:10, color:B2, borderLeft:'1px solid '+B2+'44', paddingLeft:10 }}>
+              ROUND {round}
+            </span>
+            {activeCmb && (
+              <span style={{ fontFamily:MONO, fontSize:10, color:activeCmb.color, animation:'pulse 1.2s infinite', marginLeft:4 }}>
+                ◆ {activeCmb.name.split(' ')[0].toUpperCase()}
+              </span>
+            )}
           </div>
-          <div style=display:'flex',gap:6>
+          <div style={{ display:'flex', gap:6 }}>
             <button onClick={endTurn} style={Btn(ACC,false,false)}>END TURN →</button>
+            <button onClick={()=>setShowManual(true)} style={Btn(B3,true,false)}>± DMG</button>
             <button onClick={resetCombat} style={Btn(B2,true,false)}>ABORT</button>
           </div>
         </div>
-        {/* Initiative strip */}
-        <div style=display:'flex',gap:4,overflowX:'auto',marginBottom:12,paddingBottom:2>
-          {cmbs.map((c,i)=>(
-            <div key={c.id} style=
-              minWidth:54,flexShrink:0,padding:'4px 5px',borderRadius:2,textAlign:'center',
-              background:i===tidx?c.color+'1a':'#0d0d1a',
-              border:'1px solid '+(i===tidx?c.color:B3+'22'),
-              opacity:c.isDefeated?0.2:1,
-            >
-              <div style=fontSize:8,fontFamily:MONO,color:i===tidx?c.color:B2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'>
+
+        {/* ── INITIATIVE STRIP ── */}
+        <div style={{ display:'flex', gap:4, overflowX:'auto', marginBottom:12,
+          padding:'8px 6px', background:'#08090f', borderRadius:3,
+          border:'1px solid '+B3+'18', scrollbarWidth:'thin' }}>
+          {cmbs.map((c,i) => (
+            <div key={c.id} style={{
+              minWidth:52, flexShrink:0, padding:'5px 4px', borderRadius:2, textAlign:'center',
+              background: i===tidx ? c.color+'18' : 'transparent',
+              border:'1px solid '+(i===tidx ? c.color : B3+'18'),
+              opacity: c.isDefeated ? 0.15 : 1,
+              transition:'all 0.2s',
+            }}>
+              <div style={{ fontSize:8, fontFamily:MONO, color:i===tidx?c.color:B2,
+                overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                 {c.name.split(' ')[0].slice(0,7)}
               </div>
-              <div style=fontSize:9,fontFamily:ORB,color:i===tidx?c.color:B3>{c.initiative}</div>
+              <div style={{ fontSize:11, fontFamily:ORB, color:i===tidx?c.color:B3, fontWeight:700 }}>
+                {c.initiative}
+              </div>
+              <div style={{ display:'flex', justifyContent:'center', gap:2, marginTop:2 }}>
+                {Array.from({length:c.actions}).map((_,j)=>(
+                  <div key={j} style={{ width:4, height:4, borderRadius:'50%',
+                    background: j < actsLeft(c) ? c.color : B2+'44' }} />
+                ))}
+              </div>
             </div>
           ))}
         </div>
-        {/* Main grid */}
-        <div style=display:'grid',gridTemplateColumns:'1fr 1fr',gap:12>
-          {/* LEFT: Operatives */}
-          <div>
-            <div style=fontFamily:ORB,fontSize:9,color:COLE,letterSpacing:3,marginBottom:8>OPERATIVES</div>
-            {players.map(c=>(
-              <div key={c.id} style={cardStyle(c)}>
-                <div style=display:'flex',justifyContent:'space-between',marginBottom:6>
-                  <span style=fontFamily:RAJ,fontSize:13,color:c.color,fontWeight:700>{c.name}</span>
-                  {isActive(c.id)&&<span style=fontSize:8,fontFamily:MONO,color:ACC,animation:'pulse 1s infinite',letterSpacing:2>◆ ACTIVE</span>}
+
+        {/* ── ENEMY ACTING PANEL ── */}
+        {isEnemyTurn && activeCmb && !activeCmb.isDefeated && (
+          <div style={{ background:RED+'0a', border:'1px solid '+RED+'66', borderRadius:4,
+            padding:12, marginBottom:12, position:'relative', animation:'enemyGlow 2s ease-in-out infinite' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+              <FactionIcon faction={activeCmb.faction||'NONE'} size={28} />
+              <div>
+                <div style={{ fontFamily:ORB, fontSize:11, color:RED, letterSpacing:3 }}>⚠ HOSTILE ACTING</div>
+                <div style={{ fontFamily:RAJ, fontSize:14, color:activeCmb.color, fontWeight:700 }}>
+                  {activeCmb.name}
                 </div>
-                {/* HP */}
-                <div style=marginBottom:4>
-                  <div style=display:'flex',justifyContent:'space-between',fontSize:9,color:B2,marginBottom:2>
-                    <span>HP</span><span style=color:B1>{c.hp}/{c.maxHp}</span>
-                  </div>
-                  <HpBar cur={c.hp} max={c.maxHp} color={c.color}/>
-                </div>
-                {/* EN */}
-                <div style=marginBottom:4>
-                  <div style=display:'flex',justifyContent:'space-between',fontSize:9,color:B2,marginBottom:2>
-                    <span>EN</span><span style=color:B1>{c.en}/{c.maxEn}</span>
-                  </div>
-                  <HpBar cur={c.en} max={c.maxEn} color="#4477ff"/>
-                </div>
-                {/* Vela ghost energy */}
-                {c.id==='vela'&&(
-                  <div style=marginBottom:4>
-                    <div style=display:'flex',justifyContent:'space-between',fontSize:9,color:B2,marginBottom:2>
-                      <span>GHOST</span><span style=color:VELA>{c.ghostEn||0}/{c.maxGhostEn||10}</span>
-                    </div>
-                    <HpBar cur={c.ghostEn||0} max={c.maxGhostEn||10} color={VELA}/>
-                  </div>
-                )}
-                {/* Stats */}
-                <div style=display:'flex',gap:8,fontSize:9,color:B2,marginBottom:5>
-                  {['vig','gra','min','tec'].map(s=>(
-                    <span key={s}><span style=color:B3>{s.toUpperCase()} </span>{c[s]}</span>
-                  ))}
-                  <span><span style=color:B3>ARM </span>{c.armor}</span>
-                </div>
-                {/* Conditions */}
-                {c.conditions.length>0&&<div style=marginBottom:5>{c.conditions.map((x,i)=><CondPill key={i} cond={x}/>)}</div>}
-                {/* Action dots */}
-                <div style=display:'flex',alignItems:'center',gap:3,marginBottom:6>
-                  {Array.from({length:c.actions}).map((_,i)=>(
-                    <span key={i} style=width:7,height:7,borderRadius:'50%',display:'inline-block',
-                      background:i<actsLeft(c)?c.color:B2+'44',border:'1px solid '+c.color+'55'/>
-                  ))}
-                  <span style=fontSize:8,color:B2,marginLeft:3>{actsLeft(c)}/{c.actions}{!c.sideUsed?' · ⊕':''}</span>
-                </div>
-                {/* Action buttons */}
-                {isActive(c.id)&&!c.isDefeated&&(
-                  <div style=display:'flex',flexWrap:'wrap',gap:4>
-                    {liveEnemies.map(e=>(
-                      <button key={e.id} onClick={()=>doAttack(c.id,e.id)} disabled={actsLeft(c)===0}
-                        style={Btn(RED,true,actsLeft(c)===0)}>ATK {e.name.split(' ')[0]}</button>
-                    ))}
-                    {c.id==='vela'&&<button onClick={()=>setShowHacks(true)} style={Btn(VELA,true,false)}>HACK</button>}
-                    {!c.sideUsed&&<button onClick={()=>{setItemUser(c.id);setShowItems(true);}} style={Btn(YEL,true,false)}>ITEM</button>}
-                    <button onClick={()=>{const d=roll(6)+c.vig;addLog('[R'+round+'] '+c.name+' ESCAPE: rolled '+d,YEL);}} style={Btn(YEL,true,false)}>ESC</button>
-                    <button onClick={()=>setCmbs(p=>applyHeal(p,c.id,4,0))} style={Btn(COLE,true,false)}>+HP</button>
-                    <button onClick={()=>setCmbs(p=>{const n=applyDmg(p,c.id,4,'[manual]');checkEnd(n);return n;})} style={Btn(RED,true,false)}>-HP</button>
-                  </div>
-                )}
               </div>
-            ))}
+              <div style={{ marginLeft:'auto', textAlign:'right' }}>
+                <div style={{ fontSize:9, color:B2 }}>ACTIONS</div>
+                <ActionDots used={activeCmb.actionsUsed} total={activeCmb.actions} color={RED} />
+              </div>
+            </div>
+            <div style={{ fontSize:9, color:B2, marginBottom:8 }}>
+              Weapon: d{activeCmb.wDmg?.match(/\d+/)?.[0]||6}+VIG({activeCmb.vig}) · Armor: {activeCmb.armor}
+            </div>
+            {activeCmb.conditions.length > 0 && (
+              <div style={{ marginBottom:8 }}>
+                {activeCmb.conditions.map((x,i)=><CondPill key={i} cond={x}/>)}
+              </div>
+            )}
+            <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
+              {players.filter(p=>!p.isDefeated).map(p => (
+                <button key={p.id} onClick={()=>doEnemyAttack(activeCmb.id,p.id)}
+                  disabled={actsLeft(activeCmb)===0}
+                  style={{ ...Btn(actsLeft(activeCmb)===0?B2:RED,false,actsLeft(activeCmb)===0), fontSize:11 }}>
+                  ⚔ ATK {p.name.split(' ')[0]}
+                </button>
+              ))}
+              {['overheat','shock','stun'].map(t=>(
+                <button key={t} onClick={()=>setCmbs(p=>applyCondition(p,activeCmb.id,t,2))}
+                  style={Btn(COND_META[t].color,true,false)}>
+                  {COND_META[t].icon} {t.slice(0,3).toUpperCase()}
+                </button>
+              ))}
+            </div>
           </div>
-          {/* RIGHT: Enemies + log */}
+        )}
+
+        {/* ── MAIN GRID ── */}
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+
+          {/* LEFT: OPERATIVES */}
           <div>
-            <div style=fontFamily:ORB,fontSize:9,color:RED,letterSpacing:3,marginBottom:8>HOSTILES ({liveEnemies.length})</div>
-            {liveEnemies.map(c=>(
-              <div key={c.id} style={cardStyle(c)}>
-                <div style=display:'flex',justifyContent:'space-between',marginBottom:4>
-                  <span style=fontFamily:RAJ,fontSize:12,color:c.color,fontWeight:700>{c.name}</span>
-                  <div style=display:'flex',gap:5,alignItems:'center'>
-                    <span style=fontSize:8,fontFamily:MONO,color:DIFFICULTY_COLORS[c.difficulty]||B2>{c.difficulty}</span>
-                    {isActive(c.id)&&<span style=fontSize:8,color:RED,animation:'pulse 1s infinite'>◆</span>}
+            <div style={{ fontFamily:ORB, fontSize:9, color:COLE, letterSpacing:3, marginBottom:8 }}>OPERATIVES</div>
+
+            {players.map(c => {
+              const active = isActive(c.id);
+              return (
+                <div key={c.id} style={cardStyle(c, active)}>
+                  {active && <Corner pos="tl" color={c.color}/>}
+
+                  {/* Header */}
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:7 }}>
+                    <span style={{ fontFamily:RAJ, fontSize:13, color:c.color, fontWeight:700 }}>{c.name}</span>
+                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                      <ActionDots used={c.actionsUsed} total={c.actions} color={c.color}/>
+                      {!c.sideUsed && <span style={{ fontSize:8, color:YEL }}>⊕</span>}
+                      {active && <span style={{ fontSize:8, fontFamily:MONO, color:c.color, animation:'pulse 1.2s infinite', letterSpacing:2 }}>◆ ACTIVE</span>}
+                    </div>
+                  </div>
+
+                  {/* HP / EN bars */}
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, marginBottom:6 }}>
+                    <div>
+                      <div style={{ display:'flex', justifyContent:'space-between', fontSize:8, color:B2, marginBottom:2 }}>
+                        <span>HP</span><span style={{ color:B1 }}>{c.hp}/{c.maxHp}</span>
+                      </div>
+                      <HpBar cur={c.hp} max={c.maxHp} color={c.color}/>
+                    </div>
+                    <div>
+                      <div style={{ display:'flex', justifyContent:'space-between', fontSize:8, color:B2, marginBottom:2 }}>
+                        <span>EN</span><span style={{ color:B1 }}>{c.en}/{c.maxEn}</span>
+                      </div>
+                      <HpBar cur={c.en} max={c.maxEn} color="#4477ff"/>
+                    </div>
+                  </div>
+
+                  {/* Vela ghost energy */}
+                  {c.id==='vela' && (
+                    <div style={{ marginBottom:6 }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', fontSize:8, color:B2, marginBottom:2 }}>
+                        <span>GHOST</span><span style={{ color:VELA }}>{c.ghostEn||0}/{c.maxGhostEn||10}</span>
+                      </div>
+                      <HpBar cur={c.ghostEn||0} max={c.maxGhostEn||10} color={VELA}/>
+                    </div>
+                  )}
+
+                  {/* Stats row */}
+                  <div style={{ display:'flex', gap:8, fontSize:8, color:B2, marginBottom:5 }}>
+                    {['vig','gra','min','tec'].map(s=>(
+                      <span key={s}><span style={{ color:B3 }}>{s.toUpperCase()} </span>{c[s]}</span>
+                    ))}
+                    <span><span style={{ color:B3 }}>ARM </span>{c.armor}</span>
+                  </div>
+
+                  {/* Conditions */}
+                  {c.conditions.length > 0 && (
+                    <div style={{ marginBottom:6 }}>
+                      {c.conditions.map((x,i) => <CondPill key={i} cond={x}/>)}
+                    </div>
+                  )}
+
+                  {/* Action buttons — only when active */}
+                  {active && !c.isDefeated && (
+                    <div style={{ borderTop:'1px solid '+c.color+'22', paddingTop:8, marginTop:4 }}>
+                      <div style={{ fontSize:8, color:B2, marginBottom:5 }}>
+                        WEAPON: {c.weapon} · {c.wDmg}+{c.wStat==='min'?c.min:c.vig}
+                      </div>
+                      <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
+                        {liveEnemies.map(e => (
+                          <button key={e.id} onClick={()=>doAttack(c.id,e.id)}
+                            disabled={actsLeft(c)===0}
+                            style={Btn(actsLeft(c)===0?B2:RED,true,actsLeft(c)===0)}>
+                            ⚔ {e.name.split(' ')[0]}
+                          </button>
+                        ))}
+                        {c.id==='vela' && (
+                          <button onClick={()=>setShowHacks(true)} style={Btn(VELA,true,false)}>
+                            ◈ HACK
+                          </button>
+                        )}
+                        {!c.sideUsed && (
+                          <button onClick={()=>{setItemUser(c.id);setShowItems(true);}} style={Btn(YEL,true,false)}>
+                            ⊕ ITEM
+                          </button>
+                        )}
+                        <button onClick={()=>{const d=roll(6)+c.vig;addLog('[R'+round+'] '+c.name+' ESCAPE: d6+'+c.vig+'='+d,YEL);}} style={Btn(YEL,true,false)}>
+                          ESC
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {c.isDefeated && (
+                    <div style={{ textAlign:'center', fontSize:9, color:RED+'88', fontFamily:MONO, marginTop:4 }}>
+                      💀 OPERATIVE DOWN
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* RIGHT: HOSTILES + LOG */}
+          <div>
+            <div style={{ fontFamily:ORB, fontSize:9, color:RED, letterSpacing:3, marginBottom:8 }}>
+              HOSTILES ({liveEnemies.length})
+            </div>
+
+            {liveEnemies.map(c => {
+              const active = isActive(c.id);
+              return (
+                <div key={c.id} style={cardStyle(c, active)}>
+                  {/* Header */}
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:5 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                      <FactionIcon faction={c.faction||'NONE'} size={22} />
+                      <span style={{ fontFamily:RAJ, fontSize:12, color:c.color, fontWeight:700 }}>{c.name}</span>
+                    </div>
+                    <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                      <span style={{ fontSize:8, fontFamily:MONO, color:DIFFICULTY_COLORS[c.difficulty]||B2 }}>
+                        {c.difficulty}
+                      </span>
+                      {c.isBoss && <span style={{ fontSize:8, color:RED }}>★</span>}
+                      {active && <span style={{ fontSize:8, color:RED, animation:'pulse 1.2s infinite' }}>◆</span>}
+                    </div>
+                  </div>
+
+                  {/* HP bar */}
+                  <div style={{ marginBottom:5 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', fontSize:8, color:B2, marginBottom:2 }}>
+                      <span>HP</span><span style={{ color:B1 }}>{c.hp}/{c.maxHp}</span>
+                    </div>
+                    <HpBar cur={c.hp} max={c.maxHp} color={RED}/>
+                  </div>
+
+                  {/* Stats */}
+                  <div style={{ display:'flex', gap:6, fontSize:8, color:B2, marginBottom:4 }}>
+                    <span><span style={{ color:B3 }}>ARM </span>{c.armor}</span>
+                    <span><span style={{ color:B3 }}>VIG </span>{c.vig}</span>
+                    <span><span style={{ color:B3 }}>GRA </span>{c.gra}</span>
+                    <ActionDots used={c.actionsUsed} total={c.actions} color={c.color}/>
+                  </div>
+
+                  {/* Conditions */}
+                  {c.conditions.length > 0 && (
+                    <div style={{ marginBottom:5 }}>
+                      {c.conditions.map((x,i) => <CondPill key={i} cond={x}/>)}
+                    </div>
+                  )}
+
+                  {/* Quick condition buttons — always available for manual play */}
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:3 }}>
+                    <button onClick={()=>setCmbs(p=>{const n=applyDmg(p,c.id,rollF(c.wDmg||'d6')+c.vig,c.name);checkEnd(n);return n;})}
+                      style={Btn(RED,true,false)}>ROLL ATK</button>
+                    {['overheat','shock','stun','silence'].map(t=>(
+                      <button key={t} onClick={()=>setCmbs(p=>applyCondition(p,c.id,t,2))}
+                        style={Btn(COND_META[t].color,true,false)}>{COND_META[t].icon}</button>
+                    ))}
                   </div>
                 </div>
-                <div style=marginBottom:4>
-                  <div style=display:'flex',justifyContent:'space-between',fontSize:9,color:B2,marginBottom:2>
-                    <span>HP</span><span style=color:B1>{c.hp}/{c.maxHp}</span>
-                  </div>
-                  <HpBar cur={c.hp} max={c.maxHp} color={RED}/>
-                </div>
-                <div style=display:'flex',gap:8,fontSize:9,color:B2,marginBottom:4>
-                  <span><span style=color:B3>ARM </span>{c.armor}</span>
-                  <span><span style=color:B3>VIG </span>{c.vig}</span>
-                  <span><span style=color:B3>GRA </span>{c.gra}</span>
-                  <span><span style=color:B3>ACT </span>{c.actions}</span>
-                </div>
-                {c.conditions.length>0&&<div style=marginBottom:4>{c.conditions.map((x,i)=><CondPill key={i} cond={x}/>)}</div>}
-                <div style=display:'flex',flexWrap:'wrap',gap:4>
-                  <button onClick={()=>setCmbs(p=>{const n=applyDmg(p,c.id,rollF(c.wDmg||'d6')+c.vig,c.name);checkEnd(n);return n;})} style={Btn(RED,true,false)}>ATK</button>
-                  <button onClick={()=>setCmbs(p=>{const n=applyDmg(p,c.id,4,'[manual]');checkEnd(n);return n;})} style={Btn(RED,true,false)}>HIT 4</button>
-                  <button onClick={()=>setCmbs(p=>{const n=applyDmg(p,c.id,8,'[manual]');checkEnd(n);return n;})} style={Btn(RED,true,false)}>HIT 8</button>
-                  {['overheat','shock','stun'].map(t=>(
-                    <button key={t} onClick={()=>setCmbs(p=>applyCondition(p,c.id,t,2))}
-                      style={Btn(COND_META[t].color,true,false)}>{t.slice(0,3).toUpperCase()}</button>
-                  ))}
-                </div>
-              </div>
-            ))}
-            {deadEnemies.length>0&&(
-              <div style=fontSize:9,color:B2+'66',fontFamily:MONO,marginBottom:8>
+              );
+            })}
+
+            {deadEnemies.length > 0 && (
+              <div style={{ fontSize:8, color:B2+'55', fontFamily:MONO, marginBottom:10, lineHeight:1.7 }}>
                 💀 {deadEnemies.map(e=>e.name).join(' · ')}
               </div>
             )}
-            {/* Log */}
-            <div style=fontFamily:ORB,fontSize:9,color:B2,letterSpacing:2,marginBottom:4>COMBAT LOG</div>
-            <div ref={logRef} style=background:'#06080e',border:'1px solid '+B3+'1a',borderRadius:3,
-              padding:8,height:170,overflowY:'auto',fontSize:9,fontFamily:MONO,lineHeight:1.7,scrollbarWidth:'thin'>
-              {log.map(e=><div key={e.id} style=color:e.color>{e.msg}</div>)}
+
+            {/* COMBAT LOG */}
+            <div style={{ fontFamily:ORB, fontSize:9, color:B2, letterSpacing:2, marginBottom:5 }}>
+              COMBAT LOG
+            </div>
+            <div ref={logRef} style={{
+              background:'#05060b', border:'1px solid '+B3+'18', borderRadius:3,
+              padding:'8px 10px', height:220, overflowY:'auto',
+              fontSize:9, fontFamily:MONO, lineHeight:1.8, scrollbarWidth:'thin',
+              scrollbarColor: B2+'44 transparent',
+            }}>
+              {log.length === 0 && (
+                <div style={{ color:B2+'55', fontStyle:'italic' }}>Combat log will appear here...</div>
+              )}
+              {log.map(e => <div key={e.id} style={{ color:e.color }}>{e.msg}</div>)}
             </div>
           </div>
         </div>
       </div>
 
       {/* ── HACK MODAL ── */}
-      {showHacks&&(
-        <div style=position:'fixed',inset:0,background:'#000c',zIndex:100,display:'flex',alignItems:'center',justifyContent:'center'>
-          <div style=background:CBG,border:'1px solid '+VELA,borderRadius:4,padding:20,
-            width:'min(480px,92vw)',maxHeight:'82vh',overflowY:'auto',position:'relative'>
+      {showHacks && (
+        <div style={{ position:'fixed', inset:0, background:'#000d', zIndex:100,
+          display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <div style={{ background:CBG, border:'1px solid '+VELA, borderRadius:4, padding:20,
+            width:'min(500px,94vw)', maxHeight:'85vh', overflowY:'auto', position:'relative' }}>
             <Corner pos="tl" color={VELA}/><Corner pos="tr" color={VELA}/>
-            <div style=fontFamily:ORB,fontSize:13,color:VELA,letterSpacing:3,marginBottom:4>◈ HACK PANEL</div>
-            <div style=fontSize:10,color:B2,marginBottom:12>EN: {vela?.en||0}/{vela?.maxEn||20} · MIN {vela?.min||4}</div>
-            <div style=marginBottom:12>
-              <div style=fontSize:9,color:B2,marginBottom:4>TARGET:</div>
-              <div style=display:'flex',gap:4,flexWrap:'wrap'>
+            <div style={{ fontFamily:ORB, fontSize:14, color:VELA, letterSpacing:3, marginBottom:4 }}>◈ HACK PANEL</div>
+            <div style={{ fontSize:10, color:B2, marginBottom:14 }}>
+              EN: {vela?.en||0}/{vela?.maxEn||20} · MIN {vela?.min||4}
+            </div>
+
+            {/* Target selection */}
+            <div style={{ marginBottom:14 }}>
+              <div style={{ fontSize:9, color:B2, letterSpacing:2, marginBottom:5 }}>SELECT TARGET</div>
+              <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
                 <button onClick={()=>setHackTgt(null)} style={Btn(!hackTgt?VELA:B2,true,false)}>NONE</button>
                 {liveEnemies.map(e=>(
-                  <button key={e.id} onClick={()=>setHackTgt(e.id)} style={Btn(hackTgt===e.id?RED:B2,true,false)}>{e.name.split(' ')[0]}</button>
+                  <button key={e.id} onClick={()=>setHackTgt(e.id)}
+                    style={Btn(hackTgt===e.id?RED:B2,true,false)}>{e.name.split(' ')[0]}</button>
                 ))}
               </div>
             </div>
-            <div style=display:'grid',gap:6>
-              {HACKS.map(h=>{
-                const ok=(vela?.en||0)>=h.cost;
+
+            <div style={{ display:'grid', gap:6 }}>
+              {HACKS.map(h => {
+                const ok = (vela?.en||0) >= h.cost;
                 return (
-                  <div key={h.id} style=background:'#111122',border:'1px solid '+VELA+'22',borderRadius:3,padding:8,opacity:ok?1:0.4>
-                    <div style=display:'flex',justifyContent:'space-between',marginBottom:3>
-                      <span style=fontFamily:MONO,fontSize:11,color:VELA>{h.name}</span>
-                      <span style=fontSize:9,color:YEL>{h.cost} EN</span>
+                  <div key={h.id} style={{ background:'#0d0d1a', border:'1px solid '+VELA+'22',
+                    borderRadius:3, padding:10, opacity:ok?1:0.4 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}>
+                      <span style={{ fontFamily:MONO, fontSize:11, color:VELA }}>{h.name}</span>
+                      <span style={{ fontSize:9, color:YEL }}>{h.cost} EN</span>
                     </div>
-                    <div style=fontSize:9,color:B2,marginBottom:6>{h.effect}</div>
-                    <button onClick={()=>doHack(h.id,hackTgt)} disabled={!ok} style={Btn(ok?VELA:B2,true,!ok)}>CAST</button>
+                    <div style={{ fontSize:9, color:B2, marginBottom:7 }}>{h.effect}</div>
+                    <button onClick={()=>doHack(h.id,hackTgt)} disabled={!ok}
+                      style={Btn(ok?VELA:B2,true,!ok)}>CAST</button>
                   </div>
                 );
               })}
             </div>
-            <button onClick={()=>{setShowHacks(false);setHackTgt(null);}} style=...Btn(B2,false,false),width:'100%',marginTop:12>CLOSE</button>
+            <button onClick={()=>{setShowHacks(false);setHackTgt(null);}}
+              style={{ ...Btn(B2,false,false), width:'100%', marginTop:14 }}>CLOSE</button>
           </div>
         </div>
       )}
 
       {/* ── ITEMS MODAL ── */}
-      {showItems&&(
-        <div style=position:'fixed',inset:0,background:'#000c',zIndex:100,display:'flex',alignItems:'center',justifyContent:'center'>
-          <div style=background:CBG,border:'1px solid '+YEL,borderRadius:4,padding:20,width:'min(360px,92vw)',position:'relative'>
+      {showItems && (
+        <div style={{ position:'fixed', inset:0, background:'#000d', zIndex:100,
+          display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <div style={{ background:CBG, border:'1px solid '+YEL, borderRadius:4, padding:20,
+            width:'min(400px,94vw)', position:'relative' }}>
             <Corner pos="tl" color={YEL}/><Corner pos="tr" color={YEL}/>
-            <div style=fontFamily:ORB,fontSize:13,color:YEL,letterSpacing:3,marginBottom:12>⊕ CONSUMABLES</div>
+            <div style={{ fontFamily:ORB, fontSize:14, color:YEL, letterSpacing:3, marginBottom:14 }}>⊕ CONSUMABLES</div>
             {players.filter(p=>!p.isDefeated).map(p=>(
-              <div key={p.id} style=marginBottom:14>
-                <div style=fontSize:10,color:p.color,fontFamily:RAJ,fontWeight:700,marginBottom:6>
-                  {p.name} {p.sideUsed&&<span style=fontSize:8,color:RED>[SIDE USED]</span>}
+              <div key={p.id} style={{ marginBottom:16 }}>
+                <div style={{ fontSize:11, color:p.color, fontFamily:RAJ, fontWeight:700, marginBottom:8, display:'flex', alignItems:'center', gap:8 }}>
+                  {p.name}
+                  {p.sideUsed && <span style={{ fontSize:8, color:RED, fontFamily:MONO }}>[SIDE USED]</span>}
                 </div>
                 {CONSUMABLES.map(cons=>(
-                  <div key={cons.id} style=display:'flex',justifyContent:'space-between',alignItems:'center',
-                    background:'#111122',border:'1px solid '+B3+'1a',borderRadius:2,padding:'6px 10px',marginBottom:4>
+                  <div key={cons.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center',
+                    background:'#0d0d1a', border:'1px solid '+B3+'18', borderRadius:2, padding:'7px 10px', marginBottom:4 }}>
                     <div>
-                      <div style=fontSize:10,color:B1>{cons.name}</div>
-                      <div style=fontSize:9,color:B2>{cons.effect}</div>
+                      <div style={{ fontSize:10, color:B1 }}>{cons.name}</div>
+                      <div style={{ fontSize:9, color:B2 }}>{cons.effect}</div>
                     </div>
-                    <button onClick={()=>doItem(cons,p.id)} disabled={p.sideUsed||itemUser!==p.id}
+                    <button onClick={()=>doItem(cons,p.id)}
+                      disabled={p.sideUsed || itemUser!==p.id}
                       style={Btn((p.sideUsed||itemUser!==p.id)?B2:YEL,true,p.sideUsed||itemUser!==p.id)}>USE</button>
                   </div>
                 ))}
               </div>
             ))}
-            <button onClick={()=>{setShowItems(false);setItemUser(null);}} style=...Btn(B2,false,false),width:'100%',marginTop:4>CLOSE</button>
+            <button onClick={()=>{setShowItems(false);setItemUser(null);}}
+              style={{ ...Btn(B2,false,false), width:'100%', marginTop:4 }}>CLOSE</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── MANUAL DAMAGE MODAL ── */}
+      {showManual && (
+        <div style={{ position:'fixed', inset:0, background:'#000d', zIndex:100,
+          display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <div style={{ background:CBG, border:'1px solid '+B3, borderRadius:4, padding:24,
+            width:'min(340px,94vw)', position:'relative' }}>
+            <Corner pos="tl"/><Corner pos="tr"/>
+            <div style={{ fontFamily:ORB, fontSize:13, color:B1, letterSpacing:2, marginBottom:14 }}>± MANUAL DAMAGE</div>
+            <div style={{ marginBottom:10 }}>
+              <div style={{ fontSize:9, color:B2, letterSpacing:2, marginBottom:6 }}>TARGET</div>
+              <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
+                {cmbs.filter(c=>!c.isDefeated).map(c=>(
+                  <button key={c.id} onClick={()=>setManualTgt(c.id)}
+                    style={Btn(manualTgt===c.id?c.color:B2,true,false)}>{c.name.split(' ')[0]}</button>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginBottom:14 }}>
+              <div style={{ fontSize:9, color:B2, letterSpacing:2, marginBottom:6 }}>AMOUNT</div>
+              <input value={manualDmg} onChange={e=>setManualDmg(e.target.value)} placeholder="e.g. 12"
+                type="number" min="1"
+                style={{ width:'100%', background:'#0d0d1a', border:'1px solid '+B3+'44', color:B1,
+                  fontFamily:ORB, fontSize:16, padding:'8px 12px', borderRadius:2, boxSizing:'border-box', textAlign:'center' }}/>
+            </div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={()=>manualTgt&&doManualDmg(manualTgt,manualDmg)}
+                disabled={!manualTgt||!manualDmg}
+                style={{ ...Btn((!manualTgt||!manualDmg)?B2:RED,false,!manualTgt||!manualDmg), flex:1 }}>
+                APPLY DMG
+              </button>
+              <button onClick={()=>manualTgt&&manualDmg&&setCmbs(p=>applyHeal(p,manualTgt,parseInt(manualDmg)||0,0))}
+                disabled={!manualTgt||!manualDmg}
+                style={{ ...Btn((!manualTgt||!manualDmg)?B2:COLE,false,!manualTgt||!manualDmg), flex:1 }}>
+                APPLY HEAL
+              </button>
+            </div>
+            <button onClick={()=>{setShowManual(false);setManualDmg('');setManualTgt(null);}}
+              style={{ ...Btn(B2,false,false), width:'100%', marginTop:10 }}>CLOSE</button>
           </div>
         </div>
       )}
