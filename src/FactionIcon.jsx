@@ -2702,7 +2702,7 @@ const FACTION_DATA = {
     "M6576 3573 c4 -16 2 -28 -7 -34 -21 -13 10 -12 50 2 40 14 36 27 -12 44 -37 12 -37 12 -31 -12z m39 -13 c-3 -5 -10 -10 -16 -10 -5 0 -9 5 -9 10 0 6 7 10 16 10 8 0 12 -4 9 -10z"
     ]
   },
-  // ALIEN and future factions add here
+  // future factions add here
 };
 
 const FactionIcon = function(props) {
