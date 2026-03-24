@@ -118,62 +118,83 @@ function FallbackShip({ faction, size = 64 }) {
     </svg>
   );
 
-  // NONE — inline SVG generic fighter, tinted per faction color
-  const h = Math.round(s * 1.55);
+  // NONE — hand-drawn top-down sci-fi fighter. Nose UP. No Vostoks were harmed.
   return (
-    <svg width={s} height={h} viewBox="0 0 376 582" style={{ display:'block', filter:`drop-shadow(0 0 8px ${c}88)` }}>
+    <svg width={s} height={s} viewBox="0 0 100 100" style={{ display:'block', filter:`drop-shadow(0 0 10px ${c}99)` }}>
       <defs>
-        <linearGradient id={`gf_body_${c.slice(1)}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor={c} stopOpacity="0.15"/>
-          <stop offset="0.5" stopColor={c} stopOpacity="0.45"/>
-          <stop offset="1" stopColor={c} stopOpacity="0.15"/>
+        <linearGradient id={`nf_hull_${c.slice(1)}`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor={c} stopOpacity="0.08"/>
+          <stop offset="0.5" stopColor={c} stopOpacity="0.35"/>
+          <stop offset="1" stopColor={c} stopOpacity="0.08"/>
         </linearGradient>
-        <linearGradient id={`gf_eng_${c.slice(1)}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor={c} stopOpacity="0.25"/>
-          <stop offset="0.5" stopColor={c} stopOpacity="0.75"/>
-          <stop offset="1" stopColor={c} stopOpacity="0.2"/>
-        </linearGradient>
-        <radialGradient id={`gf_core_${c.slice(1)}`} cx="50%" cy="50%" r="50%">
-          <stop offset="0" stopColor={c} stopOpacity="0.7"/>
+        <linearGradient id={`nf_eng_${c.slice(1)}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={c} stopOpacity="0.6"/>
           <stop offset="1" stopColor={c} stopOpacity="0.05"/>
+        </linearGradient>
+        <radialGradient id={`nf_core_${c.slice(1)}`} cx="50%" cy="45%" r="18%">
+          <stop offset="0" stopColor={c} stopOpacity="0.9"/>
+          <stop offset="1" stopColor={c} stopOpacity="0"/>
         </radialGradient>
       </defs>
-      {/* Main hull */}
-      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.2" stroke={c} strokeOpacity="0.7" strokeWidth="4"
-        d="m 350,712.36218 -60,0 -10,-20 -60,39.99998 -60,-159.99998 20,-75 0,-65 -38,-40 18,-180 100,40 0,120 -20,40 0,185 20,-5 20,-110 10,-10 60,0 10,10 20,110 20,5 0,-185 -20,-40 0,-120 100,-40 20,180 -40,40 0,65 20,75 -60,159.99998 -60,-39.99998 z"/>
-      {/* Left wing */}
-      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_body_${c.slice(1)})`} stroke={c} strokeOpacity="0.5" strokeWidth="3"
-        d="m 185,222.36218 50,20 0,110 25,20 -40,80 0,70 20,50 0,25 20,103 -35,12 -55,-180 10,-35 0,-65 10,-30 -20,-20 z"/>
+
+      {/* ── MAIN FUSELAGE — narrow spine, nose up ── */}
+      {/* Nose tip */}
+      <polygon points="50,4 46,18 54,18" fill={c} opacity="0.95"/>
+      {/* Forward hull */}
+      <polygon points="46,18 54,18 57,38 43,38" fill={c} opacity="0.8"/>
+      {/* Mid hull — widest point */}
+      <polygon points="43,38 57,38 60,58 40,58" fill={`url(#nf_hull_${c.slice(1)})`} stroke={c} strokeWidth="0.8" strokeOpacity="0.9"/>
+      {/* Aft hull */}
+      <polygon points="40,58 60,58 58,74 42,74" fill={c} opacity="0.5"/>
+      {/* Tail */}
+      <polygon points="42,74 58,74 55,88 45,88" fill={c} opacity="0.4"/>
+
+      {/* ── SWEPT FORWARD WINGS ── */}
+      {/* Left wing — sweeps forward and out */}
+      <polygon points="43,38 20,25 14,35 38,50 40,58" fill={c} opacity="0.6"/>
       {/* Right wing */}
-      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_body_${c.slice(1)})`} stroke={c} strokeOpacity="0.5" strokeWidth="3"
-        d="m 455,222.36218 -50,20 0,110 -25,20 40,80 0,70 -20,50 0,25 -20,103 35,12 55,-180 -10,-35 0,-65 -10,-30 20,-20 z"/>
-      {/* Engine glows */}
-      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_eng_${c.slice(1)})`}
-        d="m 150,592.36218 50,130 25,-10 -55,-180 z"/>
-      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_eng_${c.slice(1)})`}
-        d="m 490,592.36218 -50,130 -25,-10 55,-180 z"/>
-      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_eng_${c.slice(1)})`} fillOpacity="0.6"
-        d="m 140,392.36218 20,-180 25,10 -15,160 20,20 -10,30 -40,-40"/>
-      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_eng_${c.slice(1)})`} fillOpacity="0.6"
-        d="m 500,392.36218 -20,-180 -25,10 15,160 -20,20 10,30 40,-40"/>
-      {/* Cockpit core glow */}
-      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_core_${c.slice(1)})`}
-        d="m 280,482.36218 10,-10 60,0 10,10 20,110 -20,100 -80,0 -20,-100 z"/>
-      {/* Cockpit panels */}
-      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.35" stroke={c} strokeOpacity="0.6" strokeWidth="2"
-        d="m 310,482.36218 -5,90 30,0 -5,-90 z"/>
-      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.25" stroke={c} strokeOpacity="0.5" strokeWidth="2"
-        d="m 300,482.36218 -5,0 -5,5 -15,80 20,5 z"/>
-      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.25" stroke={c} strokeOpacity="0.5" strokeWidth="2"
-        d="m 340,482.36218 5,0 5,5 15,80 -20,5 z"/>
-      {/* Hull panel details */}
-      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.3" stroke={c} strokeOpacity="0.4" strokeWidth="2"
-        d="m 260,592.36218 -20,5 20,103 20,-7 z"/>
-      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.3" stroke={c} strokeOpacity="0.4" strokeWidth="2"
-        d="m 380,592.36218 20,5 -20,103 -20,-7 z"/>
-      {/* Exhaust nozzle */}
-      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.4" stroke={c} strokeOpacity="0.6" strokeWidth="2"
-        d="m 280,692.36218 80,0 -10,20 -60,0 z"/>
+      <polygon points="57,38 80,25 86,35 62,50 60,58" fill={c} opacity="0.6"/>
+
+      {/* ── WING DETAIL LINES ── */}
+      <line x1="43" y1="38" x2="20" y2="25" stroke={c} strokeWidth="0.6" strokeOpacity="0.4"/>
+      <line x1="38" y1="44" x2="16" y2="33" stroke={c} strokeWidth="0.4" strokeOpacity="0.3"/>
+      <line x1="57" y1="38" x2="80" y2="25" stroke={c} strokeWidth="0.6" strokeOpacity="0.4"/>
+      <line x1="62" y1="44" x2="84" y2="33" stroke={c} strokeWidth="0.4" strokeOpacity="0.3"/>
+
+      {/* ── CANARDS — small forward stabilizers ── */}
+      <polygon points="46,22 34,18 32,24 44,26" fill={c} opacity="0.65"/>
+      <polygon points="54,22 66,18 68,24 56,26" fill={c} opacity="0.65"/>
+
+      {/* ── WINGTIP HARDPOINTS ── */}
+      <rect x="10" y="30" width="8" height="12" rx="2" fill={c} opacity="0.5"/>
+      <rect x="82" y="30" width="8" height="12" rx="2" fill={c} opacity="0.5"/>
+      {/* Hardpoint guns */}
+      <rect x="12" y="24" width="2" height="8" rx="1" fill={c} opacity="0.8"/>
+      <rect x="86" y="24" width="2" height="8" rx="1" fill={c} opacity="0.8"/>
+
+      {/* ── AFT SPLIT FINS ── */}
+      <polygon points="42,72 32,88 40,88 45,76" fill={c} opacity="0.55"/>
+      <polygon points="58,72 68,88 60,88 55,76" fill={c} opacity="0.55"/>
+
+      {/* ── ENGINE PODS — flanking the tail ── */}
+      <rect x="37" y="76" width="8" height="16" rx="3" fill={c} opacity="0.45"/>
+      <rect x="55" y="76" width="8" height="16" rx="3" fill={c} opacity="0.45"/>
+      {/* Engine glow */}
+      <ellipse cx="41" cy="92" rx="4" ry="2.5" fill={`url(#nf_eng_${c.slice(1)})`}/>
+      <ellipse cx="59" cy="92" rx="4" ry="2.5" fill={`url(#nf_eng_${c.slice(1)})`}/>
+
+      {/* ── COCKPIT ── */}
+      <ellipse cx="50" cy="28" rx="4" ry="7" fill="#000" opacity="0.7"/>
+      <ellipse cx="50" cy="27" rx="2.5" ry="5" fill={c} opacity="0.4"/>
+      {/* Core sensor glow */}
+      <circle cx="50" cy="46" r="5" fill={`url(#nf_core_${c.slice(1)})`}/>
+      <circle cx="50" cy="46" r="2" fill={c} opacity="0.8"/>
+
+      {/* ── HULL PANEL LINES ── */}
+      <line x1="47" y1="18" x2="45" y2="58" stroke={c} strokeWidth="0.4" strokeOpacity="0.35"/>
+      <line x1="53" y1="18" x2="55" y2="58" stroke={c} strokeWidth="0.4" strokeOpacity="0.35"/>
+      <line x1="43" y1="38" x2="57" y2="38" stroke={c} strokeWidth="0.5" strokeOpacity="0.5"/>
+      <line x1="40" y1="58" x2="60" y2="58" stroke={c} strokeWidth="0.5" strokeOpacity="0.4"/>
     </svg>
   );
 }
