@@ -181,8 +181,14 @@ function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, i
         </div>
       )}
 
-      {/* Ship image or fallback */}
-      <div style={{ position: 'relative', flexShrink: 0 }}>
+      {/* Ship image or fallback — rotate the WHOLE wrapper so stripes rotate with the ship */}
+      <div style={{
+        position: 'relative', flexShrink: 0,
+        width: w, height: w,
+        transform: `rotate(${rotateDeg}deg)`,
+        filter: hitFilter,
+        transition: 'filter 0.15s',
+      }}>
         {imgSrc ? (
           <>
             <img
@@ -192,18 +198,15 @@ function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, i
                 width: w, height: w,
                 objectFit: 'contain',
                 display: 'block',
-                transform: `rotate(${rotateDeg}deg)`,
-                filter: hitFilter,
                 imageRendering: 'crisp-edges',
-                transition: 'filter 0.15s',
               }}
             />
-            {/* Red racing stripes for player */}
+            {/* Red racing stripes — now rotate with ship because wrapper rotates */}
             {isPlayer && (
               <div style={{
                 position: 'absolute', inset: 0, pointerEvents: 'none',
                 backgroundImage: `
-                  linear-gradient(${rotateDeg}deg,
+                  linear-gradient(0deg,
                     transparent 0%, transparent 30%,
                     ${RED}55 30%, ${RED}55 34%,
                     transparent 34%, transparent 58%,
@@ -217,9 +220,7 @@ function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, i
             )}
           </>
         ) : (
-          <div style={{ transform: `rotate(${rotateDeg}deg)` }}>
-            <FallbackShip faction={faction} size={w} />
-          </div>
+          <FallbackShip faction={faction} size={w} />
         )}
       </div>
     </div>
