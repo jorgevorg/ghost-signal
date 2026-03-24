@@ -118,24 +118,31 @@ function FallbackShip({ faction, size = 64 }) {
     </svg>
   );
 
-  // NONE — proper swept-wing fighter, nose UP
+  // NONE — use the uploaded generic fighter SVG, tinted to faction color via CSS filter
+  // We convert the faction hex color to a hue-rotate angle for tinting
+  const hexToHue = (hex) => {
+    const r = parseInt(hex.slice(1,3),16)/255;
+    const g = parseInt(hex.slice(3,5),16)/255;
+    const b = parseInt(hex.slice(5,7),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    if (max === min) return 0;
+    let h = max === r ? (g-b)/(max-min) : max === g ? 2+(b-r)/(max-min) : 4+(r-g)/(max-min);
+    return ((h*60)+360)%360;
+  };
+  const hue = hexToHue(c);
+  // The SVG has a blue-ish dark base — offset by ~220deg to get correct target hue
+  const rot = ((hue - 220) + 360) % 360;
   return (
-    <svg width={s} height={s} viewBox="0 0 100 100" style={{ display:'block', filter:`drop-shadow(0 0 6px ${c}77)` }}>
-      {/* Main fuselage — narrow at nose, wider at rear */}
-      <polygon points="50,5 58,30 58,78 50,85 42,78 42,30" fill={c} opacity="0.9"/>
-      {/* Forward swept wings */}
-      <polygon points="42,35 8,55 12,68 42,52" fill={c} opacity="0.75"/>
-      <polygon points="58,35 92,55 88,68 58,52" fill={c} opacity="0.75"/>
-      {/* Wing tip pods */}
-      <rect x="4" y="55" width="10" height="16" rx="3" fill={c} opacity="0.65"/>
-      <rect x="86" y="55" width="10" height="16" rx="3" fill={c} opacity="0.65"/>
-      {/* Cockpit canopy */}
-      <ellipse cx="50" cy="28" rx="5" ry="8" fill="#000" opacity="0.55"/>
-      <ellipse cx="50" cy="27" rx="3" ry="5" fill={c} opacity="0.5"/>
-      {/* Rear engine exhausts */}
-      <rect x="43" y="82" width="6" height="10" rx="2" fill={c} opacity="0.7"/>
-      <rect x="51" y="82" width="6" height="10" rx="2" fill={c} opacity="0.7"/>
-    </svg>
+    <div style={{
+      width: s, height: Math.round(s*1.55), overflow:'hidden',
+      filter: `sepia(1) saturate(4) hue-rotate(${rot}deg) brightness(0.9) drop-shadow(0 0 8px ${c}88)`,
+    }}>
+      <img
+        src="/ships/generic-fighter.svg"
+        alt="enemy ship"
+        style={{ width: s, height: Math.round(s*1.55), objectFit:'contain', display:'block' }}
+      />
+    </div>
   );
 }
 
