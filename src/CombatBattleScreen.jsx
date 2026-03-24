@@ -284,7 +284,7 @@ function Star({ x, y, size, speed, opacity, bright }) {
 }
 
 // ── Main component ─────────────────────────────────────────────────────────
-export default function CombatBattleScreen({ ctBrief }) {
+export default function CombatBattleScreen({ ctBrief, gs }) {
   const { active, enemies = [], coleHP, velaHP, round } = ctBrief || {};
 
   const prevColeHP  = useRef(coleHP);
@@ -441,13 +441,13 @@ export default function CombatBattleScreen({ ctBrief }) {
         {active&&(
           <div style={{fontFamily:MONO,fontSize:7,color:TEAL+'bb',letterSpacing:2,
             textAlign:'center',textShadow:`0 0 6px ${TEAL}66`,marginTop:2}}>
-            INDESTRUCTIBLE II
+            {(gs?.ship?.name || 'THE INCONCEIVABLE').toUpperCase()}
           </div>
         )}
         {active&&coleHP!==null&&(
           <div style={{display:'flex',gap:8}}>
-            <span style={{fontFamily:MONO,fontSize:7,color:TEAL,textShadow:`0 0 5px ${TEAL}`}}>C {coleHP}</span>
-            <span style={{fontFamily:MONO,fontSize:7,color:VELA,textShadow:`0 0 5px ${VELA}`}}>V {velaHP}</span>
+            <span style={{fontFamily:MONO,fontSize:7,color:TEAL,textShadow:`0 0 5px ${TEAL}`}}>{(gs?.cole?.name||'COLE').split(' ')[0].toUpperCase()} {coleHP}</span>
+            <span style={{fontFamily:MONO,fontSize:7,color:VELA,textShadow:`0 0 5px ${VELA}`}}>{(gs?.vela?.name||'VELA').split(' ')[0].toUpperCase()} {velaHP}</span>
           </div>
         )}
       </div>
