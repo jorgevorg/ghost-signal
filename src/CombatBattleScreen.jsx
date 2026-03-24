@@ -81,65 +81,64 @@ function VectorFlame({ color, dir, size = 60 }) {
 }
 
 // ── Fallback ships for factions without images ─────────────────────────────
+// ALL ships drawn NOSE-UP (y=0 is front) so rotation math matches real images
 function FallbackShip({ faction, size = 64 }) {
   const c = FACTION_COLOR[faction] || '#9090b8';
   const s = size;
 
   if (faction === 'MEDUSA') return (
     <svg width={s} height={s} viewBox="0 0 100 100" style={{ display:'block', filter:`drop-shadow(0 0 8px ${c}99)` }}>
-      {/* Sleek predator hull */}
-      <ellipse cx="50" cy="50" rx="38" ry="16" fill={c} opacity="0.9"/>
-      {/* Forward spike */}
-      <polygon points="88,50 50,38 50,62" fill={c}/>
-      {/* Rear swept wings */}
-      <polygon points="12,50 35,28 35,72" fill={c} opacity="0.75"/>
-      {/* Antenna cluster */}
-      <line x1="88" y1="50" x2="100" y2="44" stroke={c} strokeWidth="2"/>
-      <line x1="88" y1="50" x2="100" y2="50" stroke={c} strokeWidth="2"/>
-      <line x1="88" y1="50" x2="100" y2="56" stroke={c} strokeWidth="2"/>
-      {/* Eye */}
-      <ellipse cx="68" cy="50" rx="7" ry="5" fill="#000" opacity="0.6"/>
-      <ellipse cx="70" cy="50" rx="3" ry="2" fill={c}/>
+      {/* Nose spike pointing UP */}
+      <polygon points="50,2 38,30 62,30" fill={c}/>
+      {/* Main body ellipse — narrow top to wide middle */}
+      <ellipse cx="50" cy="52" rx="16" ry="36" fill={c} opacity="0.9"/>
+      {/* Swept side wings — rear */}
+      <polygon points="34,55 10,90 28,80 38,65" fill={c} opacity="0.75"/>
+      <polygon points="66,55 90,90 72,80 62,65" fill={c} opacity="0.75"/>
+      {/* Antenna array at nose */}
+      <line x1="50" y1="2" x2="42" y2="-8" stroke={c} strokeWidth="2"/>
+      <line x1="50" y1="2" x2="50" y2="-10" stroke={c} strokeWidth="2"/>
+      <line x1="50" y1="2" x2="58" y2="-8" stroke={c} strokeWidth="2"/>
+      {/* Eye glow */}
+      <ellipse cx="50" cy="38" rx="6" ry="4" fill="#000" opacity="0.6"/>
+      <ellipse cx="50" cy="38" rx="3" ry="2" fill={c}/>
     </svg>
   );
 
   if (faction === 'SYNTH') return (
     <svg width={s} height={s} viewBox="0 0 100 100" style={{ display:'block', filter:`drop-shadow(0 0 8px ${c}99)` }}>
-      {/* Angular geometric hull */}
-      <polygon points="90,50 65,30 30,32 15,50 30,68 65,70" fill={c} opacity="0.9"/>
-      {/* Nose cone */}
-      <polygon points="90,50 105,44 105,56" fill={c} opacity="0.7"/>
-      {/* Core diamond */}
-      <polygon points="52,50 62,43 72,50 62,57" fill="#000" opacity="0.5"/>
-      <polygon points="55,50 62,46 69,50 62,54" fill={c}/>
+      {/* Angular geometric hull — nose up */}
+      <polygon points="50,5 70,35 68,75 50,82 32,75 30,35" fill={c} opacity="0.9"/>
+      {/* Wide mid wings */}
+      <polygon points="30,40 5,55 5,65 30,60" fill={c} opacity="0.7"/>
+      <polygon points="70,40 95,55 95,65 70,60" fill={c} opacity="0.7"/>
+      {/* Core circuit diamond */}
+      <polygon points="50,38 60,50 50,62 40,50" fill="#000" opacity="0.5"/>
+      <polygon points="50,42 57,50 50,58 43,50" fill={c}/>
       {/* Rear vents */}
-      <rect x="14" y="44" width="10" height="12" rx="2" fill="#000" opacity="0.5"/>
-      <line x1="15" y1="47" x2="23" y2="47" stroke={c} strokeWidth="1.5" opacity="0.8"/>
-      <line x1="15" y1="50" x2="23" y2="50" stroke={c} strokeWidth="1.5" opacity="0.8"/>
-      <line x1="15" y1="53" x2="23" y2="53" stroke={c} strokeWidth="1.5" opacity="0.8"/>
+      <line x1="40" y1="80" x2="40" y2="92" stroke={c} strokeWidth="2" opacity="0.8"/>
+      <line x1="50" y1="82" x2="50" y2="96" stroke={c} strokeWidth="2.5" opacity="0.9"/>
+      <line x1="60" y1="80" x2="60" y2="92" stroke={c} strokeWidth="2" opacity="0.8"/>
     </svg>
   );
 
-  // NONE — a proper generic fighter, not a thumb tack or a Vostok capsule
+  // NONE — proper swept-wing fighter, nose UP
   return (
     <svg width={s} height={s} viewBox="0 0 100 100" style={{ display:'block', filter:`drop-shadow(0 0 6px ${c}77)` }}>
-      {/* Main fuselage */}
-      <rect x="20" y="43" width="60" height="14" rx="5" fill={c} opacity="0.9"/>
-      {/* Nose */}
-      <polygon points="80,43 80,57 98,50" fill={c} opacity="0.85"/>
-      {/* Swept upper wing */}
-      <polygon points="55,43 30,22 22,32 50,43" fill={c} opacity="0.7"/>
-      {/* Swept lower wing */}
-      <polygon points="55,57 30,78 22,68 50,57" fill={c} opacity="0.7"/>
-      {/* Wing tips */}
-      <rect x="19" y="26" width="12" height="5" rx="2" fill={c} opacity="0.6"/>
-      <rect x="19" y="69" width="12" height="5" rx="2" fill={c} opacity="0.6"/>
-      {/* Cockpit */}
-      <ellipse cx="74" cy="50" rx="7" ry="5" fill="#000" opacity="0.55"/>
-      <ellipse cx="75" cy="50" rx="4" ry="3" fill={c} opacity="0.55"/>
-      {/* Tail fin */}
-      <polygon points="20,43 5,38 10,50 20,50" fill={c} opacity="0.6"/>
-      <polygon points="20,57 5,62 10,50 20,50" fill={c} opacity="0.6"/>
+      {/* Main fuselage — narrow at nose, wider at rear */}
+      <polygon points="50,5 58,30 58,78 50,85 42,78 42,30" fill={c} opacity="0.9"/>
+      {/* Forward swept wings */}
+      <polygon points="42,35 8,55 12,68 42,52" fill={c} opacity="0.75"/>
+      <polygon points="58,35 92,55 88,68 58,52" fill={c} opacity="0.75"/>
+      {/* Wing tip pods */}
+      <rect x="4" y="55" width="10" height="16" rx="3" fill={c} opacity="0.65"/>
+      <rect x="86" y="55" width="10" height="16" rx="3" fill={c} opacity="0.65"/>
+      {/* Cockpit canopy */}
+      <ellipse cx="50" cy="28" rx="5" ry="8" fill="#000" opacity="0.55"/>
+      <ellipse cx="50" cy="27" rx="3" ry="5" fill={c} opacity="0.5"/>
+      {/* Rear engine exhausts */}
+      <rect x="43" y="82" width="6" height="10" rx="2" fill={c} opacity="0.7"/>
+      <rect x="51" y="82" width="6" height="10" rx="2" fill={c} opacity="0.7"/>
     </svg>
   );
 }
