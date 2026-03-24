@@ -71,11 +71,7 @@ function VectorFlame({ color, dir, size = 60 }) {
         fill="#ffffff"
         opacity="0.9"
       />
-      {/* Nozzle glow dot */}
-      <circle cx={w} cy={hh} r={hh * 0.45}
-        fill={color} opacity="0.95"
-        style={{ filter: `drop-shadow(0 0 4px ${color})` }}
-      />
+
     </svg>
   );
 }
@@ -429,8 +425,8 @@ export default function CombatBattleScreen({ ctBrief }) {
       {/* ── PLAYER SHIP — left side, vertically centered ── */}
       <div style={{
         position:'absolute',
-        left:'6%', top:'50%',
-        transform: 'translateY(-50%)',
+        left:'6%', top:0, bottom:0,
+        justifyContent:'center',
         display:'flex',flexDirection:'column',alignItems:'center',gap:6,
         zIndex:10,
         animation: hitPlayer?'none':'idleDrift 4.2s ease-in-out infinite',
@@ -460,8 +456,8 @@ export default function CombatBattleScreen({ ctBrief }) {
       {primaryEnemy ? (
         <div style={{
           position:'absolute',
-          right:'6%', top:'50%',
-          transform:'translateY(-50%)',
+          right:'6%', top:0, bottom:0,
+          justifyContent:'center',
           display:'flex',flexDirection:'column',alignItems:'center',gap:6,
           zIndex:10,
           animation: enemyDefeated||enemyHit?'none':'idleDrift 3.8s ease-in-out 0.5s infinite',
