@@ -118,31 +118,63 @@ function FallbackShip({ faction, size = 64 }) {
     </svg>
   );
 
-  // NONE — use the uploaded generic fighter SVG, tinted to faction color via CSS filter
-  // We convert the faction hex color to a hue-rotate angle for tinting
-  const hexToHue = (hex) => {
-    const r = parseInt(hex.slice(1,3),16)/255;
-    const g = parseInt(hex.slice(3,5),16)/255;
-    const b = parseInt(hex.slice(5,7),16)/255;
-    const max = Math.max(r,g,b), min = Math.min(r,g,b);
-    if (max === min) return 0;
-    let h = max === r ? (g-b)/(max-min) : max === g ? 2+(b-r)/(max-min) : 4+(r-g)/(max-min);
-    return ((h*60)+360)%360;
-  };
-  const hue = hexToHue(c);
-  // The SVG has a blue-ish dark base — offset by ~220deg to get correct target hue
-  const rot = ((hue - 220) + 360) % 360;
+  // NONE — inline SVG generic fighter, tinted per faction color
+  const h = Math.round(s * 1.55);
   return (
-    <div style={{
-      width: s, height: Math.round(s*1.55), overflow:'hidden',
-      filter: `sepia(1) saturate(4) hue-rotate(${rot}deg) brightness(0.9) drop-shadow(0 0 8px ${c}88)`,
-    }}>
-      <img
-        src="/ships/generic-fighter.svg"
-        alt="enemy ship"
-        style={{ width: s, height: Math.round(s*1.55), objectFit:'contain', display:'block' }}
-      />
-    </div>
+    <svg width={s} height={h} viewBox="0 0 376 582" style={{ display:'block', filter:`drop-shadow(0 0 8px ${c}88)` }}>
+      <defs>
+        <linearGradient id={`gf_body_${c.slice(1)}`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor={c} stopOpacity="0.15"/>
+          <stop offset="0.5" stopColor={c} stopOpacity="0.45"/>
+          <stop offset="1" stopColor={c} stopOpacity="0.15"/>
+        </linearGradient>
+        <linearGradient id={`gf_eng_${c.slice(1)}`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor={c} stopOpacity="0.25"/>
+          <stop offset="0.5" stopColor={c} stopOpacity="0.75"/>
+          <stop offset="1" stopColor={c} stopOpacity="0.2"/>
+        </linearGradient>
+        <radialGradient id={`gf_core_${c.slice(1)}`} cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor={c} stopOpacity="0.7"/>
+          <stop offset="1" stopColor={c} stopOpacity="0.05"/>
+        </radialGradient>
+      </defs>
+      {/* Main hull */}
+      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.2" stroke={c} strokeOpacity="0.7" strokeWidth="4"
+        d="m 350,712.36218 -60,0 -10,-20 -60,39.99998 -60,-159.99998 20,-75 0,-65 -38,-40 18,-180 100,40 0,120 -20,40 0,185 20,-5 20,-110 10,-10 60,0 10,10 20,110 20,5 0,-185 -20,-40 0,-120 100,-40 20,180 -40,40 0,65 20,75 -60,159.99998 -60,-39.99998 z"/>
+      {/* Left wing */}
+      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_body_${c.slice(1)})`} stroke={c} strokeOpacity="0.5" strokeWidth="3"
+        d="m 185,222.36218 50,20 0,110 25,20 -40,80 0,70 20,50 0,25 20,103 -35,12 -55,-180 10,-35 0,-65 10,-30 -20,-20 z"/>
+      {/* Right wing */}
+      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_body_${c.slice(1)})`} stroke={c} strokeOpacity="0.5" strokeWidth="3"
+        d="m 455,222.36218 -50,20 0,110 -25,20 40,80 0,70 -20,50 0,25 -20,103 35,12 55,-180 -10,-35 0,-65 -10,-30 20,-20 z"/>
+      {/* Engine glows */}
+      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_eng_${c.slice(1)})`}
+        d="m 150,592.36218 50,130 25,-10 -55,-180 z"/>
+      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_eng_${c.slice(1)})`}
+        d="m 490,592.36218 -50,130 -25,-10 55,-180 z"/>
+      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_eng_${c.slice(1)})`} fillOpacity="0.6"
+        d="m 140,392.36218 20,-180 25,10 -15,160 20,20 -10,30 -40,-40"/>
+      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_eng_${c.slice(1)})`} fillOpacity="0.6"
+        d="m 500,392.36218 -20,-180 -25,10 15,160 -20,20 10,30 40,-40"/>
+      {/* Cockpit core glow */}
+      <path transform="translate(-131.9,-152.53)" fill={`url(#gf_core_${c.slice(1)})`}
+        d="m 280,482.36218 10,-10 60,0 10,10 20,110 -20,100 -80,0 -20,-100 z"/>
+      {/* Cockpit panels */}
+      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.35" stroke={c} strokeOpacity="0.6" strokeWidth="2"
+        d="m 310,482.36218 -5,90 30,0 -5,-90 z"/>
+      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.25" stroke={c} strokeOpacity="0.5" strokeWidth="2"
+        d="m 300,482.36218 -5,0 -5,5 -15,80 20,5 z"/>
+      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.25" stroke={c} strokeOpacity="0.5" strokeWidth="2"
+        d="m 340,482.36218 5,0 5,5 15,80 -20,5 z"/>
+      {/* Hull panel details */}
+      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.3" stroke={c} strokeOpacity="0.4" strokeWidth="2"
+        d="m 260,592.36218 -20,5 20,103 20,-7 z"/>
+      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.3" stroke={c} strokeOpacity="0.4" strokeWidth="2"
+        d="m 380,592.36218 20,5 -20,103 -20,-7 z"/>
+      {/* Exhaust nozzle */}
+      <path transform="translate(-131.9,-152.53)" fill={c} fillOpacity="0.4" stroke={c} strokeOpacity="0.6" strokeWidth="2"
+        d="m 280,692.36218 80,0 -10,20 -60,0 z"/>
+    </svg>
   );
 }
 
