@@ -3126,12 +3126,225 @@ var sendToMabel=async function(userMsg){
  var upSession=function(n){setGs(function(p){return Object.assign({},p,{session:n});});};
  var upCampaign=function(cm){console.log("upCampaign called",cm);setGs(function(p){return Object.assign({},p,{campaignMap:cm,chapter:p.campaignMap?Math.min((p.chapter||1)+1,3):1});});};
 
+
+// ── HELP OVERLAY ────────────────────────────────────────────────────────────
+function HelpOverlay({onClose}) {
+  var MONO="'Share Tech Mono',monospace";
+  var ORB="'Orbitron',sans-serif";
+  var ACC="#FF6B35"; var TEAL="#00FFD0"; var VELA="#cc88ff"; var YEL="#FFD166";
+  var RED="#FF2060"; var BLUE="#88BBFF"; var PINK="#FF6EC7"; var CBG="#06080e";
+
+  var sections=[
+    {
+      tab:"MAP", color:"#cc88ff",
+      desc:"The hex star map. Navigate the campaign.",
+      tips:[
+        "Click any hex to select it and view details in the info panel.",
+        "Use the map selector dropdown to switch between all 12 campaign maps.",
+        "Barrier hexes (red border) cannot be traversed.",
+        "Faction base hexes show controlling faction crests — tap to assign.",
+        "The Séance hex marks The Inconceivable's current position.",
+      ]
+    },
+    {
+      tab:"CREW", color:"#FFD166",
+      desc:"Character sheets for Cole and Vela.",
+      tips:[
+        "HP and EN bars update live — tap the +/- buttons to adjust during play.",
+        "Equipped weapons show in the loadout row — tap to swap from inventory.",
+        "Cybertech implants appear in the CYBER tab but stat bonuses show here.",
+        "Status conditions (Overheat, Shock, etc.) display as colored pills.",
+        "Character names are editable — tap the name to rename.",
+      ]
+    },
+    {
+      tab:"SHIP", color:"#00FFD0",
+      desc:"The Inconceivable's systems and modules.",
+      tips:[
+        "Hull and Fuel track ship health and movement — adjust after each encounter.",
+        "Module slots hold equipped ship abilities used in ship combat.",
+        "Scraps (〒) are the ship's currency — update after buying or looting.",
+        "Control, Engines, and Modules determine your ship combat dice pool.",
+        "Cargo holds items that don't fit in crew inventory.",
+      ]
+    },
+    {
+      tab:"LOGS", color:"#FF6EC7",
+      desc:"Session journal and mission history.",
+      tips:[
+        "MABEL auto-generates session recaps — tap 'RECAP' in COMMS to trigger.",
+        "Manual log entries can be added via the text input at the bottom.",
+        "Completed combat logs are saved here automatically after combat ends.",
+        "Use logs to track faction standing changes and story beats.",
+      ]
+    },
+    {
+      tab:"COMMS", color:"#88BBFF",
+      desc:"MABEL — your ship AI. Ask anything.",
+      tips:[
+        "Type any question — rules lookups, tactical advice, lore, narrative flavor.",
+        "Say 'roll d6', 'roll d10', 'roll d66' in chat and MABEL rolls inline.",
+        "Ask MABEL for a 'session recap' to generate a log entry.",
+        "MABEL remembers recent exchanges — her memory persists across sessions.",
+        "The Oracle tab generates random mission and encounter tables.",
+      ]
+    },
+    {
+      tab:"CYBER", color:"#FF2060",
+      desc:"The Cybersphere — Vela's netrunning interface.",
+      tips:[
+        "Vela uses MIN stat for all Cybersphere rolls.",
+        "Navigate the node map using direction buttons — each node has an effect.",
+        "Encounter nodes (X) trigger random ICE — resolve with the encounter table.",
+        "Reward nodes give hacks, drones, or EXP on a d66 roll.",
+        "HACK_ and DRONE_ items acquired here go directly to Vela's inventory.",
+      ]
+    },
+    {
+      tab:"COMBAT", color:"#FF6B35",
+      desc:"Full tactical combat tracker.",
+      tips:[
+        "Hit '⚔ INITIATE COMBAT' — select enemies from the database first.",
+        "Initiative is rolled automatically for all combatants on start.",
+        "The active combatant glows — end their turn with 'END TURN →'.",
+        "Enemy turns show a red HOSTILE ACTING panel — select who they attack.",
+        "Vela's HACK button opens the full hack panel — pick target first.",
+        "Use '± DMG' for manual damage/heal on any combatant.",
+        "Victory auto-rolls loot. Defeat prompts Abyssal Scar rolls.",
+      ]
+    },
+    {
+      tab:"DICE", color:"#aaaaff",
+      desc:"Quick dice roller — always accessible.",
+      tips:[
+        "Switch between COLE and VELA to roll with their weapon and stats.",
+        "CHALLENGE rolls add your stat automatically.",
+        "DAMAGE rolls the equipped weapon's damage dice.",
+        "FREE roll lets you pick any die size.",
+        "Results are logged to COMMS automatically.",
+      ]
+    },
+    {
+      tab:"TACTICAL", color:"#00FFD0",
+      desc:"The side panel — live combat status at a glance.",
+      tips:[
+        "Pull out the ⚔ tab on the left edge during combat for a live status strip.",
+        "Shows current round, active combatant, and HP for all characters.",
+        "Visible from any tab — no need to switch to COMBAT to check status.",
+      ]
+    },
+  ];
+
+  var [activeIdx,setActiveIdx]=React.useState(0);
+  var sec=sections[activeIdx];
+
+  return React.createElement("div",{
+    onClick:onClose,
+    style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:200,
+      display:"flex",alignItems:"center",justifyContent:"center",
+      backdropFilter:"blur(3px)"}
+  },
+    React.createElement("div",{
+      onClick:function(e){e.stopPropagation();},
+      style:{background:CBG,border:"1px solid "+BLUE+"66",borderRadius:6,
+        width:"min(680px,96vw)",maxHeight:"85vh",overflow:"hidden",
+        display:"flex",flexDirection:"column",position:"relative",
+        boxShadow:"0 0 40px "+BLUE+"22"}
+    },
+      // Header
+      React.createElement("div",{style:{padding:"16px 20px 12px",borderBottom:"1px solid "+BLUE+"22",
+        display:"flex",justifyContent:"space-between",alignItems:"center"}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontFamily:ORB,fontSize:14,color:BLUE,letterSpacing:4}},
+            "◈ GHOST SIGNAL — NAVIGATION GUIDE"),
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#445",marginTop:3,letterSpacing:2}},
+            "TAP A SECTION · TAP OUTSIDE TO CLOSE")
+        ),
+        React.createElement("button",{onClick:onClose,style:{background:"transparent",border:"none",
+          color:"#445",cursor:"pointer",fontFamily:ORB,fontSize:16,padding:"0 4px"}},"✕")
+      ),
+      // Tab strip
+      React.createElement("div",{style:{display:"flex",overflowX:"auto",
+        borderBottom:"1px solid "+BLUE+"18",padding:"0 8px",
+        scrollbarWidth:"none",gap:2}},
+        sections.map(function(s,i){
+          var a=i===activeIdx;
+          return React.createElement("button",{key:s.tab,onClick:function(){setActiveIdx(i);},
+            style:{fontFamily:MONO,fontSize:8,letterSpacing:2,padding:"10px 10px",
+              background:a?s.color+"18":"transparent",
+              color:a?s.color:"#445",
+              border:"none",borderBottom:a?"2px solid "+s.color:"2px solid transparent",
+              cursor:"pointer",whiteSpace:"nowrap",transition:"all .15s"}
+          },s.tab);
+        })
+      ),
+      // Content
+      React.createElement("div",{style:{padding:"20px 24px",overflowY:"auto",flex:1}},
+        React.createElement("div",{style:{fontFamily:ORB,fontSize:11,color:sec.color,
+          letterSpacing:3,marginBottom:6}},sec.tab),
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#778",
+          marginBottom:16,letterSpacing:1}},sec.desc),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
+          sec.tips.map(function(tip,i){
+            return React.createElement("div",{key:i,style:{display:"flex",gap:12,
+              padding:"10px 14px",
+              background:sec.color+"08",
+              border:"1px solid "+sec.color+"22",
+              borderRadius:3}},
+              React.createElement("span",{style:{fontFamily:ORB,fontSize:9,
+                color:sec.color,opacity:0.7,flexShrink:0,marginTop:1}},
+                "0"+(i+1)),
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:10,
+                color:"#aab",lineHeight:1.7,letterSpacing:0.5}},tip)
+            );
+          })
+        ),
+        // Global shortcuts
+        i===0&&React.createElement("div",{style:{marginTop:20,padding:"12px 14px",
+          background:"#ffffff06",border:"1px solid #ffffff11",borderRadius:3}},
+          React.createElement("div",{style:{fontFamily:ORB,fontSize:9,color:"#445",
+            letterSpacing:3,marginBottom:8}},"GLOBAL"),
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}},
+            [
+              ["SAVE","Snapshot current game state to localStorage"],
+              ["?","This guide"],
+              ["COMMS → MABEL","Ask rules questions or get tactical help"],
+              ["Left panel ⚔","Live combat status from any tab"],
+            ].map(function(r,i){
+              return React.createElement("div",{key:i,style:{display:"flex",gap:8,
+                alignItems:"flex-start"}},
+                React.createElement("span",{style:{fontFamily:ORB,fontSize:8,
+                  color:BLUE,flexShrink:0,marginTop:1}},r[0]),
+                React.createElement("span",{style:{fontFamily:MONO,fontSize:9,
+                  color:"#445",lineHeight:1.5}},r[1])
+              );
+            })
+          )
+        )
+      ),
+      // Footer
+      React.createElement("div",{style:{padding:"10px 20px",borderTop:"1px solid "+BLUE+"18",
+        display:"flex",justifyContent:"space-between",alignItems:"center"}},
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#334",letterSpacing:2}},
+          "GHOST SIGNAL · ASTROPRISMA CAMPAIGN COMPANION"),
+        React.createElement("button",{onClick:onClose,
+          style:{fontFamily:MONO,fontSize:9,padding:"4px 14px",
+            background:"transparent",border:"1px solid "+BLUE+"44",
+            color:BLUE,borderRadius:2,cursor:"pointer",letterSpacing:2}},
+          "CLOSE")
+      )
+    )
+  );
+}
+
  var TABS=["MAP","CREW","SHIP","LOGS","COMMS","CYBER","COMBAT"];
+ var showHelpS=React.useState(false),setShowHelp=showHelpS[1],showHelp=showHelpS[0];
  var TAB_C={MAP:"#cc88ff",CREW:"#FFD166",SHIP:"#00FFD0",LOGS:"#FF6EC7",COMMS:"#88BBFF",CYBER:"#FF2060",COMBAT:"#FF6B35"};
 
  return React.createElement("div",{style:{height:"100vh",overflow:"hidden",background:BG,color:"#ddd",position:"relative",zIndex:1}},
   React.createElement("style",null,css),
     smOpen&&React.createElement(SaveManager,{gs:gs,onClose:function(){setSmOpen(false);},onLoad:function(state){upGs(function(){return merge(state);});}}),
+    showHelp&&React.createElement(HelpOverlay,{onClose:function(){setShowHelp(false);}},null),
     gs.campaignMap&&gs.shipPopup&&SHIP_DATA[gs.shipPopup.ship]&&React.createElement("div",{onClick:function(){setGs(function(g){return Object.assign({},g,{shipPopup:null});});},style:{position:"fixed",top:gs.shipPopup.y+12,left:gs.shipPopup.x+12,background:"#0a0a14ee",border:"1px solid "+SHIP_DATA[gs.shipPopup.ship].color+"66",borderRadius:8,padding:"12px 16px",fontFamily:"'Share Tech Mono',monospace",zIndex:9999,minWidth:180,cursor:"pointer"}},React.createElement("div",{style:{color:SHIP_DATA[gs.shipPopup.ship].color,fontSize:10,fontFamily:"'Orbitron',sans-serif",marginBottom:2}},SHIP_DATA[gs.shipPopup.ship].name),React.createElement("div",{style:{color:"#aaaacc",fontSize:8,marginBottom:6}},SHIP_DATA[gs.shipPopup.ship].cls+" • HULL "+SHIP_DATA[gs.shipPopup.ship].hull+" • ACT "+SHIP_DATA[gs.shipPopup.ship].act),React.createElement("div",{style:{height:1,background:"#ffffff18",margin:"4px 0 8px"}}),React.createElement("div",{style:{color:"#aaaacc",fontSize:8,lineHeight:"1.6"}},SHIP_DATA[gs.shipPopup.ship].skill),React.createElement("div",{style:{color:"#ffffff22",fontSize:7,marginTop:8,textAlign:"right"}},"CLICK TO DISMISS")),
   boot&&React.createElement("div",{style:{position:"fixed",inset:0,zIndex:9999,cursor:"pointer"},onClick:function(){setBoot(false);}},React.createElement(BootSequence,{onDone:function(){setBoot(false);}})),
    tab!=="CYBER"&&React.createElement(Starfield,null),
@@ -3148,7 +3361,8 @@ var sendToMabel=async function(userMsg){
   !boot&&tab!=="COMMS"&&React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
   React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box"}},
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #44445a",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
-     TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);}),React.createElement("button",{onClick:function(){setSmOpen(true);},style:{marginLeft:6,padding:"5px 13px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"SAVE")
+     TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);}),React.createElement("button",{onClick:function(){setSmOpen(true);},style:{marginLeft:6,padding:"5px 13px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"SAVE"),
+    React.createElement("button",{onClick:function(){setShowHelp(true);},title:"Navigation Help",style:{marginLeft:6,padding:"5px 10px",background:"#88BBFF18",border:"1px solid #88BBFF55",color:"#88BBFF",borderRadius:4,cursor:"pointer",fontFamily:"'Orbitron',sans-serif",fontSize:11,fontWeight:700,letterSpacing:1}},"?")
     ),
     React.createElement("div",{style:{paddingTop:20,flex:1,overflowY:"auto",minHeight:0,paddingBottom:60}},
      React.createElement("div",{style:{display:tab==="MAP"?"block":"none"}},
