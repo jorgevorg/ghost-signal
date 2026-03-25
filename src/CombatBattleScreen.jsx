@@ -762,15 +762,50 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
   const eCount         = displayEnemies.length;
   const allDefeated    = enemies.length > 0 && enemies.every(e => e.hp <= 0);
   const playerDown     = coleHP === 0 && velaHP === 0;
-  const shipSize = eCount <= 1 ? 72 : eCount === 2 ? 60 : eCount === 3 ? 50 : eCount === 4 ? 43 : 37;
-  const SCREEN_H = 240;
+
+  const selectedEnemy  = enemies.find(e => e.id === selectedEnemyId) || null;
+  const enemyHpPct     = selectedEnemy ? selectedEnemy.hp / Math.max(1, selectedEnemy.hpMax || selectedEnemy.hp) : 1;
+  const hailAvailable  = !!(active && selectedEnemy && !allDefeated && !playerDown && enemyHpPct < 0.5);
+
+  const enemyDisposition = (enemy) => {
+    if (!enemy || enemy.hp <= 0) return 'DESTROYED';
+    const pct = enemy.hp / Math.max(1, enemy.hpMax || enemy.hp);
+    if (pct > 0.6) return 'DEFIANT';
+    if (pct > 0.35) return 'ENGAGED';
+    if (pct > 0.15) return 'RATTLED';
+    return 'DESPERATE';
+  };
+  const enemyDispositionColor = (enemy) => {
+    const d = enemyDisposition(enemy);
+    if (d === 'DEFIANT')   return RED;
+    if (d === 'ENGAGED')   return YEL;
+    if (d === 'RATTLED')   return ACC;
+    if (d === 'DESPERATE') return TEAL;
+    return '#ffffff33';
+  };
+
+  const coleHPDisp  = coleHP  != null ? coleHP  : (gs?.cole?.hp  ?? 20);
+  const velaHPDisp  = velaHP  != null ? velaHP  : (gs?.vela?.hp  ?? 20);
+  const coleMaxHP   = gs?.cole?.hpMax ?? 20;
+  const velaMaxHP   = gs?.vela?.hpMax ?? 20;
+  const shipHull    = gs?.ship?.hull    ?? 20;
+  const shipHullMax = gs?.ship?.hullMax ?? 20;
+  const shipSize    = eCount <= 1 ? 68 : eCount === 2 ? 58 : eCount === 3 ? 48 : eCount === 4 ? 41 : 35;
+
+  const MiniBar = ({ val, max, color, h = 3 }) => (
+    React.createElement('div', { style: { height: h, background: '#ffffff10', borderRadius: 1.5, overflow: 'hidden' } },
+      React.createElement('div', { style: {
+        height: '100%',
+        width: `${Math.max(0, Math.min(100, (val / Math.max(1, max)) * 100))}%`,
+        background: color, borderRadius: 1.5, transition: 'width 0.35s'
+      } })
+    )
+  );
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: SCREEN_H, background: '#010208', overflow: 'hidden', borderBottom: '1px solid #FF6B3533' }}>
+    <div style={{ position: 'relative', width: '100%', background: '#010208', display: 'flex', flexDirection: 'column', overflow: 'hidden', userSelect: 'none' }}>
       <style>{`
         @keyframes starDrift{from{transform:translateX(0)}to{transform:translateX(-60px)}}
-        
-        
         @keyframes explode{0%{transform:translate(-50%,-50%) scale(0.1);opacity:1}55%{transform:translate(-50%,-50%) scale(1.7);opacity:0.8}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
         @keyframes spark0{to{transform:translate(calc(-50% + 24px),calc(-50% - 20px));opacity:0}}
         @keyframes spark1{to{transform:translate(calc(-50% - 22px),calc(-50% - 14px));opacity:0}}
@@ -778,327 +813,285 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
         @keyframes idleDrift{0%,100%{transform:translateY(0px)}50%{transform:translateY(-4px)}}
         @keyframes flameMorph{from{transform:scaleY(0.82) scaleX(0.95)}to{transform:scaleY(1.18) scaleX(1.05)}}
         @keyframes roundPulse{0%,100%{opacity:0.5}50%{opacity:1}}
-        @keyframes warpInLeft{
-          0%  {transform:translateX(-380px) scaleX(3.5) scaleY(0.3);opacity:0;filter:blur(28px) brightness(8) saturate(0);}
-          8%  {transform:translateX(-280px) scaleX(2.8) scaleY(0.4);opacity:0.15;filter:blur(22px) brightness(6) saturate(0.2);}
-          22% {transform:translateX(-140px) scaleX(2.0) scaleY(0.65);opacity:0.45;filter:blur(14px) brightness(4) saturate(0.5);}
-          40% {transform:translateX(-40px)  scaleX(1.3) scaleY(0.85);opacity:0.75;filter:blur(6px)  brightness(2.2) saturate(0.8);}
-          58% {transform:translateX(18px)   scaleX(0.96) scaleY(1.02);opacity:0.92;filter:blur(2px)  brightness(1.5);}
-          70% {transform:translateX(-10px)  scaleX(1.01) scaleY(0.99);opacity:1;filter:blur(0) brightness(1.15);}
-          80% {transform:translateX(5px);}
-          88% {transform:translateX(-3px);}
-          94% {transform:translateX(1.5px);}
-          100%{transform:translateX(0) scaleX(1) scaleY(1);opacity:1;filter:blur(0) brightness(1);}
-        }
-        @keyframes warpTrailLeft1{
-          0%  {transform:translateX(-420px) scaleX(2.2);opacity:0;}
-          12% {opacity:0.28;filter:blur(4px);}
-          45% {transform:translateX(-50px);opacity:0.12;}
-          100%{transform:translateX(0);opacity:0;}
-        }
-        @keyframes warpTrailLeft2{
-          0%  {transform:translateX(-500px) scaleX(2.8);opacity:0;}
-          18% {opacity:0.18;filter:blur(8px);}
-          55% {transform:translateX(-80px);opacity:0.06;}
-          100%{transform:translateX(0);opacity:0;}
-        }
-        @keyframes warpTrailLeft3{
-          0%  {transform:translateX(-600px) scaleX(3.5);opacity:0;}
-          22% {opacity:0.10;filter:blur(12px);}
-          65% {transform:translateX(-120px);opacity:0.03;}
-          100%{transform:translateX(0);opacity:0;}
-        }
-        @keyframes warpFlash{
-          0%  {opacity:0;}
-          15% {opacity:0.55;}
-          40% {opacity:0.2;}
-          60% {opacity:0.08;}
-          100%{opacity:0;}
-        }
-        @keyframes warpHorizStreak{
-          0%  {transform:translateX(-100%) scaleY(1);opacity:0;}
-          10% {opacity:0.35;}
-          50% {transform:translateX(100%) scaleY(0.3);opacity:0;}
-        }
-        @keyframes warpIn{
-          0%{transform:translateX(280px) scaleX(1.7);opacity:0;filter:blur(20px) brightness(6);}
-          18%{transform:translateX(90px) scaleX(1.25);opacity:0.5;filter:blur(9px) brightness(2.8);}
-          52%{transform:translateX(-16px) scaleX(0.97);opacity:0.92;filter:blur(1px) brightness(1.4);}
-          70%{transform:translateX(8px) scaleX(1.01);opacity:1;filter:blur(0) brightness(1.1);}
-          84%{transform:translateX(-4px);}93%{transform:translateX(2px);}
-          100%{transform:translateX(0) scaleX(1);opacity:1;filter:blur(0) brightness(1);}
-        }
+        @keyframes hailPulse{0%,100%{opacity:0.7;box-shadow:0 0 6px rgba(0,255,208,0.27)}50%{opacity:1;box-shadow:0 0 16px rgba(0,255,208,0.6)}}
+        @keyframes shieldGlow{0%,100%{opacity:0.55}50%{opacity:0.9}}
+        @keyframes warpInLeft{0%{transform:translateX(-380px) scaleX(3.5) scaleY(0.3);opacity:0;filter:blur(28px) brightness(8) saturate(0);}8%{transform:translateX(-280px) scaleX(2.8) scaleY(0.4);opacity:0.15;filter:blur(22px) brightness(6) saturate(0.2);}22%{transform:translateX(-140px) scaleX(2.0) scaleY(0.65);opacity:0.45;filter:blur(14px) brightness(4) saturate(0.5);}40%{transform:translateX(-40px) scaleX(1.3) scaleY(0.85);opacity:0.75;filter:blur(6px) brightness(2.2) saturate(0.8);}58%{transform:translateX(18px) scaleX(0.96) scaleY(1.02);opacity:0.92;filter:blur(2px) brightness(1.5);}70%{transform:translateX(-10px) scaleX(1.01) scaleY(0.99);opacity:1;filter:blur(0) brightness(1.15);}80%{transform:translateX(5px);}88%{transform:translateX(-3px);}94%{transform:translateX(1.5px);}100%{transform:translateX(0) scaleX(1) scaleY(1);opacity:1;filter:blur(0) brightness(1);}}
+        @keyframes warpTrailLeft1{0%{transform:translateX(-420px) scaleX(2.2);opacity:0;}12%{opacity:0.28;filter:blur(4px);}45%{transform:translateX(-50px);opacity:0.12;}100%{transform:translateX(0);opacity:0;}}
+        @keyframes warpTrailLeft2{0%{transform:translateX(-500px) scaleX(2.8);opacity:0;}18%{opacity:0.18;filter:blur(8px);}55%{transform:translateX(-80px);opacity:0.06;}100%{transform:translateX(0);opacity:0;}}
+        @keyframes warpTrailLeft3{0%{transform:translateX(-600px) scaleX(3.5);opacity:0;}22%{opacity:0.10;filter:blur(12px);}65%{transform:translateX(-120px);opacity:0.03;}100%{transform:translateX(0);opacity:0;}}
+        @keyframes warpFlash{0%{opacity:0;}15%{opacity:0.55;}40%{opacity:0.2;}60%{opacity:0.08;}100%{opacity:0;}}
+        @keyframes warpHorizStreak{0%{transform:translateX(-100%) scaleY(1);opacity:0;}10%{opacity:0.35;}50%{transform:translateX(100%) scaleY(0.3);opacity:0;}}
+        @keyframes warpIn{0%{transform:translateX(280px) scaleX(1.7);opacity:0;filter:blur(20px) brightness(6);}18%{transform:translateX(90px) scaleX(1.25);opacity:0.5;filter:blur(9px) brightness(2.8);}52%{transform:translateX(-16px) scaleX(0.97);opacity:0.92;filter:blur(1px) brightness(1.4);}70%{transform:translateX(8px) scaleX(1.01);opacity:1;filter:blur(0) brightness(1.1);}84%{transform:translateX(-4px);}93%{transform:translateX(2px);}100%{transform:translateX(0) scaleX(1);opacity:1;filter:blur(0) brightness(1);}}
         @keyframes warpTrail1{0%{transform:translateX(340px) scaleX(1.8);opacity:0;}15%{opacity:0.22;}55%{transform:translateX(35px);opacity:0.08;}100%{transform:translateX(0);opacity:0;}}
         @keyframes warpTrail2{0%{transform:translateX(400px) scaleX(2.0);opacity:0;}20%{opacity:0.14;}60%{transform:translateX(65px);opacity:0.04;}100%{transform:translateX(0);opacity:0;}}
-        @keyframes unknownPulse{0%,100%{opacity:0.35;box-shadow:0 0 12px #FF206033}50%{opacity:0.6;box-shadow:0 0 24px #FF206066}}
+        @keyframes unknownPulse{0%,100%{opacity:0.35;box-shadow:0 0 12px rgba(255,32,96,0.2)}50%{opacity:0.6;box-shadow:0 0 24px rgba(255,32,96,0.4)}}
         @keyframes shieldRipple{0%{transform:translate(-50%,-50%) scale(0.7);opacity:1;border-width:4px}60%{opacity:0.6;border-width:2px}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0;border-width:1px}}
         @keyframes shieldHex{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.85) rotate(0deg)}50%{opacity:0.5}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6) rotate(15deg)}}
         @keyframes resultFloat{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}20%{opacity:1;transform:translateX(-50%) translateY(-6px) scale(1.08)}100%{opacity:0;transform:translateX(-50%) translateY(-38px) scale(0.9)}}
-        
         @keyframes reticlePulse{0%,100%{opacity:0.5}50%{opacity:1}}
         @keyframes destroyFlash{0%{filter:brightness(1)}15%{filter:brightness(4) saturate(0)}35%{filter:brightness(0.3) saturate(0)}60%{filter:brightness(2) saturate(0)}100%{filter:brightness(0) saturate(0);opacity:0}}
+        @keyframes commsSlideIn{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
       `}</style>
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>{stars.map(s => <Star key={s.id} {...s} />)}</div>
-      <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:40,background:'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.2) 2px,rgba(0,0,0,0.2) 4px)' }}/>
-      <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:39,background:'radial-gradient(ellipse at 50% 50%,rgba(0,255,180,0.022) 0%,transparent 68%)' }}/>
-      <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:41,background:'radial-gradient(ellipse at 50% 50%,transparent 50%,rgba(0,0,0,0.75) 100%)' }}/>
-      <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:41,background:'linear-gradient(to bottom,rgba(0,0,0,0.2) 0%,transparent 10%,transparent 90%,rgba(0,0,0,0.2) 100%)' }}/>
 
-      {/* HUD */}
-      <div style={{ position:'absolute',top:7,left:0,right:0,display:'flex',justifyContent:'center',alignItems:'center',gap:16,pointerEvents:'none',zIndex:42 }}>
-        {active&&!allDefeated&&!playerDown&&(
-          <div style={{ fontFamily:MONO,fontSize:9,color:ACC,letterSpacing:3,textShadow:`0 0 8px ${ACC}`,animation:'roundPulse 2s ease-in-out infinite' }}>ROUND {round}</div>
-        )}
-        {allDefeated&&<div style={{ fontFamily:ORB,fontSize:12,color:ACC,letterSpacing:5,textShadow:`0 0 20px ${ACC},0 0 40px ${ACC}88` }}>★ VICTORY ★</div>}
-        {playerDown&&!allDefeated&&<div style={{ fontFamily:ORB,fontSize:12,color:RED,letterSpacing:5,textShadow:`0 0 20px ${RED}` }}>✕ DEFEAT ✕</div>}
+      {/* ── TOP BAR ── */}
+      <div style={{ height:34, background:'#04070b', borderBottom:'1px solid rgba(255,255,255,0.04)', display:'flex', alignItems:'center', padding:'0 10px', gap:8, zIndex:50, flexShrink:0 }}>
+        <div style={{ width:5, height:5, borderRadius:'50%', background: active ? TEAL : 'rgba(255,255,255,0.1)', boxShadow: active ? '0 0 6px ' + TEAL : 'none', flexShrink:0, transition:'all 0.5s' }} />
+        <span style={{ fontFamily:MONO, fontSize:7, color: active ? TEAL+'cc' : 'rgba(255,255,255,0.13)', letterSpacing:2 }}>
+          {active ? 'MABEL // COMBAT ACTIVE' : 'MABEL // GHOST SIGNAL // STANDBY'}
+        </span>
+        <div style={{ flex:1 }}/>
+        {allDefeated   && <span style={{ fontFamily:ORB, fontSize:9, color:ACC, letterSpacing:4, textShadow:'0 0 14px '+ACC }}>★ VICTORY ★</span>}
+        {playerDown && !allDefeated && <span style={{ fontFamily:ORB, fontSize:9, color:RED, letterSpacing:4, textShadow:'0 0 14px '+RED }}>✕ DEFEAT ✕</span>}
       </div>
 
-      {/* Combat result float */}
-      {combatResult&&(
-        <div key={combatResult.key} style={{
-          position:'absolute',left:'50%',top:'38%',
-          fontFamily:ORB,fontSize:14,fontWeight:900,
-          color:combatResult.color,
-          textShadow:`0 0 20px ${combatResult.color}`,
-          letterSpacing:3,whiteSpace:'nowrap',
-          animation:'resultFloat 1.8s ease-out forwards',
-          pointerEvents:'none',zIndex:50,
-        }}>
-          {combatResult.txt}
+      {/* ── MAIN ROW ── */}
+      <div style={{ display:'flex', flexDirection:'row', height:272, overflow:'hidden' }}>
+
+        {/* LEFT PANEL: Crew */}
+        <div style={{ width:100, flexShrink:0, background:'#03060a', borderRight:'1px solid rgba(255,255,255,0.03)', padding:'7px 6px', display:'flex', flexDirection:'column', gap:6, zIndex:45, overflow:'hidden' }}>
+          <div style={{ fontFamily:MONO, fontSize:6, color:'rgba(255,255,255,0.1)', letterSpacing:2 }}>CREW</div>
+
+          <div style={{ display:'flex', flexDirection:'column', gap:3, padding:'5px', background:'rgba(255,255,255,0.01)', borderRadius:2, border:'1px solid rgba(0,255,208,0.08)' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:3 }}>
+              <div style={{ width:4, height:4, borderRadius:'50%', background: coleHPDisp > 0 ? TEAL : 'rgba(255,255,255,0.13)', flexShrink:0 }} />
+              <span style={{ fontFamily:ORB, fontSize:7, color: coleHPDisp > 0 ? TEAL : 'rgba(255,255,255,0.2)', letterSpacing:1, flex:1 }}>COLE</span>
+              <span style={{ fontFamily:MONO, fontSize:7, color: coleHPDisp > 0 ? TEAL+'99' : 'rgba(255,255,255,0.13)' }}>{coleHPDisp}</span>
+            </div>
+            <MiniBar val={coleHPDisp} max={coleMaxHP} color={TEAL} h={3} />
+            <div style={{ fontFamily:MONO, fontSize:5, color:'rgba(255,255,255,0.1)', letterSpacing:1 }}>HP</div>
+          </div>
+
+          <div style={{ display:'flex', flexDirection:'column', gap:3, padding:'5px', background:'rgba(255,255,255,0.01)', borderRadius:2, border:'1px solid rgba(204,136,255,0.08)' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:3 }}>
+              <div style={{ width:4, height:4, borderRadius:'50%', background: velaHPDisp > 0 ? VELA : 'rgba(255,255,255,0.13)', flexShrink:0 }} />
+              <span style={{ fontFamily:ORB, fontSize:7, color: velaHPDisp > 0 ? VELA : 'rgba(255,255,255,0.2)', letterSpacing:1, flex:1 }}>VELA</span>
+              <span style={{ fontFamily:MONO, fontSize:7, color: velaHPDisp > 0 ? VELA+'99' : 'rgba(255,255,255,0.13)' }}>{velaHPDisp}</span>
+            </div>
+            <MiniBar val={velaHPDisp} max={velaMaxHP} color={VELA} h={3} />
+            <div style={{ fontFamily:MONO, fontSize:5, color:'rgba(255,255,255,0.1)', letterSpacing:1 }}>HP</div>
+          </div>
+
+          <div style={{ marginTop:'auto', borderTop:'1px solid rgba(255,255,255,0.03)', paddingTop:5, display:'flex', flexDirection:'column', gap:3 }}>
+            <div style={{ fontFamily:MONO, fontSize:5, color:'rgba(255,255,255,0.1)', letterSpacing:2 }}>SHIP</div>
+            <div style={{ fontFamily:ORB, fontSize:6, color:TEAL, letterSpacing:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+              {(gs?.ship?.name||'INCONCEIVABLE').toUpperCase()}
+            </div>
+            <MiniBar val={shipHull} max={shipHullMax} color={TEAL} h={3} />
+            <div style={{ fontFamily:MONO, fontSize:5, color:'rgba(255,255,255,0.1)', letterSpacing:1 }}>HULL {shipHull}/{shipHullMax}</div>
+          </div>
         </div>
-      )}
 
-      {/* PLAYER SHIP */}
-      <div style={{ position:'absolute',left:'5%',top:0,bottom:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6,zIndex:10 }}>
-        {/* Warp entry VFX */}
-        {playerShipState==='warping'&&(
-          <>
-            {/* Horizontal hyperspace streaks */}
-            <div style={{ position:'absolute',top:'42%',left:'-20%',width:'140%',height:3,background:`linear-gradient(90deg,transparent,${TEAL}88,${TEAL}cc,transparent)`,animation:'warpHorizStreak 1.4s ease-out forwards',pointerEvents:'none',zIndex:8 }}/>
-            <div style={{ position:'absolute',top:'50%',left:'-20%',width:'140%',height:2,background:`linear-gradient(90deg,transparent,${TEAL}44,${TEAL}88,transparent)`,animation:'warpHorizStreak 1.4s ease-out 0.06s forwards',pointerEvents:'none',zIndex:8 }}/>
-            <div style={{ position:'absolute',top:'58%',left:'-20%',width:'140%',height:2,background:`linear-gradient(90deg,transparent,${TEAL}33,${TEAL}66,transparent)`,animation:'warpHorizStreak 1.4s ease-out 0.12s forwards',pointerEvents:'none',zIndex:8 }}/>
-            {/* White flash bloom on arrival */}
-            <div style={{ position:'absolute',inset:-30,background:`radial-gradient(ellipse,${TEAL}55 0%,transparent 70%)`,animation:'warpFlash 1.6s ease-out forwards',pointerEvents:'none',zIndex:7 }}/>
-            {/* Trail ghost 3 — furthest */}
-            <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft3 1.6s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:`blur(14px) hue-rotate(40deg)`,opacity:0 }}>
-              <ShipDisplay isPlayer={true} size={active?72:60} facing="right"/>
+        {/* CENTER: Battlefield */}
+        <div style={{ flex:1, position:'relative', overflow:'hidden' }}>
+          <div style={{ position:'absolute', inset:0, overflow:'hidden', zIndex:1 }}>{stars.map(s => <Star key={s.id} {...s} />)}</div>
+          <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:40,background:'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 4px)' }}/>
+          <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:39,background:'radial-gradient(ellipse at 50% 50%,rgba(0,255,180,0.018) 0%,transparent 68%)' }}/>
+          <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:41,background:'radial-gradient(ellipse at 50% 50%,transparent 48%,rgba(0,0,0,0.82) 100%)' }}/>
+
+          {combatResult && (
+            <div key={combatResult.key} style={{ position:'absolute',left:'50%',top:'35%', fontFamily:ORB,fontSize:12,fontWeight:900, color:combatResult.color, textShadow:'0 0 20px '+combatResult.color, letterSpacing:3,whiteSpace:'nowrap', animation:'resultFloat 1.8s ease-out forwards', pointerEvents:'none',zIndex:50, transform:'translateX(-50%)' }}>
+              {combatResult.txt}
             </div>
-            {/* Trail ghost 2 */}
-            <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft2 1.4s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:`blur(8px) hue-rotate(20deg)`,opacity:0 }}>
-              <ShipDisplay isPlayer={true} size={active?72:60} facing="right"/>
+          )}
+
+          {/* PLAYER SHIP */}
+          <div style={{ position:'absolute',left:'5%',top:0,bottom:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,zIndex:10 }}>
+            {shipHull > 0 && active && (
+              <div style={{ position:'absolute', width:76, height:76, borderRadius:'50%', border:'1px solid rgba(0,255,208,0.27)', boxShadow:'0 0 14px rgba(0,255,208,0.13)', animation:'shieldGlow 3s ease-in-out infinite', pointerEvents:'none', zIndex:5 }} />
+            )}
+            {playerShipState==='warping' && (
+              <>
+                <div style={{ position:'absolute',top:'42%',left:'-20%',width:'140%',height:3,background:'linear-gradient(90deg,transparent,'+TEAL+'88,'+TEAL+'cc,transparent)',animation:'warpHorizStreak 1.4s ease-out forwards',pointerEvents:'none',zIndex:8 }}/>
+                <div style={{ position:'absolute',top:'50%',left:'-20%',width:'140%',height:2,background:'linear-gradient(90deg,transparent,'+TEAL+'44,'+TEAL+'88,transparent)',animation:'warpHorizStreak 1.4s ease-out 0.06s forwards',pointerEvents:'none',zIndex:8 }}/>
+                <div style={{ position:'absolute',top:'58%',left:'-20%',width:'140%',height:2,background:'linear-gradient(90deg,transparent,'+TEAL+'33,'+TEAL+'66,transparent)',animation:'warpHorizStreak 1.4s ease-out 0.12s forwards',pointerEvents:'none',zIndex:8 }}/>
+                <div style={{ position:'absolute',inset:-30,background:'radial-gradient(ellipse,'+TEAL+'55 0%,transparent 70%)',animation:'warpFlash 1.6s ease-out forwards',pointerEvents:'none',zIndex:7 }}/>
+                <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft3 1.6s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(14px) hue-rotate(40deg)',opacity:0 }}><ShipDisplay isPlayer={true} size={active?66:54} facing="right"/></div>
+                <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft2 1.4s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(8px) hue-rotate(20deg)',opacity:0 }}><ShipDisplay isPlayer={true} size={active?66:54} facing="right"/></div>
+                <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft1 1.2s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(4px)',opacity:0 }}><ShipDisplay isPlayer={true} size={active?66:54} facing="right"/></div>
+              </>
+            )}
+            <div style={{ animation: playerShipState==='warping' ? 'warpInLeft 1.6s cubic-bezier(0.16,1,0.3,1) forwards' : hitPlayer ? 'none' : 'idleDrift 4.2s ease-in-out infinite', position:'relative', zIndex:10 }}>
+              <ShipDisplay isPlayer={true} size={active?66:54} facing="right" hit={hitPlayer} defeated={playerDown&&!allDefeated}/>
             </div>
-            {/* Trail ghost 1 — closest */}
-            <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft1 1.2s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(4px)',opacity:0 }}>
-              <ShipDisplay isPlayer={true} size={active?72:60} facing="right"/>
-            </div>
-          </>
-        )}
-        <div style={{ animation: playerShipState==='warping'
-          ? 'warpInLeft 1.6s cubic-bezier(0.16,1,0.3,1) forwards'
-          : hitPlayer ? 'none' : 'idleDrift 4.2s ease-in-out infinite' }}>
-          <ShipDisplay isPlayer={true} size={active?72:60} facing="right" hit={hitPlayer} defeated={playerDown&&!allDefeated}/>
-        </div>
-        {active&&<div style={{ fontFamily:MONO,fontSize:7,color:TEAL+'bb',letterSpacing:2,textAlign:'center',textShadow:`0 0 6px ${TEAL}66`,marginTop:2 }}>{(gs?.ship?.name||'THE INCONCEIVABLE').toUpperCase()}</div>}
-        {active&&coleHP!==null&&(
-          <div style={{ display:'flex',gap:8 }}>
-            <span style={{ fontFamily:MONO,fontSize:7,color:YEL,textShadow:`0 0 5px ${YEL}88` }}>{(gs?.cole?.name||'COLE').split(' ')[0].toUpperCase()} {coleHP}</span>
-            <span style={{ fontFamily:MONO,fontSize:7,color:RED,textShadow:`0 0 5px ${RED}88` }}>{(gs?.vela?.name||'VELA').split(' ')[0].toUpperCase()} {velaHP}</span>
           </div>
-        )}
-      </div>
 
-      {/* ENEMY SHIPS — V/diamond formation */}
-      <div style={{ position:'absolute',right:'1%',top:0,bottom:0,width:'46%',zIndex:10 }}>
+          {/* ENEMY SHIPS */}
+          <div style={{ position:'absolute',right:'1%',top:0,bottom:0,width:'46%',zIndex:10 }}>
+            {eCount===0 && !active && (
+              <div style={{ position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:8 }}>
+                <svg width="44" height="44" viewBox="0 0 56 56" style={{opacity:0.2,animation:'idleDrift 5s ease-in-out infinite'}}>
+                  <circle cx="28" cy="28" r="24" fill="none" stroke="#FF6B35" strokeWidth="1" strokeDasharray="4 4"/>
+                  <circle cx="28" cy="28" r="14" fill="none" stroke="#FF6B35" strokeWidth="1" opacity="0.6"/>
+                  <circle cx="28" cy="28" r="3" fill="#FF6B35" opacity="0.5"/>
+                  <line x1="28" y1="2" x2="28" y2="12" stroke="#FF6B35" strokeWidth="1"/>
+                  <line x1="28" y1="44" x2="28" y2="54" stroke="#FF6B35" strokeWidth="1"/>
+                  <line x1="2" y1="28" x2="12" y2="28" stroke="#FF6B35" strokeWidth="1"/>
+                  <line x1="44" y1="28" x2="54" y2="28" stroke="#FF6B35" strokeWidth="1"/>
+                </svg>
+                <div style={{ fontFamily:MONO,fontSize:6,color:'rgba(255,107,53,0.19)',letterSpacing:3 }}>NO TARGETS</div>
+              </div>
+            )}
+            {eCount===0 && active && (
+              <div style={{ position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:6 }}>
+                <div style={{ width:60,height:60,border:'2px solid rgba(255,32,96,0.4)',borderRadius:4,background:'#0a0005',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:4,animation:'unknownPulse 2.2s ease-in-out infinite' }}>
+                  <div style={{ fontFamily:MONO,fontSize:18,color:'rgba(255,32,96,0.53)' }}>?</div>
+                  <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,32,96,0.33)',letterSpacing:2 }}>UNKNOWN</div>
+                </div>
+              </div>
+            )}
 
-        {/* No enemies — idle / unknown states */}
-        {eCount===0&&!active&&(
-          <div style={{ position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:10 }}>
-            <svg width="56" height="56" viewBox="0 0 56 56" style={{opacity:0.22,animation:'idleDrift 5s ease-in-out infinite'}}>
-              <circle cx="28" cy="28" r="24" fill="none" stroke="#FF6B35" strokeWidth="1" strokeDasharray="4 4"/>
-              <circle cx="28" cy="28" r="14" fill="none" stroke="#FF6B35" strokeWidth="1" opacity="0.6"/>
-              <circle cx="28" cy="28" r="3" fill="#FF6B35" opacity="0.5"/>
-              <line x1="28" y1="2" x2="28" y2="12" stroke="#FF6B35" strokeWidth="1"/>
-              <line x1="28" y1="44" x2="28" y2="54" stroke="#FF6B35" strokeWidth="1"/>
-              <line x1="2" y1="28" x2="12" y2="28" stroke="#FF6B35" strokeWidth="1"/>
-              <line x1="44" y1="28" x2="54" y2="28" stroke="#FF6B35" strokeWidth="1"/>
-            </svg>
-            <div style={{ fontFamily:'Share Tech Mono,monospace',fontSize:7,color:'#FF6B3544',letterSpacing:3 }}>NO TARGETS</div>
-          </div>
-        )}
-        {eCount===0&&active&&(
-          <div style={{ position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:8 }}>
-            <div style={{ width:72,height:72,border:`2px solid ${RED}66`,borderRadius:4,background:'#0a0005',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:4,animation:'unknownPulse 2.2s ease-in-out infinite' }}>
-              <div style={{ fontFamily:MONO,fontSize:20,color:`${RED}88` }}>?</div>
-              <div style={{ fontFamily:MONO,fontSize:6,color:`${RED}55`,letterSpacing:2 }}>UNKNOWN</div>
-            </div>
-            <div style={{ fontFamily:MONO,fontSize:7,color:`${RED}44`,letterSpacing:2 }}>CONTACT</div>
-          </div>
-        )}
-
-        {/* Formation ships */}
-        {eCount>0&&(()=>{
-          // V formation: leader at point (leftmost, toward player), wings trail right+up/down
-          // dx = horizontal offset from zone center (negative = left = forward toward player)
-          // dy = vertical offset from zone center
-          const FORMATIONS = [
-            [{dx:0,   dy:0}],
-            [{dx:-20, dy:-26},{dx:14, dy:26}],
-            [{dx:-22, dy:0},  {dx:14, dy:-70},{dx:14, dy:70}],
-            [{dx:-24, dy:0},  {dx:6,  dy:-68},{dx:6,  dy:68},{dx:44, dy:0}],
-            [{dx:-24, dy:0},  {dx:4,  dy:-66},{dx:4,  dy:66},{dx:26, dy:-32},{dx:26, dy:32}],
-          ];
-          const positions = FORMATIONS[Math.min(eCount,5)-1];
-          const baseShipSize = eCount<=1?70:eCount===2?58:eCount===3?48:eCount===4?41:35;
-
-          return displayEnemies.map((enemy, idx) => {
-            const state      = shipStates[enemy.id] || 'hidden';
-            const isWarping  = state === 'warping';
-            const isLanded   = state === 'landed';
-            const isHidden   = state === 'hidden';
-            const eColor     = FACTION_COLOR[enemy.faction] || '#9090b8';
-            const isDefeated   = enemy.hp <= 0;
-            const isHit        = !!hitEnemy[enemy.id];
-            const isLeader     = !!enemy.isLeader;
-            const isTargeted   = ctBrief?.selectedEnemyId === enemy.id && !isDefeated;
-            const isShieldFlash= shieldFlash === enemy.id;
-            const isDestroying = destroyAnim.has(enemy.id);
-            const sz         = isLeader ? baseShipSize + 10 : baseShipSize;
-            const pos        = positions[idx] || {dx:0,dy:0};
-            const driftDelay = (idx * 0.65).toFixed(1) + 's';
-
-            return (
-              <div key={enemy.id}
-                onClick={()=>{ if(!isDefeated&&isLanded&&onSelectEnemy) onSelectEnemy(isTargeted?null:enemy.id); }}
-                style={{
-                position:'absolute',
-                left:`calc(50% + ${pos.dx}px)`,
-                top:`calc(50% + ${pos.dy}px)`,
-                transform:'translate(-50%,-50%)',
-                display:'flex',flexDirection:'column',alignItems:'center',gap:2,
-                opacity:isDefeated?0.25:1,
-                transition:'opacity 0.6s ease',
-                cursor:isDefeated||!isLanded?'default':'crosshair',
-                zIndex:isLeader?12:10,
-              }}>
-
-                {/* Leader crown badge */}
-                {isLeader&&eCount>1&&!isDefeated&&(
-                  <div style={{ fontFamily:MONO,fontSize:8,color:eColor,letterSpacing:2,textShadow:`0 0 8px ${eColor}`,marginBottom:1,animation:'roundPulse 2.5s ease-in-out infinite' }}>◆ LEADER</div>
-                )}
-
-                {isHidden&&(
-                  <div style={{ width:sz,height:sz,border:`1px solid ${RED}44`,borderRadius:3,background:'#080005',display:'flex',alignItems:'center',justifyContent:'center',animation:'unknownPulse 2.2s ease-in-out infinite' }}>
-                    <div style={{ fontFamily:MONO,fontSize:eCount>3?10:14,color:`${RED}66` }}>?</div>
-                  </div>
-                )}
-
-                {(isWarping||isLanded)&&(
-                  <div style={{ position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:2 }}>
-                    {isWarping&&(
+            {(()=>{
+              const FMTS=[
+                [{x:50,y:50}],
+                [{x:38,y:26},{x:62,y:74}],
+                [{x:36,y:50},{x:60,y:18},{x:60,y:82}],
+                [{x:34,y:50},{x:56,y:18},{x:56,y:82},{x:80,y:50}],
+                [{x:32,y:50},{x:52,y:16},{x:52,y:84},{x:72,y:28},{x:72,y:72}],
+              ];
+              const fmt = eCount > 0 ? (FMTS[Math.min(eCount,5)-1]||FMTS[0]) : [];
+              return displayEnemies.map((enemy,idx)=>{
+                const pos       = fmt[idx] || {x:50,y:50};
+                const eColor    = FACTION_COLOR[enemy.faction] || FACTION_COLOR.NONE;
+                const isDefeated= enemy.hp <= 0;
+                const isSelected= enemy.id === selectedEnemyId;
+                const isLeader  = idx === 0;
+                const shipSt    = shipStates[enemy.id] || 'landed';
+                const destroyed = destroyAnim.has(enemy.id);
+                const driftDelay= (idx * 0.6).toFixed(1) + 's';
+                return (
+                  <div key={enemy.id}
+                    onClick={() => !isDefeated && onSelectEnemy && onSelectEnemy(enemy.id)}
+                    style={{ position:'absolute', left:pos.x+'%', top:pos.y+'%', transform:'translate(-50%,-50%)', cursor: isDefeated ? 'default' : 'pointer', zIndex: isSelected ? 12 : 10 }}>
+                    {(enemy.shields||0) > 0 && !isDefeated && (
+                      <div style={{ position:'absolute',left:'50%',top:'50%',width:shipSize*1.7,height:shipSize*1.7,transform:'translate(-50%,-50%)', border:'1px solid '+eColor+'77', borderRadius:'50%', boxShadow:'0 0 10px '+eColor+'33', animation:'shieldGlow 2s ease-in-out infinite', pointerEvents:'none', zIndex:5 }}/>
+                    )}
+                    {shieldFlash===enemy.id && (
                       <>
-                        <div style={{ position:'absolute',inset:0,display:'flex',justifyContent:'center',alignItems:'center',animation:'warpTrail2 1.1s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(7px)',opacity:0 }}>
-                          <ShipDisplay faction={enemy.faction} isBoss={enemy.isBoss} size={sz} facing="left"/>
-                        </div>
-                        <div style={{ position:'absolute',inset:0,display:'flex',justifyContent:'center',alignItems:'center',animation:'warpTrail1 1.0s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(3px)',opacity:0 }}>
-                          <ShipDisplay faction={enemy.faction} isBoss={enemy.isBoss} size={sz} facing="left"/>
-                        </div>
+                        <div style={{ position:'absolute',left:'50%',top:'50%',width:shipSize*2,height:shipSize*2,border:'3px solid '+eColor,borderRadius:'50%',animation:'shieldRipple 0.5s ease-out forwards',pointerEvents:'none',zIndex:16 }}/>
+                        <div style={{ position:'absolute',left:'50%',top:'50%',width:shipSize*1.8,height:shipSize*1.8,border:'2px solid '+eColor+'cc',borderRadius:6,animation:'shieldHex 0.45s ease-out forwards',pointerEvents:'none',zIndex:15 }}/>
                       </>
                     )}
-
-                    {/* Targeting reticle — 3-dot corners, neon red-pink gradient */}
-                    {isTargeted&&isLanded&&(()=>{
-                      const rw=sz+28, rh=sz+28;
-                      const cx=rw/2, cy=rh/2;
-                      const ex=rw/2-2, ey=rh/2-2;
-                      const DOT='#FF2060';
-                      const ds=3, gap=6; // dot size, spacing
-                      // 3 dots per arm: corner dot + 1 along each axis
-                      // Returns [{cx,cy,opacity}] for one corner
-                      const corner=(ox,oy,dx,dy)=>[
-                        {cx:ox,       cy:oy,       o:1.0},   // corner
-                        {cx:ox+dx*gap,cy:oy,       o:0.55},  // horizontal arm
-                        {cx:ox,       cy:oy+dy*gap,o:0.55},  // vertical arm
-                      ];
-                      const allDots=[
-                        ...corner(cx-ex, cy-ey,  1,  1),  // TL
-                        ...corner(cx+ex, cy-ey, -1,  1),  // TR
-                        ...corner(cx-ex, cy+ey,  1, -1),  // BL
-                        ...corner(cx+ex, cy+ey, -1, -1),  // BR
-                      ];
-                      return React.createElement('div',{style:{position:'absolute',top:'50%',left:'50%',width:rw,height:rh,transform:'translate(-50%,-50%)',pointerEvents:'none',zIndex:15,animation:'reticlePulse 1.2s ease-in-out infinite'}},
-                        React.createElement('svg',{width:rw,height:rh,viewBox:`0 0 ${rw} ${rh}`,style:{position:'absolute',inset:0,overflow:'visible'}},
-                          React.createElement('defs',null,
-                            React.createElement('filter',{id:'dotGlow'},
-                              React.createElement('feGaussianBlur',{stdDeviation:'1.5',result:'blur'}),
-                              React.createElement('feMerge',null,
-                                React.createElement('feMergeNode',{in:'blur'}),
-                                React.createElement('feMergeNode',{in:'SourceGraphic'})
-                              )
-                            )
-                          ),
-                          allDots.map((d,i)=>React.createElement('rect',{key:i,x:d.cx-ds/2,y:d.cy-ds/2,width:ds,height:ds,fill:DOT,opacity:d.o,filter:'url(#dotGlow)'})),
-                          // Ghost crosshair
-                          React.createElement('line',{x1:cx-ex+20,y1:cy,x2:cx+ex-20,y2:cy,stroke:DOT,strokeWidth:0.4,opacity:0.18}),
-                          React.createElement('line',{x1:cx,y1:cy-ey+20,x2:cx,y2:cy+ey-20,stroke:DOT,strokeWidth:0.4,opacity:0.18}),
-                          React.createElement('rect',{x:cx-1.5,y:cy-1.5,width:3,height:3,fill:DOT,opacity:0.6,filter:'url(#dotGlow)'})
-                        )
-                      );
-                    })()}
-                    {/* Shield flash ripple */}
-                    {isShieldFlash&&(
-                      <>
-                        <div style={{ position:'absolute',top:'50%',left:'50%',width:sz+14,height:sz+14,border:`3px solid ${TEAL}`,borderRadius:'50%',pointerEvents:'none',zIndex:20,animation:'shieldRipple 0.9s ease-out forwards' }}/>
-                        <div style={{ position:'absolute',top:'50%',left:'50%',width:sz+6,height:sz+6,border:`2px solid ${TEAL}88`,borderRadius:4,pointerEvents:'none',zIndex:20,animation:'shieldHex 0.9s ease-out forwards' }}/>
-                      </>
+                    {isSelected && !isDefeated && (
+                      <div style={{ position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)', width:shipSize+20,height:shipSize+20, border:'1px solid '+eColor, borderRadius:'50%', animation:'reticlePulse 1.2s ease-in-out infinite', pointerEvents:'none', zIndex:14 }}/>
                     )}
-                    {/* Ship wrapper */}
-                    <div style={{
-                      transition:'opacity 0.3s ease',
-                      animation: isDestroying
-                        ? 'destroyFlash 1.2s ease-out forwards'
-                        : isWarping
-                        ? 'warpIn 0.95s cubic-bezier(0.22,1,0.36,1) forwards'
-                        : (isDefeated||isHit?'none':`idleDrift 3.8s ease-in-out ${driftDelay} infinite`),
-                    }}>
-                      <ShipDisplay
-                        faction={enemy.faction}
-                        isBoss={enemy.isBoss}
-                        size={sz}
-                        facing="left"
-                        hit={isHit}
-                        defeated={isDefeated}
-                        isLeader={isLeader && eCount > 1}
-                        eColor={eColor}
-                      />
-                    </div>
-
-                    {eCount<=3&&(
-                      <div style={{ fontFamily:MONO,fontSize:isLeader?7:6,color:isLeader?eColor:eColor+'99',letterSpacing:1,textAlign:'center',maxWidth:sz+16,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textShadow:isLeader?`0 0 8px ${eColor}66`:`0 0 4px ${eColor}33`,fontWeight:isLeader?'bold':'normal' }}>
-                        {enemy.name?.toUpperCase()}
+                    {active && !isDefeated && (
+                      <div style={{ position:'absolute',bottom:-14,left:'50%',transform:'translateX(-50%)', fontFamily:MONO,fontSize:6,color:eColor,letterSpacing:1,whiteSpace:'nowrap',textShadow:'0 0 6px '+eColor+'77',pointerEvents:'none' }}>
+                        {enemy.hp}/{enemy.hpMax||enemy.hp}
                       </div>
                     )}
-                    <div style={{ fontFamily:MONO,fontSize:6,color:isDefeated?RED+'44':isLeader?RED:RED+'aa',textShadow:`0 0 4px ${RED}55` }}>
-                      {isDefeated?'✕':`${enemy.hp}/${enemy.hpMax}`}
+                    <div style={{ animation: shipSt==='warping' ? 'warpIn 1.4s cubic-bezier(0.16,1,0.3,1) forwards' : destroyed ? 'destroyFlash 1.2s ease-out forwards' : 'idleDrift 3.8s ease-in-out '+driftDelay+' infinite' }}>
+                      <ShipDisplay faction={enemy.faction} isBoss={enemy.isBoss} isLeader={isLeader && eCount>1} size={shipSize} facing="left" defeated={isDefeated} hit={!!hitEnemy[enemy.id]} eColor={eColor}/>
                     </div>
                   </div>
-                )}
+                );
+              });
+            })()}
+          </div>
+
+          {/* Weapons */}
+          {beams.map(b=>(
+            <BeamWeapon key={b.id} x1pct={b.x1pct} y1pct={b.y1pct} x2pct={b.x2pct} y2pct={b.y2pct} color={b.color} weaponType={b.weaponType} onDone={()=>setBeams(prev=>prev.filter(x=>x.id!==b.id))}/>
+          ))}
+          {missiles.map(m=>(
+            <MissileSwarm key={m.id} x1pct={m.x1pct} y1pct={m.y1pct} x2pct={m.x2pct} y2pct={m.y2pct} color={m.color} onDone={()=>setMissiles(prev=>prev.filter(x=>x.id!==m.id))}/>
+          ))}
+          {explosions.map(e=><Explosion key={e.id} x={e.x} y={e.y} color={e.color}/>)}
+
+          {/* COMMS OVERLAY */}
+          {commsOpen && (
+            <div style={{ position:'absolute',inset:0,background:'rgba(1,2,8,0.93)',zIndex:60,display:'flex',flexDirection:'column',padding:'10px 12px',animation:'commsSlideIn 0.2s ease-out' }}>
+              <div style={{ fontFamily:MONO,fontSize:6,color:TEAL+'88',letterSpacing:4,textAlign:'center',marginBottom:8 }}>⬡ COMM CHANNEL OPEN ⬡</div>
+              <div style={{ display:'flex',gap:10,flex:1 }}>
+                <div style={{ flex:1,border:'1px solid rgba(0,255,208,0.17)',borderRadius:3,padding:'8px',display:'flex',flexDirection:'column',alignItems:'center',gap:5,background:'rgba(0,255,208,0.02)' }}>
+                  <div style={{ fontFamily:MONO,fontSize:5,color:TEAL+'77',letterSpacing:2 }}>OUR SIGNAL</div>
+                  <div style={{ width:46,height:62,border:'1px solid rgba(0,255,208,0.23)',borderRadius:2,background:'rgba(0,255,208,0.03)',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:2 }}>
+                    <div style={{ fontFamily:ORB,fontSize:16,color:TEAL }}>M</div>
+                    <div style={{ fontFamily:MONO,fontSize:4,color:TEAL+'55',letterSpacing:1 }}>ONLINE</div>
+                  </div>
+                  <div style={{ fontFamily:ORB,fontSize:7,color:TEAL,letterSpacing:2 }}>MABEL</div>
+                </div>
+                <div style={{ flex:1,border:'1px solid rgba(255,255,255,0.07)',borderRadius:3,padding:'8px',display:'flex',flexDirection:'column',alignItems:'center',gap:5,background:'rgba(255,255,255,0.01)' }}>
+                  <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.17)',letterSpacing:2 }}>ENEMY SIGNAL</div>
+                  <div style={{ width:46,height:62,border:'1px solid rgba(255,255,255,0.07)',borderRadius:2,background:'rgba(255,255,255,0.02)',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:2 }}>
+                    <div style={{ fontFamily:ORB,fontSize:16,color:'rgba(255,255,255,0.2)' }}>?</div>
+                    {selectedEnemy && <div style={{ fontFamily:MONO,fontSize:4,color:(FACTION_COLOR[selectedEnemy.faction]||'#ffffff')+'44',letterSpacing:1 }}>{selectedEnemy.faction}</div>}
+                  </div>
+                  <div style={{ fontFamily:ORB,fontSize:7,color:selectedEnemy?(FACTION_COLOR[selectedEnemy.faction]||'rgba(255,255,255,0.33)'):'rgba(255,255,255,0.13)',letterSpacing:1 }}>{selectedEnemy?.name||'UNKNOWN'}</div>
+                  {selectedEnemy && <div style={{ fontFamily:MONO,fontSize:6,color:enemyDispositionColor(selectedEnemy),letterSpacing:2 }}>{enemyDisposition(selectedEnemy)}</div>}
+                </div>
               </div>
-            );
-          });
-        })()}
+              <div style={{ display:'flex',gap:6,marginTop:8,justifyContent:'center',flexWrap:'wrap' }}>
+                {['NEGOTIATE','DEMAND','BLUFF','REJECT'].map(opt=>(
+                  <button key={opt} onClick={()=>setCommsOpen(false)}
+                    style={{ fontFamily:MONO,fontSize:6,letterSpacing:2,padding:'4px 9px',background:'transparent', border:'1px solid '+(opt==='REJECT'?RED:opt==='DEMAND'?YEL:TEAL)+'33', color:opt==='REJECT'?RED:opt==='DEMAND'?YEL:TEAL, cursor:'pointer',borderRadius:2 }}>
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT PANEL: Target info */}
+        <div style={{ width:100,flexShrink:0,background:'#03060a',borderLeft:'1px solid rgba(255,255,255,0.03)',padding:'7px 6px',display:'flex',flexDirection:'column',gap:5,zIndex:45,overflow:'hidden' }}>
+          <div style={{ fontFamily:MONO,fontSize:6,color:'rgba(255,255,255,0.1)',letterSpacing:2 }}>TARGET</div>
+          {selectedEnemy ? (
+            <>
+              <div style={{ display:'flex',alignItems:'center',gap:3 }}>
+                <div style={{ width:4,height:4,borderRadius:'50%',background:selectedEnemy.hp>0?(FACTION_COLOR[selectedEnemy.faction]||RED):'rgba(255,255,255,0.1)',flexShrink:0 }}/>
+                <span style={{ fontFamily:ORB,fontSize:6,color:selectedEnemy.hp>0?(FACTION_COLOR[selectedEnemy.faction]||'rgba(255,255,255,0.47)'):'rgba(255,255,255,0.13)',letterSpacing:1,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{selectedEnemy.faction||'?'}</span>
+              </div>
+              <div style={{ padding:'4px',background:'rgba(255,255,255,0.01)',borderRadius:2,border:'1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.1)',letterSpacing:1,marginBottom:2 }}>HP</div>
+                <MiniBar val={selectedEnemy.hp} max={selectedEnemy.hpMax||selectedEnemy.hp} color={FACTION_COLOR[selectedEnemy.faction]||RED} h={4} />
+                <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.13)',marginTop:2 }}>{selectedEnemy.hp}/{selectedEnemy.hpMax||selectedEnemy.hp}</div>
+              </div>
+              {(selectedEnemy.shields||0) > 0 && (
+                <div style={{ padding:'4px',background:'rgba(0,191,255,0.02)',borderRadius:2,border:'1px solid rgba(0,191,255,0.08)' }}>
+                  <div style={{ fontFamily:MONO,fontSize:5,color:BLUE+'77',letterSpacing:1,marginBottom:2 }}>SHIELDS</div>
+                  <MiniBar val={selectedEnemy.shields} max={selectedEnemy.shieldsMax||selectedEnemy.shields} color={BLUE} h={3} />
+                </div>
+              )}
+              <div style={{ padding:'4px',background:'rgba(255,255,255,0.01)',borderRadius:2,border:'1px solid rgba(255,255,255,0.04)' }}>
+                <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.1)',letterSpacing:1,marginBottom:2 }}>STATUS</div>
+                <div style={{ fontFamily:MONO,fontSize:8,color:enemyDispositionColor(selectedEnemy),letterSpacing:1 }}>{enemyDisposition(selectedEnemy)}</div>
+              </div>
+              <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.17)',letterSpacing:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',marginTop:1 }}>{selectedEnemy.name}</div>
+            </>
+          ) : (
+            <div style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center' }}>
+              <div style={{ fontFamily:MONO,fontSize:6,color:'rgba(255,255,255,0.06)',textAlign:'center',lineHeight:1.8,letterSpacing:1 }}>SELECT{'\n'}TARGET</div>
+            </div>
+          )}
+        </div>
+
       </div>
 
-      {beams.map(b=>(
-        <BeamWeapon key={b.id} x1pct={b.x1pct} y1pct={b.y1pct} x2pct={b.x2pct} y2pct={b.y2pct}
-          color={b.color} weaponType={b.weaponType}
-          onDone={()=>setBeams(prev=>prev.filter(x=>x.id!==b.id))}/>
-      ))}
-      {missiles.map(m=>(
-        <MissileSwarm key={m.id} x1pct={m.x1pct} y1pct={m.y1pct} x2pct={m.x2pct} y2pct={m.y2pct}
-          color={m.color}
-          onDone={()=>setMissiles(prev=>prev.filter(x=>x.id!==m.id))}/>
-      ))}
-      {explosions.map(e=><Explosion key={e.id} x={e.x} y={e.y} color={e.color}/>)}
+      {/* ── BOTTOM ACTION BAR ── */}
+      <div style={{ height:40,background:'#04070b',borderTop:'1px solid rgba(255,255,255,0.03)',display:'flex',alignItems:'center',padding:'0 10px',gap:8,zIndex:50,flexShrink:0 }}>
+        {active && !allDefeated && !playerDown && (
+          <div style={{ fontFamily:MONO,fontSize:7,color:ACC,letterSpacing:3,animation:'roundPulse 2s ease-in-out infinite',minWidth:60 }}>
+            RND {round}
+          </div>
+        )}
+        <div style={{ flex:1 }}/>
+        {active && !allDefeated && !playerDown && !commsOpen && selectedEnemy && (
+          <button onClick={()=>setCommsOpen(true)}
+            style={{ fontFamily:MONO,fontSize:7,letterSpacing:2,padding:'4px 11px', background:hailAvailable?'rgba(0,255,208,0.06)':'transparent', border:'1px solid '+(hailAvailable?TEAL:'rgba(255,255,255,0.08)'), color:hailAvailable?TEAL:'rgba(255,255,255,0.13)', cursor:'pointer',borderRadius:2, animation:hailAvailable?'hailPulse 1.8s ease-in-out infinite':'none', transition:'all 0.2s' }}>
+            HAIL
+          </button>
+        )}
+        {commsOpen && (
+          <button onClick={()=>setCommsOpen(false)}
+            style={{ fontFamily:MONO,fontSize:7,letterSpacing:2,padding:'4px 9px', background:'rgba(255,32,96,0.04)', border:'1px solid rgba(255,32,96,0.2)', color:RED, cursor:'pointer',borderRadius:2 }}>
+            CLOSE
+          </button>
+        )}
+        {(!active || allDefeated || playerDown) && (
+          <div style={{ fontFamily:MONO,fontSize:6,color:'rgba(255,255,255,0.06)',letterSpacing:3 }}>STANDBY</div>
+        )}
+      </div>
+
     </div>
   );
 }
