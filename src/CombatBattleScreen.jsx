@@ -199,9 +199,15 @@ function FallbackShip({ faction, size = 64 }) {
   );
 }
 
+// Maps faction color hex to approximate hue-rotate degrees for CSS filter tinting
+function _hueFor(hex) {
+  const map = {'#FF2060':330,'#FFD166':45,'#00FFD0':174,'#aaaaff':240,'#cc88ff':280,'#FF6B35':20,'#FF6EC7':320};
+  return map[hex] || 0;
+}
+
 // ── Ship display with correct rotation + flame positioning ─────────────────
 // facing: 'right' = player (nose right), 'left' = enemy (nose left)
-function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, isPlayer }) {
+function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, isPlayer, isLeader, eColor }) {
   const imgSrc = isPlayer ? '/ships/duskwing.webp' : factionShipSrc(faction, isBoss);
   const color  = isPlayer ? TEAL : (FACTION_COLOR[faction] || '#9090b8');
   const w = size || (isBoss ? 88 : 68);
@@ -217,8 +223,11 @@ function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, i
   const flameDir  = facing === 'right' ? 'left' : 'right';
   const flameSize = Math.round(w * 0.75);
 
+  const leaderColor = eColor || color;
   const hitFilter = hit
     ? `drop-shadow(0 0 18px ${RED}ff) drop-shadow(0 0 6px ${RED}) brightness(2)`
+    : isLeader && !isPlayer
+    ? `sepia(1) saturate(8) hue-rotate(${_hueFor(leaderColor)}deg) brightness(1.05)`
     : isPlayer
     ? `drop-shadow(0 0 10px ${TEAL}88)`
     : `drop-shadow(0 0 8px ${color}66)`;
@@ -261,23 +270,7 @@ function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, i
                 imageRendering: 'crisp-edges',
               }}
             />
-            {/* Red racing stripes — now rotate with ship because wrapper rotates */}
-            {isPlayer && (
-              <div style={{
-                position: 'absolute', inset: 0, pointerEvents: 'none',
-                backgroundImage: `
-                  linear-gradient(0deg,
-                    transparent 0%, transparent 30%,
-                    ${RED}55 30%, ${RED}55 34%,
-                    transparent 34%, transparent 58%,
-                    ${RED}33 58%, ${RED}33 61%,
-                    transparent 61%
-                  )
-                `,
-                mixBlendMode: 'screen',
-                borderRadius: 4,
-              }} />
-            )}
+
           </>
         ) : (
           <FallbackShip faction={faction} size={w} />
@@ -287,46 +280,261 @@ function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, i
   );
 }
 
-// ── Projectile bolt ────────────────────────────────────────────────────────
-function Projectile({ fromLeft, color, onDone }) {
-  useEffect(() => { const t = setTimeout(onDone, 620); return () => clearTimeout(t); }, []);
+// ── Missile swarm — tiny dashes, bell-curve arcs, cluster impact ──────────
+function MissileSwarm({ x1pct, y1pct, x2pct, y2pct, color, onDone, screenW=1032, screenH=240 }) {
+  const uid = React.useRef('ms'+Math.round(Math.random()*999999)).current;
+  const N = 6;
+  const ax = x1pct/100*screenW, ay = y1pct/100*screenH;
+  const bx = x2pct/100*screenW, by = y2pct/100*screenH;
+  const dist = Math.sqrt((bx-ax)**2+(by-ay)**2);
+  const travelMs = Math.round(120 + dist * 1.1);  // slower
+  const [tick, setTick] = React.useState(0);
+  const [impacted, setImpacted] = React.useState(false);
+
+  React.useEffect(() => {
+    const iv = setInterval(() => setTick(t => t+1), 30);
+    const impactT = setTimeout(() => { clearInterval(iv); setImpacted(true); }, travelMs);
+    const doneT = setTimeout(() => onDone(), travelMs + 500);
+    return () => { clearInterval(iv); clearTimeout(impactT); clearTimeout(doneT); };
+  }, []);
+
+  const elapsed = tick * 30;
+  const rawProg = Math.min(1, elapsed / travelMs);
+  // ease-in: slow start, faster finish
+  const prog = rawProg * rawProg;
+
+  // Each rocket follows a bell-curve arc (spread left/right then converge)
+  const rockets = React.useMemo(() => Array.from({length:N}, (_,i) => {
+    const side = i % 2 === 0 ? 1 : -1;
+    const spreadAmt = 18 + (Math.floor(i/2)) * 10; // 18, 18, 28, 28, 38, 38
+    const bodyAngle = Math.atan2(by-ay, bx-ax); // direction to target
+    const perpX = -Math.sin(bodyAngle);
+    const perpY =  Math.cos(bodyAngle);
+    // Control point for bell curve: perpendicular to path, max spread at midpoint
+    const cpX = (ax+bx)/2 + perpX * side * spreadAmt;
+    const cpY = (ay+by)/2 + perpY * side * spreadAmt;
+    // Final scatter near impact
+    const scatterA = (i/N)*Math.PI*2;
+    const ex = bx + Math.cos(scatterA)*2;
+    const ey = by + Math.sin(scatterA)*2;
+    // Rocket angle in deg (points toward travel direction)
+    const dashAngle = Math.atan2(by-ay, bx-ax) * 180/Math.PI;
+    return { cpX, cpY, ex, ey, dashAngle, side, spreadAmt };
+  }), []);
+
+  // Quadratic bezier: P = (1-t)^2*P0 + 2*(1-t)*t*P1 + t^2*P2
+  const bezier = (p0x,p0y,p1x,p1y,p2x,p2y,t) => {
+    const mt = 1-t;
+    return [mt*mt*p0x + 2*mt*t*p1x + t*t*p2x, mt*mt*p0y + 2*mt*t*p1y + t*t*p2y];
+  };
+
+  // Impact pops — 10 tiny scattered flashes
+  const pops = React.useMemo(() => Array.from({length:10}, (_,i) => ({
+    cx: bx + (Math.random()-0.5)*20,
+    cy: by + (Math.random()-0.5)*20,
+    r:  1 + Math.random()*2.5,
+    delay: i * 0.035,
+    angle: Math.random()*Math.PI*2,
+    rayLen: 4 + Math.random()*7,
+  })), []);
+
+  const PINK = '#FF2060';
+
   return (
-    <div style={{
-      position: 'absolute',
-      top: '50%', left: fromLeft ? '26%' : '74%',
-      width: 54, height: 4,
-      background: `linear-gradient(${fromLeft?'90deg':'270deg'}, ${color}ff, ${color}66, transparent)`,
-      borderRadius: 3,
-      transform: 'translateY(-50%)',
-      animation: `bolt${fromLeft?'R':'L'} 0.56s ease-in forwards`,
-      boxShadow: `0 0 10px 2px ${color}88`,
-      zIndex: 20,
-    }} />
+    <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:22,overflow:'visible'}}
+         viewBox={`0 0 ${screenW} ${screenH}`} preserveAspectRatio="none">
+      <defs>
+        <filter id={uid+'g'} x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <style>{`
+          @keyframes ${uid}pop{0%{opacity:1}80%{opacity:0.6}100%{opacity:0}}
+        `}</style>
+      </defs>
+
+      {/* Flying rockets */}
+      {!impacted && rockets.map((r, i) => {
+        const [cx2, cy2] = bezier(ax, ay, r.cpX, r.cpY, r.ex, r.ey, prog);
+        // Tail point slightly behind
+        const tailT = Math.max(0, prog - 0.06);
+        const [tx, ty] = bezier(ax, ay, r.cpX, r.cpY, r.ex, r.ey, tailT);
+        // Rocket travel angle at current point
+        const dx = cx2 - tx, dy = cy2 - ty;
+        const angle = Math.atan2(dy, dx);
+        // Rocket body: tiny dash 6px long
+        const bodyLen = 6, tipLen = 2;
+        const rx1 = cx2 - Math.cos(angle)*bodyLen;
+        const ry1 = cy2 - Math.sin(angle)*bodyLen;
+        const tipX = cx2 + Math.cos(angle)*tipLen;
+        const tipY = cy2 + Math.sin(angle)*tipLen;
+        return (
+          <React.Fragment key={i}>
+            {/* Fading tracer */}
+            <line x1={tx} y1={ty} x2={cx2} y2={cy2}
+              stroke={color} strokeWidth="0.8" strokeOpacity="0.3" strokeLinecap="round"/>
+            {/* Rocket body — 3px wide dash */}
+            <line x1={rx1} y1={ry1} x2={cx2} y2={cy2}
+              stroke={color} strokeWidth="3" strokeLinecap="round"
+              filter={`url(#${uid}g)`}/>
+            {/* Hot pink neon tip — 2px dot */}
+            <circle cx={tipX} cy={tipY} r="2" fill={PINK}
+              filter={`url(#${uid}g)`}/>
+          </React.Fragment>
+        );
+      })}
+
+      {/* Cluster impact: tiny bright pops */}
+      {impacted && pops.map((p,i) => (
+        <React.Fragment key={i}>
+          {/* Core flash dot */}
+          <circle cx={p.cx} cy={p.cy} r={p.r} fill={PINK} opacity="0"
+            filter={`url(#${uid}g)`}
+            style={{animation:`${uid}pop 0.22s ease-out ${p.delay}s forwards`}}/>
+          <circle cx={p.cx} cy={p.cy} r={p.r*0.5} fill="#fff" opacity="0"
+            style={{animation:`${uid}pop 0.15s ease-out ${p.delay}s forwards`}}/>
+          {/* 2-ray starburst per pop */}
+          {[0,1].map(j => {
+            const a = p.angle + j*Math.PI/2;
+            return <line key={j}
+              x1={p.cx} y1={p.cy}
+              x2={p.cx+Math.cos(a)*p.rayLen} y2={p.cy+Math.sin(a)*p.rayLen}
+              stroke={PINK} strokeWidth="1" strokeLinecap="round" opacity="0"
+              style={{animation:`${uid}pop 0.2s ease-out ${p.delay+0.02}s forwards`}}/>;
+          })}
+        </React.Fragment>
+      ))}
+    </svg>
   );
 }
 
-// ── Explosion ──────────────────────────────────────────────────────────────
-function Explosion({ x, y, color }) {
+// ── Beam weapon — SVG lightning arc from cannon to target ─────────────────
+function BeamWeapon({ x1pct, y1pct, x2pct, y2pct, color, onDone, screenW=1032, screenH=240 }) {
+  const uid = React.useRef('bw'+Math.round(Math.random()*999999)).current;
+  const [tick, setTick] = React.useState(0);
+
+  const ax = x1pct/100*screenW, ay = y1pct/100*screenH;
+  const bx = x2pct/100*screenW, by = y2pct/100*screenH;
+  const dist = Math.sqrt((bx-ax)**2+(by-ay)**2);
+  const travelMs = Math.round(40 + dist * 0.5);
+
+  // Jitter every 40ms for continuous wiggle
+  React.useEffect(() => {
+    const iv = setInterval(() => setTick(t => t+1), 40);
+    const t = setTimeout(() => { clearInterval(iv); onDone(); }, travelMs + 280);
+    return () => { clearInterval(iv); clearTimeout(t); };
+  }, []);
+
+  // Generate jagged lightning path
+  const makePath = (jag, nSegs) => {
+    const pts = [[ax,ay]];
+    for (let i=1; i<nSegs; i++) {
+      const t2 = i/nSegs;
+      const mx = ax+(bx-ax)*t2, my = ay+(by-ay)*t2;
+      const perp = (Math.random()-0.5)*jag*(1-Math.abs(t2-0.5)*1.2);
+      const dx = -(by-ay), dy = (bx-ax);
+      const len = Math.sqrt(dx*dx+dy*dy)||1;
+      pts.push([mx+dx/len*perp, my+dy/len*perp]);
+    }
+    pts.push([bx,by]);
+    return 'M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L');
+  };
+
+  // Three paths: outer glow, mid crackle, bright core — each re-randomized on tick
+  const d1 = makePath(16, 9);   // outer — big jag
+  const d2 = makePath(10, 9);   // mid
+  const d3 = makePath(6,  7);   // core — tighter
+
+  const sLen = dist * 1.4;
+  const elapsed = tick * 40;
+  const drawProg = Math.min(1, elapsed / travelMs);
+  const offset = sLen * (1 - drawProg);
+
   return (
-    <>
-      <div style={{
-        position: 'absolute', left: x+'%', top: y+'%',
-        transform: 'translate(-50%,-50%)',
-        width: 52, height: 52, borderRadius: '50%',
-        background: `radial-gradient(circle, #ffffffcc 0%, ${color}ff 25%, ${color}44 60%, transparent 80%)`,
-        animation: 'explode 0.55s ease-out forwards',
-        zIndex: 25,
-      }}/>
-      {[...Array(5)].map((_,i) => (
-        <div key={i} style={{
-          position: 'absolute', left: x+'%', top: y+'%',
-          width: 5, height: 5, borderRadius: '50%', background: color,
-          transform: 'translate(-50%,-50%)',
-          animation: `spark${i%3} 0.5s ease-out forwards`,
-          zIndex: 24,
-        }}/>
-      ))}
-    </>
+    <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:22,overflow:'visible'}}
+         viewBox={`0 0 ${screenW} ${screenH}`} preserveAspectRatio="none">
+      <defs>
+        <filter id={uid+'g'} x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      {/* Outer glow — wide, soft */}
+      <path d={d1} fill="none" stroke={color} strokeWidth="4" strokeOpacity="0.18"
+        filter={`url(#${uid}g)`} strokeLinecap="round"
+        strokeDasharray={sLen} strokeDashoffset={offset}/>
+      {/* Mid crackle */}
+      <path d={d2} fill="none" stroke={color} strokeWidth="1.4" strokeOpacity={0.55+Math.random()*0.3}
+        strokeLinecap="round"
+        strokeDasharray={sLen} strokeDashoffset={offset}/>
+      {/* Bright white core */}
+      <path d={d3} fill="none" stroke="#ffffff" strokeWidth="0.7" strokeOpacity={0.7+Math.random()*0.3}
+        strokeLinecap="round"
+        strokeDasharray={sLen} strokeDashoffset={offset}/>
+      {/* Origin burst */}
+      {drawProg < 0.3 && <>
+        <circle cx={ax} cy={ay} r={5+Math.random()*3} fill={color} opacity={0.6*(1-drawProg/0.3)}/>
+        <circle cx={ax} cy={ay} r={9+Math.random()*4} fill={color} opacity={0.2*(1-drawProg/0.3)}/>
+      </>}
+    </svg>
+  );
+}
+
+
+// ── Explosion — SVG starburst / radial sun ─────────────────────────────
+function Explosion({ x, y, color, screenW=900, screenH=240 }) {
+  const uid = React.useRef('ex'+Math.round(Math.random()*99999)).current;
+  const cx = x/100*screenW, cy = y/100*screenH;
+  const nRays = 12;
+  const rays = Array.from({length:nRays},(_,i)=>{
+    const angle = (i/nRays)*Math.PI*2;
+    const len = 14 + Math.random()*22;
+    const wid = 1.5 + Math.random()*2.5;
+    return {angle, len, wid, delay: Math.random()*0.08};
+  });
+  return (
+    <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:26,overflow:'visible'}}
+         viewBox={`0 0 ${screenW} ${screenH}`} preserveAspectRatio="none">
+      <defs>
+        <filter id={uid+'glow'} x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <style>{`
+          @keyframes ${uid}ring{0%{r:3;opacity:1}100%{r:28;opacity:0}}
+          @keyframes ${uid}ring2{0%{r:2;opacity:0.7}100%{r:18;opacity:0}}
+          @keyframes ${uid}ray{0%{opacity:1;stroke-width:inherit}60%{opacity:0.8}100%{opacity:0;stroke-width:0}}
+          @keyframes ${uid}core{0%{opacity:1;r:7}100%{opacity:0;r:2}}
+        `}</style>
+      </defs>
+      {/* Expanding rings */}
+      <circle cx={cx} cy={cy} r={3} fill="none" stroke={color} strokeWidth="2" opacity="1"
+        style={{animation:`${uid}ring 0.45s ease-out forwards`}} filter={`url(#${uid}glow)`}/>
+      <circle cx={cx} cy={cy} r={2} fill="none" stroke="#ffffff" strokeWidth="1.5" opacity="0.8"
+        style={{animation:`${uid}ring2 0.35s ease-out 0.05s forwards`}}/>
+      {/* Radial rays */}
+      {rays.map((r,i)=>{
+        const x1=cx, y1=cy;
+        const x2=cx+Math.cos(r.angle)*r.len, y2=cy+Math.sin(r.angle)*r.len;
+        const xm=cx+Math.cos(r.angle)*(r.len*0.5), ym=cy+Math.sin(r.angle)*(r.len*0.5);
+        return (
+          <React.Fragment key={i}>
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={r.wid} opacity="1"
+              filter={`url(#${uid}glow)`} strokeLinecap="round"
+              style={{animation:`${uid}ray 0.4s ease-out ${r.delay}s forwards`}}/>
+            <line x1={x1} y1={y1} x2={xm} y2={ym} stroke="#ffffff" strokeWidth={r.wid*0.6} opacity="0.8"
+              strokeLinecap="round"
+              style={{animation:`${uid}ray 0.3s ease-out ${r.delay}s forwards`}}/>
+          </React.Fragment>
+        );
+      })}
+      {/* Hot core */}
+      <circle cx={cx} cy={cy} r={7} fill="#ffffff" opacity="1"
+        style={{animation:`${uid}core 0.3s ease-out forwards`}}/>
+      <circle cx={cx} cy={cy} r={5} fill={color} opacity="1"
+        filter={`url(#${uid}glow)`}
+        style={{animation:`${uid}core 0.4s ease-out forwards`}}/>
+    </svg>
   );
 }
 
@@ -345,265 +553,552 @@ function Star({ x, y, size, speed, opacity, bright }) {
 }
 
 // ── Main component ─────────────────────────────────────────────────────────
-export default function CombatBattleScreen({ ctBrief, gs }) {
+export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) {
   const { active, enemies = [], coleHP, velaHP, round } = ctBrief || {};
 
   const prevColeHP  = useRef(coleHP);
   const prevVelaHP  = useRef(velaHP);
   const prevEnemyHP = useRef({});
 
-  const [projectiles, setProjectiles] = useState([]);
-  const [explosions,  setExplosions]  = useState([]);
-  const [hitPlayer,   setHitPlayer]   = useState(false);
-  const [hitEnemy,    setHitEnemy]    = useState({});
+  const [beams,           setBeams]           = useState([]);
+  const [missiles,        setMissiles]        = useState([]);
+  const [explosions,      setExplosions]       = useState([]);
+  const [hitPlayer,       setHitPlayer]        = useState(false);
+  const [hitEnemy,        setHitEnemy]         = useState({});
+  const [playerShipState, setPlayerShipState]  = useState('hidden'); // 'hidden'|'warping'|'landed'
 
-  const stars = useMemo(() => Array.from({length:70}, (_,i) => ({
+  // Per-enemy ship state: { [id]: 'hidden' | 'warping' | 'landed' }
+  const [shipStates,  setShipStates]  = useState({});
+  const [shieldFlash, setShieldFlash] = useState(null);     // enemyId
+  const [destroyAnim, setDestroyAnim] = useState(new Set()); // Set of enemyIds
+  const [combatResult,setCombatResult]= useState(null);      // {txt,color,key}
+  const prevActive   = useRef(false);
+  const prevEnemyIds = useRef([]);
+  const prevTab      = useRef(tab);
+  const prevLastFire = useRef(null);
+
+  const stars = useMemo(() => Array.from({ length: 70 }, (_, i) => ({
     id: i,
-    x: Math.random()*100, y: Math.random()*100,
-    size: Math.random()<0.08 ? 3 : Math.random()<0.25 ? 2 : 1,
-    speed: 14 + Math.random()*28,
-    opacity: 0.12 + Math.random()*0.65,
-    bright: Math.random()<0.1,
+    x: Math.random() * 100, y: Math.random() * 100,
+    size: Math.random() < 0.08 ? 3 : Math.random() < 0.25 ? 2 : 1,
+    speed: 14 + Math.random() * 28,
+    opacity: 0.12 + Math.random() * 0.65,
+    bright: Math.random() < 0.1,
   })), []);
 
-  const addProjectile = (fromLeft, color) => {
-    const id = Date.now()+Math.random();
-    setProjectiles(p=>[...p,{id,fromLeft,color}]);
+  // Combat start: stagger warp-in for all initial enemies
+  useEffect(() => {
+    if (active && !prevActive.current) {
+      const initial = enemies.slice(0, 5);
+      const init = {};
+      initial.forEach(e => { init[e.id] = 'hidden'; });
+      setShipStates(init);
+      initial.forEach((e, i) => {
+        setTimeout(() => {
+          setShipStates(s => ({ ...s, [e.id]: 'warping' }));
+          setTimeout(() => setShipStates(s => ({ ...s, [e.id]: 'landed' })), 1100);
+        }, i * 300);
+      });
+      prevActive.current = true;
+      prevEnemyIds.current = enemies.map(e => e.id);
+    }
+    if (!active) {
+      setShipStates({});
+      prevActive.current = false;
+      prevEnemyIds.current = [];
+    }
+  }, [active]);
+
+  // New enemy added during active combat
+  useEffect(() => {
+    if (!active) return;
+    const currentIds = enemies.map(e => e.id);
+    const newIds = currentIds.filter(id => !prevEnemyIds.current.includes(id));
+    newIds.forEach(id => {
+      setShipStates(s => ({ ...s, [id]: 'warping' }));
+      setTimeout(() => setShipStates(s => ({ ...s, [id]: 'landed' })), 1100);
+    });
+    prevEnemyIds.current = currentIds;
+  }, [enemies]);
+
+  // lastFire event → trigger visuals
+  useEffect(() => {
+    const fire = ctBrief?.lastFire;
+    if (!fire || fire === prevLastFire.current) return;
+    prevLastFire.current = fire;
+
+    const eid = fire.enemyId;
+    const allEnemies = ctBrief?.enemies || [];
+    const displayEnemies = allEnemies.slice(0, 5);
+    const eCount = displayEnemies.length;
+
+    // Formation positions — must match the render formations exactly
+    const FORMATIONS = [
+      [{dx:0,dy:0}],
+      [{dx:-20,dy:-26},{dx:14,dy:26}],
+      [{dx:-22,dy:0},{dx:14,dy:-70},{dx:14,dy:70}],
+      [{dx:-24,dy:0},{dx:6,dy:-68},{dx:6,dy:68},{dx:44,dy:0}],
+      [{dx:-24,dy:0},{dx:4,dy:-66},{dx:4,dy:66},{dx:26,dy:-32},{dx:26,dy:32}],
+    ];
+    const idx = displayEnemies.findIndex(e => e.id === eid);
+    const pos = (FORMATIONS[Math.min(eCount,5)-1] || [{dx:0,dy:0}])[Math.max(0,idx)] || {dx:0,dy:0};
+
+    // Enemy target position in % of screen
+    // Enemy zone is right:'1%', width:'46%' → center of zone at ~77% from left
+    // Formation dx offsets are in px within the zone; zone is ~420px wide in a ~900px container
+    // Convert: each px ≈ 0.11% of screen width
+    const targetX = 76 + (pos.dx * 0.111);
+    const targetY = 50 + (pos.dy / 2.4);
+
+    // Wing gun origins — corrected for actual container width (~1032px not 900px)
+    // SVG screenW must match actual container width or positions shift right
+    // Ship nose x = 17% of 1032px. Wing Y: ship centered ~45% from top when labels show
+    const wingTop    = { x: 15.8, y: 38 };
+    const wingBottom = { x: 15.8, y: 52.2 };
+    const SCREEN_ACTUAL_W = 1032;
+
+    // Random hit across ship body — center ± small scatter
+    const aimX = targetX + (Math.random() - 0.5) * 4;  // ±2% horizontal scatter
+    const aimY = targetY + (Math.random() - 0.5) * 10; // ±5% vertical scatter
+
+    // Travel time in px — MUST match BeamWeapon formula exactly
+    const SCREEN_H = 240;
+    const ax = wingTop.x/100*SCREEN_ACTUAL_W, ay = wingTop.y/100*SCREEN_H;
+    const bx = aimX/100*SCREEN_ACTUAL_W,      by = aimY/100*SCREEN_H;
+    const distPx = Math.sqrt((bx-ax)**2 + (by-ay)**2);
+    const travelMs = Math.round(40 + distPx * 0.5);
+
+    if (fire.type === 'shield') {
+      // Two beams, delayed explosion on shield
+      setShieldFlash(eid);
+      setTimeout(() => setShieldFlash(null), 900 + travelMs);
+      const bc=fire.wpnColor||TEAL;
+      const wt=fire.wpnName&&(fire.wpnName.toLowerCase().includes('missile')||fire.wpnName.toLowerCase().includes('rocket'))?'missile':'laser';
+      addBeam(wingTop.x, wingTop.y, aimX, aimY, bc, wt);
+      addBeam(wingBottom.x, wingBottom.y, aimX, aimY, bc, wt);
+      // Shield ripple fires on impact
+      setTimeout(() => {
+        setCombatResult({txt:'⊕ SHIELD ABSORBED', color: TEAL, key: Date.now()});
+      }, travelMs);
+    } else if (fire.type === 'hit') {
+      const bc2=fire.wpnColor||TEAL;
+      const wt2=fire.wpnName&&(fire.wpnName.toLowerCase().includes('missile')||fire.wpnName.toLowerCase().includes('rocket'))?'missile':'laser';
+      addBeam(wingTop.x, wingTop.y, aimX, aimY, bc2, wt2);
+      addBeam(wingBottom.x, wingBottom.y, aimX, aimY, bc2, wt2);
+      // Explosion fires on impact
+      addExplosion(aimX, aimY, RED, travelMs);
+      setTimeout(() => {
+        setHitEnemy(h => ({ ...h, [eid]: true }));
+        setTimeout(() => setHitEnemy(h => ({ ...h, [eid]: false })), 320);
+        setCombatResult({txt: '-' + fire.dmg + ' DMG', color: RED, key: Date.now()});
+      }, travelMs);
+    } else if (fire.type === 'destroy') {
+      const bc3=fire.wpnColor||TEAL;
+      const wt3=fire.wpnName&&(fire.wpnName.toLowerCase().includes('missile')||fire.wpnName.toLowerCase().includes('rocket'))?'missile':'laser';
+      addBeam(wingTop.x, wingTop.y, aimX, aimY, bc3, wt3);
+      addBeam(wingBottom.x, wingBottom.y, aimX, aimY, bc3, wt3);
+      // Destruction sequence fires on impact
+      setTimeout(() => {
+        setDestroyAnim(s => new Set([...s, eid]));
+        setCombatResult({txt: '💥 DESTROYED', color: RED, key: Date.now()});
+        [0, 180, 360].forEach((delay, i) => {
+          addExplosion(targetX + (i-1)*3, targetY + (i%2===0?-4:4), i===1?YEL:RED, delay);
+        });
+      }, travelMs);
+    }
+    setTimeout(() => setCombatResult(null), travelMs + 1800);
+  }, [ctBrief?.lastFire]);
+
+  // Tab enter: warp in player ship from the left
+  useEffect(() => {
+    if (tab === 'COMBAT' && prevTab.current !== 'COMBAT') {
+      setPlayerShipState('warping');
+      setTimeout(() => setPlayerShipState('landed'), 1800);
+    }
+    if (tab !== 'COMBAT') {
+      setPlayerShipState('hidden');
+    }
+    prevTab.current = tab;
+  }, [tab]);
+
+  const addBeam = (x1pct, y1pct, x2pct, y2pct, color, weaponType='laser') => {
+    const id = Date.now() + Math.random();
+    if (weaponType === 'missile') {
+      setMissiles(p => [...p, { id, x1pct, y1pct, x2pct, y2pct, color }]);
+    } else {
+      setBeams(p => [...p, { id, x1pct, y1pct, x2pct, y2pct, color, weaponType }]);
+    }
   };
-  const addExplosion = (x, y, color) => {
-    const id = Date.now()+Math.random();
-    setExplosions(p=>[...p,{id,x,y,color}]);
-    setTimeout(()=>setExplosions(p=>p.filter(e=>e.id!==id)), 620);
+  const addExplosion = (x, y, color, delay=0) => {
+    setTimeout(() => {
+      const id = Date.now() + Math.random();
+      setExplosions(p => [...p, { id, x, y, color }]);
+      setTimeout(() => setExplosions(p => p.filter(e => e.id !== id)), 700);
+    }, delay);
   };
 
   useEffect(() => {
     if (!active) return;
-    const coleDmg = (prevColeHP.current??coleHP) > (coleHP??0);
-    const velaDmg = (prevVelaHP.current??velaHP) > (velaHP??0);
-    if (coleDmg||velaDmg) {
-      addProjectile(false, RED);
+    const coleDmg = (prevColeHP.current ?? coleHP) > (coleHP ?? 0);
+    const velaDmg = (prevVelaHP.current ?? velaHP) > (velaHP ?? 0);
+    if (coleDmg || velaDmg) {
+      addBeam(74, 50, 11, 50, RED, 'laser');
       setHitPlayer(true);
-      addExplosion(22, 50, RED);
-      setTimeout(()=>setHitPlayer(false), 320);
+      addExplosion(11, 50, RED);
+      setTimeout(() => setHitPlayer(false), 320);
     }
     prevColeHP.current = coleHP;
     prevVelaHP.current = velaHP;
   }, [coleHP, velaHP, active]);
 
   useEffect(() => {
-    if (!active||!enemies.length) return;
-    enemies.forEach(e => {
-      const prev = prevEnemyHP.current[e.id];
-      if (prev!==undefined && e.hp<prev) {
-        addProjectile(true, TEAL);
-        addExplosion(78, 50, TEAL);
-        setHitEnemy(h=>({...h,[e.id]:true}));
-        setTimeout(()=>setHitEnemy(h=>({...h,[e.id]:false})), 320);
-      }
-      prevEnemyHP.current[e.id] = e.hp;
-    });
+    if (!active || !enemies.length) return;
+    const displayEnemies = enemies.slice(0, 5);
+    // Just track HP for reference — beams/explosions handled by lastFire system only
+    enemies.forEach(e => { prevEnemyHP.current[e.id] = e.hp; });
   }, [enemies, active]);
 
-  const liveEnemies   = enemies.filter(e=>e.hp>0);
-  const primaryEnemy  = liveEnemies[0]||enemies[0];
-  const enemyDefeated = primaryEnemy&&primaryEnemy.hp<=0;
-  const enemyHit      = primaryEnemy&&hitEnemy[primaryEnemy.id];
-  const allDefeated   = enemies.length>0 && enemies.every(e=>e.hp<=0);
-  const playerDown    = coleHP===0 && velaHP===0;
-
-  const SCREEN_H = 200;
+  const displayEnemies = enemies.slice(0, 5);
+  const eCount         = displayEnemies.length;
+  const allDefeated    = enemies.length > 0 && enemies.every(e => e.hp <= 0);
+  const playerDown     = coleHP === 0 && velaHP === 0;
+  const shipSize = eCount <= 1 ? 72 : eCount === 2 ? 60 : eCount === 3 ? 50 : eCount === 4 ? 43 : 37;
+  const SCREEN_H = 240;
 
   return (
-    <div style={{
-      position: 'relative', width: '100%', height: SCREEN_H,
-      background: '#010208', overflow: 'hidden',
-      borderBottom: '1px solid #FF6B3533',
-    }}>
+    <div style={{ position: 'relative', width: '100%', height: SCREEN_H, background: '#010208', overflow: 'hidden', borderBottom: '1px solid #FF6B3533' }}>
       <style>{`
         @keyframes starDrift{from{transform:translateX(0)}to{transform:translateX(-60px)}}
-        @keyframes boltR{from{left:26%;opacity:1}to{left:80%;opacity:0}}
-        @keyframes boltL{from{left:74%;opacity:1}to{left:20%;opacity:0}}
-        @keyframes explode{
-          0%{transform:translate(-50%,-50%) scale(0.1);opacity:1}
-          55%{transform:translate(-50%,-50%) scale(1.7);opacity:0.8}
-          100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}
-        }
+        
+        
+        @keyframes explode{0%{transform:translate(-50%,-50%) scale(0.1);opacity:1}55%{transform:translate(-50%,-50%) scale(1.7);opacity:0.8}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
         @keyframes spark0{to{transform:translate(calc(-50% + 24px),calc(-50% - 20px));opacity:0}}
         @keyframes spark1{to{transform:translate(calc(-50% - 22px),calc(-50% - 14px));opacity:0}}
         @keyframes spark2{to{transform:translate(calc(-50% + 8px),calc(-50% + 24px));opacity:0}}
         @keyframes idleDrift{0%,100%{transform:translateY(0px)}50%{transform:translateY(-4px)}}
-        @keyframes flameMorph{
-          from{transform:scaleY(0.82) scaleX(0.95)}
-          to{transform:scaleY(1.18) scaleX(1.05)}
-        }
+        @keyframes flameMorph{from{transform:scaleY(0.82) scaleX(0.95)}to{transform:scaleY(1.18) scaleX(1.05)}}
         @keyframes roundPulse{0%,100%{opacity:0.5}50%{opacity:1}}
+        @keyframes warpInLeft{
+          0%  {transform:translateX(-380px) scaleX(3.5) scaleY(0.3);opacity:0;filter:blur(28px) brightness(8) saturate(0);}
+          8%  {transform:translateX(-280px) scaleX(2.8) scaleY(0.4);opacity:0.15;filter:blur(22px) brightness(6) saturate(0.2);}
+          22% {transform:translateX(-140px) scaleX(2.0) scaleY(0.65);opacity:0.45;filter:blur(14px) brightness(4) saturate(0.5);}
+          40% {transform:translateX(-40px)  scaleX(1.3) scaleY(0.85);opacity:0.75;filter:blur(6px)  brightness(2.2) saturate(0.8);}
+          58% {transform:translateX(18px)   scaleX(0.96) scaleY(1.02);opacity:0.92;filter:blur(2px)  brightness(1.5);}
+          70% {transform:translateX(-10px)  scaleX(1.01) scaleY(0.99);opacity:1;filter:blur(0) brightness(1.15);}
+          80% {transform:translateX(5px);}
+          88% {transform:translateX(-3px);}
+          94% {transform:translateX(1.5px);}
+          100%{transform:translateX(0) scaleX(1) scaleY(1);opacity:1;filter:blur(0) brightness(1);}
+        }
+        @keyframes warpTrailLeft1{
+          0%  {transform:translateX(-420px) scaleX(2.2);opacity:0;}
+          12% {opacity:0.28;filter:blur(4px);}
+          45% {transform:translateX(-50px);opacity:0.12;}
+          100%{transform:translateX(0);opacity:0;}
+        }
+        @keyframes warpTrailLeft2{
+          0%  {transform:translateX(-500px) scaleX(2.8);opacity:0;}
+          18% {opacity:0.18;filter:blur(8px);}
+          55% {transform:translateX(-80px);opacity:0.06;}
+          100%{transform:translateX(0);opacity:0;}
+        }
+        @keyframes warpTrailLeft3{
+          0%  {transform:translateX(-600px) scaleX(3.5);opacity:0;}
+          22% {opacity:0.10;filter:blur(12px);}
+          65% {transform:translateX(-120px);opacity:0.03;}
+          100%{transform:translateX(0);opacity:0;}
+        }
+        @keyframes warpFlash{
+          0%  {opacity:0;}
+          15% {opacity:0.55;}
+          40% {opacity:0.2;}
+          60% {opacity:0.08;}
+          100%{opacity:0;}
+        }
+        @keyframes warpHorizStreak{
+          0%  {transform:translateX(-100%) scaleY(1);opacity:0;}
+          10% {opacity:0.35;}
+          50% {transform:translateX(100%) scaleY(0.3);opacity:0;}
+        }
+        @keyframes warpIn{
+          0%{transform:translateX(280px) scaleX(1.7);opacity:0;filter:blur(20px) brightness(6);}
+          18%{transform:translateX(90px) scaleX(1.25);opacity:0.5;filter:blur(9px) brightness(2.8);}
+          52%{transform:translateX(-16px) scaleX(0.97);opacity:0.92;filter:blur(1px) brightness(1.4);}
+          70%{transform:translateX(8px) scaleX(1.01);opacity:1;filter:blur(0) brightness(1.1);}
+          84%{transform:translateX(-4px);}93%{transform:translateX(2px);}
+          100%{transform:translateX(0) scaleX(1);opacity:1;filter:blur(0) brightness(1);}
+        }
+        @keyframes warpTrail1{0%{transform:translateX(340px) scaleX(1.8);opacity:0;}15%{opacity:0.22;}55%{transform:translateX(35px);opacity:0.08;}100%{transform:translateX(0);opacity:0;}}
+        @keyframes warpTrail2{0%{transform:translateX(400px) scaleX(2.0);opacity:0;}20%{opacity:0.14;}60%{transform:translateX(65px);opacity:0.04;}100%{transform:translateX(0);opacity:0;}}
+        @keyframes unknownPulse{0%,100%{opacity:0.35;box-shadow:0 0 12px #FF206033}50%{opacity:0.6;box-shadow:0 0 24px #FF206066}}
+        @keyframes shieldRipple{0%{transform:translate(-50%,-50%) scale(0.7);opacity:1;border-width:4px}60%{opacity:0.6;border-width:2px}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0;border-width:1px}}
+        @keyframes shieldHex{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.85) rotate(0deg)}50%{opacity:0.5}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6) rotate(15deg)}}
+        @keyframes resultFloat{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}20%{opacity:1;transform:translateX(-50%) translateY(-6px) scale(1.08)}100%{opacity:0;transform:translateX(-50%) translateY(-38px) scale(0.9)}}
+        
+        @keyframes reticlePulse{0%,100%{opacity:0.5}50%{opacity:1}}
+        @keyframes destroyFlash{0%{filter:brightness(1)}15%{filter:brightness(4) saturate(0)}35%{filter:brightness(0.3) saturate(0)}60%{filter:brightness(2) saturate(0)}100%{filter:brightness(0) saturate(0);opacity:0}}
       `}</style>
-
-      {/* Starfield */}
-      <div style={{position:'absolute',inset:0,overflow:'hidden'}}>
-        {stars.map(s=><Star key={s.id} {...s}/>)}
-      </div>
-
-      {/* CRT scanlines */}
-      <div style={{
-        position:'absolute',inset:0,pointerEvents:'none',zIndex:40,
-        background:'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.2) 2px,rgba(0,0,0,0.2) 4px)',
-      }}/>
-      {/* CRT phosphor glow */}
-      <div style={{
-        position:'absolute',inset:0,pointerEvents:'none',zIndex:39,
-        background:'radial-gradient(ellipse at 50% 50%,rgba(0,255,180,0.022) 0%,transparent 68%)',
-      }}/>
-      {/* CRT barrel vignette */}
-      <div style={{
-        position:'absolute',inset:0,pointerEvents:'none',zIndex:41,
-        background:'radial-gradient(ellipse at 50% 50%,transparent 50%,rgba(0,0,0,0.75) 100%)',
-      }}/>
-      {/* CRT horizontal edge fade */}
-      <div style={{
-        position:'absolute',inset:0,pointerEvents:'none',zIndex:41,
-        background:'linear-gradient(to bottom,rgba(0,0,0,0.2) 0%,transparent 10%,transparent 90%,rgba(0,0,0,0.2) 100%)',
-      }}/>
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>{stars.map(s => <Star key={s.id} {...s} />)}</div>
+      <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:40,background:'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.2) 2px,rgba(0,0,0,0.2) 4px)' }}/>
+      <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:39,background:'radial-gradient(ellipse at 50% 50%,rgba(0,255,180,0.022) 0%,transparent 68%)' }}/>
+      <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:41,background:'radial-gradient(ellipse at 50% 50%,transparent 50%,rgba(0,0,0,0.75) 100%)' }}/>
+      <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:41,background:'linear-gradient(to bottom,rgba(0,0,0,0.2) 0%,transparent 10%,transparent 90%,rgba(0,0,0,0.2) 100%)' }}/>
 
       {/* HUD */}
-      <div style={{
-        position:'absolute',top:7,left:0,right:0,
-        display:'flex',justifyContent:'center',alignItems:'center',gap:16,
-        pointerEvents:'none',zIndex:42,
-      }}>
+      <div style={{ position:'absolute',top:7,left:0,right:0,display:'flex',justifyContent:'center',alignItems:'center',gap:16,pointerEvents:'none',zIndex:42 }}>
         {active&&!allDefeated&&!playerDown&&(
-          <div style={{fontFamily:MONO,fontSize:9,color:ACC,letterSpacing:3,
-            textShadow:`0 0 8px ${ACC}`,animation:'roundPulse 2s ease-in-out infinite'}}>
-            ROUND {round}
-          </div>
+          <div style={{ fontFamily:MONO,fontSize:9,color:ACC,letterSpacing:3,textShadow:`0 0 8px ${ACC}`,animation:'roundPulse 2s ease-in-out infinite' }}>ROUND {round}</div>
         )}
-        {allDefeated&&<div style={{fontFamily:ORB,fontSize:12,color:ACC,letterSpacing:5,
-          textShadow:`0 0 20px ${ACC},0 0 40px ${ACC}88`}}>★ VICTORY ★</div>}
-        {playerDown&&!allDefeated&&<div style={{fontFamily:ORB,fontSize:12,color:RED,letterSpacing:5,
-          textShadow:`0 0 20px ${RED}`}}>✕ DEFEAT ✕</div>}
+        {allDefeated&&<div style={{ fontFamily:ORB,fontSize:12,color:ACC,letterSpacing:5,textShadow:`0 0 20px ${ACC},0 0 40px ${ACC}88` }}>★ VICTORY ★</div>}
+        {playerDown&&!allDefeated&&<div style={{ fontFamily:ORB,fontSize:12,color:RED,letterSpacing:5,textShadow:`0 0 20px ${RED}` }}>✕ DEFEAT ✕</div>}
       </div>
 
-      {/* ── PLAYER SHIP — left side, vertically centered ── */}
-      <div style={{
-        position:'absolute',
-        left:'6%', top:0, bottom:0,
-        justifyContent:'center',
-        display:'flex',flexDirection:'column',alignItems:'center',gap:6,
-        zIndex:10,
-        animation: hitPlayer?'none':'idleDrift 4.2s ease-in-out infinite',
-      }}>
-        <ShipDisplay
-          isPlayer={true}
-          size={active?72:60}
-          facing="right"
-          hit={hitPlayer}
-          defeated={playerDown&&!allDefeated}
-        />
-        {active&&(
-          <div style={{fontFamily:MONO,fontSize:7,color:TEAL+'bb',letterSpacing:2,
-            textAlign:'center',textShadow:`0 0 6px ${TEAL}66`,marginTop:2}}>
-            {(gs?.ship?.name || 'THE INCONCEIVABLE').toUpperCase()}
-          </div>
-        )}
-        {active&&coleHP!==null&&(
-          <div style={{display:'flex',gap:8}}>
-            <span style={{fontFamily:MONO,fontSize:7,color:TEAL,textShadow:`0 0 5px ${TEAL}`}}>{(gs?.cole?.name||'COLE').split(' ')[0].toUpperCase()} {coleHP}</span>
-            <span style={{fontFamily:MONO,fontSize:7,color:VELA,textShadow:`0 0 5px ${VELA}`}}>{(gs?.vela?.name||'VELA').split(' ')[0].toUpperCase()} {velaHP}</span>
-          </div>
-        )}
-      </div>
-
-      {/* ── ENEMY SHIP — right side, vertically centered ── */}
-      {primaryEnemy ? (
-        <div style={{
-          position:'absolute',
-          right:'6%', top:0, bottom:0,
-          justifyContent:'center',
-          display:'flex',flexDirection:'column',alignItems:'center',gap:6,
-          zIndex:10,
-          animation: enemyDefeated||enemyHit?'none':'idleDrift 3.8s ease-in-out 0.5s infinite',
+      {/* Combat result float */}
+      {combatResult&&(
+        <div key={combatResult.key} style={{
+          position:'absolute',left:'50%',top:'38%',
+          fontFamily:ORB,fontSize:14,fontWeight:900,
+          color:combatResult.color,
+          textShadow:`0 0 20px ${combatResult.color}`,
+          letterSpacing:3,whiteSpace:'nowrap',
+          animation:'resultFloat 1.8s ease-out forwards',
+          pointerEvents:'none',zIndex:50,
         }}>
-          <ShipDisplay
-            faction={primaryEnemy.faction}
-            isBoss={primaryEnemy.isBoss}
-            size={primaryEnemy.isBoss?90:70}
-            facing="left"
-            hit={enemyHit}
-            defeated={enemyDefeated}
-          />
-          {active&&(
-            <div style={{
-              fontFamily:MONO,fontSize:7,
-              color:(FACTION_COLOR[primaryEnemy.faction]||'#9090b8')+'bb',
-              letterSpacing:1,textAlign:'center',maxWidth:90,
-              overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
-              textShadow:`0 0 6px ${FACTION_COLOR[primaryEnemy.faction]||'#9090b8'}55`,
-              marginTop:2,
-            }}>{primaryEnemy.name?.toUpperCase()}</div>
-          )}
-          {active&&(
-            <div style={{fontFamily:MONO,fontSize:7,color:RED,textShadow:`0 0 5px ${RED}88`}}>
-              {primaryEnemy.hp}/{primaryEnemy.hpMax} HP
+          {combatResult.txt}
+        </div>
+      )}
+
+      {/* PLAYER SHIP */}
+      <div style={{ position:'absolute',left:'5%',top:0,bottom:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6,zIndex:10 }}>
+        {/* Warp entry VFX */}
+        {playerShipState==='warping'&&(
+          <>
+            {/* Horizontal hyperspace streaks */}
+            <div style={{ position:'absolute',top:'42%',left:'-20%',width:'140%',height:3,background:`linear-gradient(90deg,transparent,${TEAL}88,${TEAL}cc,transparent)`,animation:'warpHorizStreak 1.4s ease-out forwards',pointerEvents:'none',zIndex:8 }}/>
+            <div style={{ position:'absolute',top:'50%',left:'-20%',width:'140%',height:2,background:`linear-gradient(90deg,transparent,${TEAL}44,${TEAL}88,transparent)`,animation:'warpHorizStreak 1.4s ease-out 0.06s forwards',pointerEvents:'none',zIndex:8 }}/>
+            <div style={{ position:'absolute',top:'58%',left:'-20%',width:'140%',height:2,background:`linear-gradient(90deg,transparent,${TEAL}33,${TEAL}66,transparent)`,animation:'warpHorizStreak 1.4s ease-out 0.12s forwards',pointerEvents:'none',zIndex:8 }}/>
+            {/* White flash bloom on arrival */}
+            <div style={{ position:'absolute',inset:-30,background:`radial-gradient(ellipse,${TEAL}55 0%,transparent 70%)`,animation:'warpFlash 1.6s ease-out forwards',pointerEvents:'none',zIndex:7 }}/>
+            {/* Trail ghost 3 — furthest */}
+            <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft3 1.6s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:`blur(14px) hue-rotate(40deg)`,opacity:0 }}>
+              <ShipDisplay isPlayer={true} size={active?72:60} facing="right"/>
             </div>
-          )}
+            {/* Trail ghost 2 */}
+            <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft2 1.4s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:`blur(8px) hue-rotate(20deg)`,opacity:0 }}>
+              <ShipDisplay isPlayer={true} size={active?72:60} facing="right"/>
+            </div>
+            {/* Trail ghost 1 — closest */}
+            <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',animation:'warpTrailLeft1 1.2s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(4px)',opacity:0 }}>
+              <ShipDisplay isPlayer={true} size={active?72:60} facing="right"/>
+            </div>
+          </>
+        )}
+        <div style={{ animation: playerShipState==='warping'
+          ? 'warpInLeft 1.6s cubic-bezier(0.16,1,0.3,1) forwards'
+          : hitPlayer ? 'none' : 'idleDrift 4.2s ease-in-out infinite' }}>
+          <ShipDisplay isPlayer={true} size={active?72:60} facing="right" hit={hitPlayer} defeated={playerDown&&!allDefeated}/>
         </div>
-      ) : !active&&(
-        <div style={{
-          position:'absolute',left:'50%',top:'50%',
-          transform:'translate(-50%,-50%)',
-          display:'flex',flexDirection:'column',alignItems:'center',gap:8,
-        }}>
-          <div style={{animation:'idleDrift 4s ease-in-out infinite'}}>
-            <ShipDisplay isPlayer={true} size={64} facing="right"/>
+        {active&&<div style={{ fontFamily:MONO,fontSize:7,color:TEAL+'bb',letterSpacing:2,textAlign:'center',textShadow:`0 0 6px ${TEAL}66`,marginTop:2 }}>{(gs?.ship?.name||'THE INCONCEIVABLE').toUpperCase()}</div>}
+        {active&&coleHP!==null&&(
+          <div style={{ display:'flex',gap:8 }}>
+            <span style={{ fontFamily:MONO,fontSize:7,color:YEL,textShadow:`0 0 5px ${YEL}88` }}>{(gs?.cole?.name||'COLE').split(' ')[0].toUpperCase()} {coleHP}</span>
+            <span style={{ fontFamily:MONO,fontSize:7,color:RED,textShadow:`0 0 5px ${RED}88` }}>{(gs?.vela?.name||'VELA').split(' ')[0].toUpperCase()} {velaHP}</span>
           </div>
-          <div style={{fontFamily:MONO,fontSize:8,color:ACC+'44',letterSpacing:4}}>STANDING BY</div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Extra live enemy indicators */}
-      {active&&liveEnemies.length>1&&(
-        <div style={{position:'absolute',top:8,right:10,zIndex:42,display:'flex',gap:4}}>
-          {liveEnemies.slice(1,5).map(e=>{
-            const ec=FACTION_COLOR[e.faction]||'#9090b8';
-            return <div key={e.id} style={{
-              width:16,height:16,borderRadius:'50%',
-              background:ec+'18',border:'1px solid '+ec+'88',
-              display:'flex',alignItems:'center',justifyContent:'center',
-              fontFamily:MONO,fontSize:6,color:ec,
-            }}>+1</div>;
-          })}
-        </div>
-      )}
+      {/* ENEMY SHIPS — V/diamond formation */}
+      <div style={{ position:'absolute',right:'1%',top:0,bottom:0,width:'46%',zIndex:10 }}>
 
-      {/* Center divider */}
-      {active&&primaryEnemy&&!enemyDefeated&&(
-        <div style={{
-          position:'absolute',left:'50%',top:'12%',bottom:'12%',
-          width:1,
-          background:`linear-gradient(to bottom,transparent,${ACC}44,transparent)`,
-          zIndex:5,
-        }}/>
-      )}
+        {/* No enemies — idle / unknown states */}
+        {eCount===0&&!active&&(
+          <div style={{ position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:10 }}>
+            <svg width="56" height="56" viewBox="0 0 56 56" style={{opacity:0.22,animation:'idleDrift 5s ease-in-out infinite'}}>
+              <circle cx="28" cy="28" r="24" fill="none" stroke="#FF6B35" strokeWidth="1" strokeDasharray="4 4"/>
+              <circle cx="28" cy="28" r="14" fill="none" stroke="#FF6B35" strokeWidth="1" opacity="0.6"/>
+              <circle cx="28" cy="28" r="3" fill="#FF6B35" opacity="0.5"/>
+              <line x1="28" y1="2" x2="28" y2="12" stroke="#FF6B35" strokeWidth="1"/>
+              <line x1="28" y1="44" x2="28" y2="54" stroke="#FF6B35" strokeWidth="1"/>
+              <line x1="2" y1="28" x2="12" y2="28" stroke="#FF6B35" strokeWidth="1"/>
+              <line x1="44" y1="28" x2="54" y2="28" stroke="#FF6B35" strokeWidth="1"/>
+            </svg>
+            <div style={{ fontFamily:'Share Tech Mono,monospace',fontSize:7,color:'#FF6B3544',letterSpacing:3 }}>NO TARGETS</div>
+          </div>
+        )}
+        {eCount===0&&active&&(
+          <div style={{ position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',display:'flex',flexDirection:'column',alignItems:'center',gap:8 }}>
+            <div style={{ width:72,height:72,border:`2px solid ${RED}66`,borderRadius:4,background:'#0a0005',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:4,animation:'unknownPulse 2.2s ease-in-out infinite' }}>
+              <div style={{ fontFamily:MONO,fontSize:20,color:`${RED}88` }}>?</div>
+              <div style={{ fontFamily:MONO,fontSize:6,color:`${RED}55`,letterSpacing:2 }}>UNKNOWN</div>
+            </div>
+            <div style={{ fontFamily:MONO,fontSize:7,color:`${RED}44`,letterSpacing:2 }}>CONTACT</div>
+          </div>
+        )}
 
-      {/* Projectiles */}
-      {projectiles.map(p=>(
-        <Projectile key={p.id} fromLeft={p.fromLeft} color={p.color}
-          onDone={()=>setProjectiles(prev=>prev.filter(x=>x.id!==p.id))}/>
+        {/* Formation ships */}
+        {eCount>0&&(()=>{
+          // V formation: leader at point (leftmost, toward player), wings trail right+up/down
+          // dx = horizontal offset from zone center (negative = left = forward toward player)
+          // dy = vertical offset from zone center
+          const FORMATIONS = [
+            [{dx:0,   dy:0}],
+            [{dx:-20, dy:-26},{dx:14, dy:26}],
+            [{dx:-22, dy:0},  {dx:14, dy:-70},{dx:14, dy:70}],
+            [{dx:-24, dy:0},  {dx:6,  dy:-68},{dx:6,  dy:68},{dx:44, dy:0}],
+            [{dx:-24, dy:0},  {dx:4,  dy:-66},{dx:4,  dy:66},{dx:26, dy:-32},{dx:26, dy:32}],
+          ];
+          const positions = FORMATIONS[Math.min(eCount,5)-1];
+          const baseShipSize = eCount<=1?70:eCount===2?58:eCount===3?48:eCount===4?41:35;
+
+          return displayEnemies.map((enemy, idx) => {
+            const state      = shipStates[enemy.id] || 'hidden';
+            const isWarping  = state === 'warping';
+            const isLanded   = state === 'landed';
+            const isHidden   = state === 'hidden';
+            const eColor     = FACTION_COLOR[enemy.faction] || '#9090b8';
+            const isDefeated   = enemy.hp <= 0;
+            const isHit        = !!hitEnemy[enemy.id];
+            const isLeader     = !!enemy.isLeader;
+            const isTargeted   = ctBrief?.selectedEnemyId === enemy.id && !isDefeated;
+            const isShieldFlash= shieldFlash === enemy.id;
+            const isDestroying = destroyAnim.has(enemy.id);
+            const sz         = isLeader ? baseShipSize + 10 : baseShipSize;
+            const pos        = positions[idx] || {dx:0,dy:0};
+            const driftDelay = (idx * 0.65).toFixed(1) + 's';
+
+            return (
+              <div key={enemy.id}
+                onClick={()=>{ if(!isDefeated&&isLanded&&onSelectEnemy) onSelectEnemy(isTargeted?null:enemy.id); }}
+                style={{
+                position:'absolute',
+                left:`calc(50% + ${pos.dx}px)`,
+                top:`calc(50% + ${pos.dy}px)`,
+                transform:'translate(-50%,-50%)',
+                display:'flex',flexDirection:'column',alignItems:'center',gap:2,
+                opacity:isDefeated?0.25:1,
+                transition:'opacity 0.6s ease',
+                cursor:isDefeated||!isLanded?'default':'crosshair',
+                zIndex:isLeader?12:10,
+              }}>
+
+                {/* Leader crown badge */}
+                {isLeader&&eCount>1&&!isDefeated&&(
+                  <div style={{ fontFamily:MONO,fontSize:8,color:eColor,letterSpacing:2,textShadow:`0 0 8px ${eColor}`,marginBottom:1,animation:'roundPulse 2.5s ease-in-out infinite' }}>◆ LEADER</div>
+                )}
+
+                {isHidden&&(
+                  <div style={{ width:sz,height:sz,border:`1px solid ${RED}44`,borderRadius:3,background:'#080005',display:'flex',alignItems:'center',justifyContent:'center',animation:'unknownPulse 2.2s ease-in-out infinite' }}>
+                    <div style={{ fontFamily:MONO,fontSize:eCount>3?10:14,color:`${RED}66` }}>?</div>
+                  </div>
+                )}
+
+                {(isWarping||isLanded)&&(
+                  <div style={{ position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:2 }}>
+                    {isWarping&&(
+                      <>
+                        <div style={{ position:'absolute',inset:0,display:'flex',justifyContent:'center',alignItems:'center',animation:'warpTrail2 1.1s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(7px)',opacity:0 }}>
+                          <ShipDisplay faction={enemy.faction} isBoss={enemy.isBoss} size={sz} facing="left"/>
+                        </div>
+                        <div style={{ position:'absolute',inset:0,display:'flex',justifyContent:'center',alignItems:'center',animation:'warpTrail1 1.0s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',filter:'blur(3px)',opacity:0 }}>
+                          <ShipDisplay faction={enemy.faction} isBoss={enemy.isBoss} size={sz} facing="left"/>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Targeting reticle — 3-dot corners, neon red-pink gradient */}
+                    {isTargeted&&isLanded&&(()=>{
+                      const rw=sz+28, rh=sz+28;
+                      const cx=rw/2, cy=rh/2;
+                      const ex=rw/2-2, ey=rh/2-2;
+                      const DOT='#FF2060';
+                      const ds=3, gap=6; // dot size, spacing
+                      // 3 dots per arm: corner dot + 1 along each axis
+                      // Returns [{cx,cy,opacity}] for one corner
+                      const corner=(ox,oy,dx,dy)=>[
+                        {cx:ox,       cy:oy,       o:1.0},   // corner
+                        {cx:ox+dx*gap,cy:oy,       o:0.55},  // horizontal arm
+                        {cx:ox,       cy:oy+dy*gap,o:0.55},  // vertical arm
+                      ];
+                      const allDots=[
+                        ...corner(cx-ex, cy-ey,  1,  1),  // TL
+                        ...corner(cx+ex, cy-ey, -1,  1),  // TR
+                        ...corner(cx-ex, cy+ey,  1, -1),  // BL
+                        ...corner(cx+ex, cy+ey, -1, -1),  // BR
+                      ];
+                      return React.createElement('div',{style:{position:'absolute',top:'50%',left:'50%',width:rw,height:rh,transform:'translate(-50%,-50%)',pointerEvents:'none',zIndex:15,animation:'reticlePulse 1.2s ease-in-out infinite'}},
+                        React.createElement('svg',{width:rw,height:rh,viewBox:`0 0 ${rw} ${rh}`,style:{position:'absolute',inset:0,overflow:'visible'}},
+                          React.createElement('defs',null,
+                            React.createElement('filter',{id:'dotGlow'},
+                              React.createElement('feGaussianBlur',{stdDeviation:'1.5',result:'blur'}),
+                              React.createElement('feMerge',null,
+                                React.createElement('feMergeNode',{in:'blur'}),
+                                React.createElement('feMergeNode',{in:'SourceGraphic'})
+                              )
+                            )
+                          ),
+                          allDots.map((d,i)=>React.createElement('rect',{key:i,x:d.cx-ds/2,y:d.cy-ds/2,width:ds,height:ds,fill:DOT,opacity:d.o,filter:'url(#dotGlow)'})),
+                          // Ghost crosshair
+                          React.createElement('line',{x1:cx-ex+20,y1:cy,x2:cx+ex-20,y2:cy,stroke:DOT,strokeWidth:0.4,opacity:0.18}),
+                          React.createElement('line',{x1:cx,y1:cy-ey+20,x2:cx,y2:cy+ey-20,stroke:DOT,strokeWidth:0.4,opacity:0.18}),
+                          React.createElement('rect',{x:cx-1.5,y:cy-1.5,width:3,height:3,fill:DOT,opacity:0.6,filter:'url(#dotGlow)'})
+                        )
+                      );
+                    })()}
+                    {/* Shield flash ripple */}
+                    {isShieldFlash&&(
+                      <>
+                        <div style={{ position:'absolute',top:'50%',left:'50%',width:sz+14,height:sz+14,border:`3px solid ${TEAL}`,borderRadius:'50%',pointerEvents:'none',zIndex:20,animation:'shieldRipple 0.9s ease-out forwards' }}/>
+                        <div style={{ position:'absolute',top:'50%',left:'50%',width:sz+6,height:sz+6,border:`2px solid ${TEAL}88`,borderRadius:4,pointerEvents:'none',zIndex:20,animation:'shieldHex 0.9s ease-out forwards' }}/>
+                      </>
+                    )}
+                    {/* Ship wrapper */}
+                    <div style={{
+                      transition:'opacity 0.3s ease',
+                      animation: isDestroying
+                        ? 'destroyFlash 1.2s ease-out forwards'
+                        : isWarping
+                        ? 'warpIn 0.95s cubic-bezier(0.22,1,0.36,1) forwards'
+                        : (isDefeated||isHit?'none':`idleDrift 3.8s ease-in-out ${driftDelay} infinite`),
+                    }}>
+                      <ShipDisplay
+                        faction={enemy.faction}
+                        isBoss={enemy.isBoss}
+                        size={sz}
+                        facing="left"
+                        hit={isHit}
+                        defeated={isDefeated}
+                        isLeader={isLeader && eCount > 1}
+                        eColor={eColor}
+                      />
+                    </div>
+
+                    {eCount<=3&&(
+                      <div style={{ fontFamily:MONO,fontSize:isLeader?7:6,color:isLeader?eColor:eColor+'99',letterSpacing:1,textAlign:'center',maxWidth:sz+16,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textShadow:isLeader?`0 0 8px ${eColor}66`:`0 0 4px ${eColor}33`,fontWeight:isLeader?'bold':'normal' }}>
+                        {enemy.name?.toUpperCase()}
+                      </div>
+                    )}
+                    <div style={{ fontFamily:MONO,fontSize:6,color:isDefeated?RED+'44':isLeader?RED:RED+'aa',textShadow:`0 0 4px ${RED}55` }}>
+                      {isDefeated?'✕':`${enemy.hp}/${enemy.hpMax}`}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          });
+        })()}
+      </div>
+
+      {beams.map(b=>(
+        <BeamWeapon key={b.id} x1pct={b.x1pct} y1pct={b.y1pct} x2pct={b.x2pct} y2pct={b.y2pct}
+          color={b.color} weaponType={b.weaponType}
+          onDone={()=>setBeams(prev=>prev.filter(x=>x.id!==b.id))}/>
       ))}
-
-      {/* Explosions */}
+      {missiles.map(m=>(
+        <MissileSwarm key={m.id} x1pct={m.x1pct} y1pct={m.y1pct} x2pct={m.x2pct} y2pct={m.y2pct}
+          color={m.color}
+          onDone={()=>setMissiles(prev=>prev.filter(x=>x.id!==m.id))}/>
+      ))}
       {explosions.map(e=><Explosion key={e.id} x={e.x} y={e.y} color={e.color}/>)}
-
-      {/* Corner brackets */}
-      {[['top','left'],['top','right'],['bottom','left'],['bottom','right']].map(([v,h])=>(
-        <div key={v+h} style={{
-          position:'absolute',[v]:5,[h]:5,width:10,height:10,
-          borderStyle:'solid',borderColor:ACC+'55',borderWidth:0,
-          [`border${v.charAt(0).toUpperCase()+v.slice(1)}Width`]:1,
-          [`border${h.charAt(0).toUpperCase()+h.slice(1)}Width`]:1,
-          zIndex:42,
-        }}/>
-      ))}
     </div>
   );
 }

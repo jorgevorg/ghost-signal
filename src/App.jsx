@@ -7,7 +7,7 @@ import CombatBattleScreen from './CombatBattleScreen.jsx';
 
 const SAVES_KEY="gs_saves";
 const MONO="'Share Tech Mono',monospace",ORB="'Orbitron',sans-serif",RAJ="'Rajdhani',sans-serif",BG="#0a0a14";
-const B1="#7a7aaa",B2="#555578",B3="#9090b8";
+const B1="#aaaadd",B2="#8888bb",B3="#bbbbdd";
 const css=`@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap');
 html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1.15}
 @keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -37,7 +37,7 @@ html,body{background:#080810!important;margin:0;padding:0;overflow:hidden;zoom:1
 @keyframes tactScan{0%{background-position:0 0}100%{background-position:0 4px}}
 @keyframes tactPulse{0%,100%{opacity:.7}50%{opacity:1}}
 @keyframes ctIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-@keyframes ctFlash{0%{border-color:#FF6B35cc;box-shadow:inset 0 0 16px #FF6B3566}50%{border-color:#FF2060cc;box-shadow:inset 0 0 30px #FF206066}100%{border-color:#FF6B35cc;box-shadow:inset 0 0 16px #FF6B3566}}
+@keyframes manifestAlert{0%,100%{border-color:#FF206055;box-shadow:none}25%{border-color:#FF2060cc;box-shadow:0 0 18px #FF206066,inset 0 0 12px #FF206022}75%{border-color:#FF2060aa;box-shadow:0 0 10px #FF206044}}@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}@keyframes ctFlash{0%{border-color:#FF6B35cc;box-shadow:inset 0 0 16px #FF6B3566}50%{border-color:#FF2060cc;box-shadow:inset 0 0 30px #FF206066}100%{border-color:#FF6B35cc;box-shadow:inset 0 0 16px #FF6B3566}}
 @keyframes mabelTalk{0%,100%{transform:scaleY(0.18);opacity:.45}35%{transform:scaleY(1);opacity:1}65%{transform:scaleY(0.5);opacity:.75}}
 `;
 
@@ -93,7 +93,8 @@ const TYPE_LABELS={small:"Small Planet",medium:"Medium Planet",giant:"Giant Plan
 const HEX_FLAVOR={small:"A compact rocky world. Mineral traces detected.",medium:"Temperate conditions. Possible signs of past habitation.",giant:"Massive gas giant. Gravity well extends several hexes.",medium_moon1:"A planet with a natural satellite. Tidal forces active.",medium_moon2:"Twin-moon system. Navigational complexity.",ring:"A ringed world. The rings are navigable but unpredictable.",void:"Hollow resonance detected. Origin: unknown.",settlement:"Populated zone. Docking and resupply available.",research:"Active station. Encrypted transmissions detected.",asteroid:"Dense asteroid field. Rich in rare minerals.",helios:"Solar energy farm. Helios array fully operational.",flare:"Active solar flare zone. Hull integrity warning.",starcruiser:"Large vessel. Transponder signal: unregistered.",pirate:"Hostile signatures on all frequencies.",seance:"THE INCONCEIVABLE. Right where you left her.",barrier:"Impassable. Navigation locked out.",base:"Faction-controlled territory. Approach with caution."};
 
 const DICE_COLORS={4:"#FF6B35",6:"#FFD166",8:"#00FFD0",10:"#FF6EC7",12:"#cc88ff",20:"#FF2060"};
-const FACTIONS=[{id:"medusa",label:"MEDUSA",c:"#00FFD0"},{id:"isf",label:"ISF",c:"#aaaaff"},{id:"warg",label:"W.A.R.G.",c:"#FFD166"},{id:"corsair",label:"CORSAIR",c:"#FF2060"},{id:"synth",label:"SYNTH ARCH",c:"#cc88ff"}];
+const LETTER_MAP={corsair:"C",warg:"W",medusa:"M",isf:"I",synth:"S"};
+const FACTIONS=[{id:"corsair",label:"CORSAIR",c:"#FF2060"},{id:"warg",label:"W.A.R.G.",c:"#FFD166"},{id:"medusa",label:"MEDUSA",c:"#00FFD0"},{id:"isf",label:"ISF",c:"#aaaaff"},{id:"synth",label:"SYNTH ARCH",c:"#cc88ff"},{id:"alien",label:"ALIEN",c:"#FF6B35"},{id:"wanted",label:"WANTED",c:"#FF6EC7"},{id:"",label:"NONE",c:"#8899cc"}];
 const mkW=()=>[{name:"",mod1:"",mod2:""},{name:"",mod1:"",mod2:""}];
 const mkCrew=()=>({name:"",role:"",hp:10,vigor:0,grace:0,mind:0,tech:0,inventory:Array(4).fill(""),skills:Array(3).fill(""),passive:"",notes:""});
 const mkC=()=>({hp:20,hpMax:20,en:20,enMax:20,armor:0,hyp:0,exp:0,serum:0,vigor:0,grace:0,mind:0,tech:0,origin:"",fav:{medusa:0,isf:0,warg:0,corsair:0,synth:0},weapons:mkW(),memory:Array(6).fill(""),inventory:Array(8).fill(""),cybertech:Array(6).fill("")});
@@ -941,7 +942,7 @@ function BootSequence(props){
   ),
   phase>=6&&React.createElement("div",{style:{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:40,pointerEvents:"none",background:"rgba(10,10,20,0.75)",animation:"in 0.6s ease"}},
    React.createElement("div",{style:{fontFamily:ORB,fontSize:52,fontWeight:900,color:"#00FFD0",letterSpacing:18,textAlign:"center",textShadow:"-2px 0 0 #FF206066,2px 0 0 #88BBFF66,0 0 40px #00FFD0cc,0 0 80px #00FFD066,0 0 160px #00FFD022",minHeight:"1.2em",animation:"glitch 2.5s ease 1.5s infinite"}},titleText,React.createElement("span",{style:{animation:"blink 0.5s step-end infinite",color:"#00FFD0",textShadow:"none"}},"_")),
-   React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0aa",letterSpacing:8,marginTop:14,minHeight:"1em"}},subText,subText.length>0&&subText!=="ALL SYSTEMS NOMINAL"&&React.createElement("span",{style:{animation:"blink 0.5s step-end infinite"}},"_")),React.createElement("div",{style:{display:"flex",justifyContent:"center",gap:10,marginTop:22,opacity:0.7}},["WARG","MEDUSA","CORSAIR","ISF"].map(function(fid){return React.createElement(FactionIcon,{key:fid,faction:fid,size:36});}))
+   React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0aa",letterSpacing:8,marginTop:14,minHeight:"1em"}},subText,subText.length>0&&subText!=="ALL SYSTEMS NOMINAL"&&React.createElement("span",{style:{animation:"blink 0.5s step-end infinite"}},"_")),React.createElement("div",{style:{display:"flex",justifyContent:"center",gap:10,marginTop:22,opacity:0.7}},["WARG","MEDUSA","CORSAIR","ISF","SYNTH"].map(function(fid){return React.createElement(FactionIcon,{key:fid,faction:fid,size:36});}))
   )
  );
 }
@@ -987,8 +988,8 @@ function Bar(props){
 function Dots(props){
  var n=(typeof props.v==="number"&&isFinite(props.v))?props.v:0;
  return React.createElement("div",{style:{display:"flex",gap:3,alignItems:"center"}},
-  [-3,-2,-1,0,1,2,3].map(function(i){var lit=i===0?n===0:i>0?n>=i:n<=i;var c=i<0?"#FF2060":i===0?"#555":"#00FFD0";return React.createElement("div",{key:i,style:{width:i===0?10:8,height:i===0?10:8,borderRadius:"50%",background:lit?c:"#111",border:"1px solid "+(lit?c:B1)}});}),
-  React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:n<0?"#FF2060":n>0?"#00FFD0":"#888",marginLeft:5}},n>0?"+"+n:n)
+  [-3,-2,-1,0,1,2,3].map(function(i){var lit=i===0?n===0:i>0?n>=i:n<=i;var c=i<0?"#FF2060":i===0?"#7788bb":"#00FFD0";return React.createElement("div",{key:i,style:{width:i===0?10:8,height:i===0?10:8,borderRadius:"50%",background:lit?c:"#111",border:"1px solid "+(lit?c:B1)}});}),
+  React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:n<0?"#FF2060":n>0?"#00FFD0":"#99aacc",marginLeft:5}},n>0?"+"+n:n)
  );
 }
 function Spin(props){
@@ -1031,9 +1032,9 @@ function HexTypeSelect(props){
    React.createElement("span",{style:{color:"#999",fontSize:9}},open?"▲":"▼")
   ),
   open&&React.createElement("div",{style:{position:"absolute",top:"100%",left:0,right:0,zIndex:300,background:"#08080f",border:"1px solid "+B3,borderRadius:4,maxHeight:300,overflowY:"auto",boxShadow:"0 8px 32px #000000cc",marginTop:-6}},
-   React.createElement("div",{onClick:function(){onChange("");setOpen(false);},style:{display:"flex",alignItems:"center",gap:10,padding:"7px 10px",cursor:"pointer",color:"#888",fontFamily:MONO,fontSize:10,borderBottom:"1px solid "+B2}},"— CLEAR READING —"),
+   React.createElement("div",{onClick:function(){onChange("");setOpen(false);},style:{display:"flex",alignItems:"center",gap:10,padding:"7px 10px",cursor:"pointer",color:"#99aacc",fontFamily:MONO,fontSize:10,borderBottom:"1px solid "+B2}},"— CLEAR READING —"),
    GROUPS.map(function(g){return React.createElement("div",{key:g.label},
-    React.createElement("div",{style:{padding:"5px 10px 3px",fontFamily:MONO,fontSize:9,color:"#778",letterSpacing:2,background:"#060610",borderTop:"1px solid "+B2}},g.label),
+    React.createElement("div",{style:{padding:"5px 10px 3px",fontFamily:MONO,fontSize:9,color:"#99aacc",letterSpacing:2,background:"#060610",borderTop:"1px solid "+B2}},g.label),
     g.types.map(function(t){var sel=value===t;return React.createElement("div",{key:t,onClick:function(){onChange(t);setOpen(false);},onMouseEnter:function(e){e.currentTarget.style.background="#ffffff0d";},onMouseLeave:function(e){e.currentTarget.style.background=sel?"#ffffff08":"transparent";},style:{display:"flex",alignItems:"center",gap:10,padding:"6px 10px",cursor:"pointer",background:sel?"#ffffff08":"transparent",color:sel?"#fff":"#ccc",fontFamily:RAJ,fontSize:14}},MiniHex(t),React.createElement("span",{style:{marginLeft:4}},getLabel(t)));})
    );})
   )
@@ -1047,9 +1048,9 @@ var CYBER_OPTS=["","Second Brain — first Hack each combat costs 0 Energy","Neu
 var WPN_OPTS=["","Laser Blaster","Plasma Rifle","Ion Blade","Shock Pistol","Railgun","Flame Caster","Venom Blade","EMP Cannon","Particle Lance","Scatter Shotgun"];
 var MOD_OPTS=["","Reflex Sight","Extended Mag","Silencer","Scope","Incendiary Rounds","EMP Rounds","Shield Breaker","Heat Sink","Targeting AI","Drum Magazine"];
 function SlotSelect(props){
-var val=props.value||"",onChg=props.onChange,opts=props.options||[],color=props.color||"#aaa",mt=props.marginTop||0;
-return React.createElement("select",{value:val,onChange:function(e){onChg(e.target.value);},style:{width:"100%",background:"#05050f",border:"1px solid "+(val?color+"99":B1),borderRadius:4,color:val?color:"#445",fontFamily:MONO,fontSize:11,padding:"7px 10px",outline:"none",boxSizing:"border-box",cursor:"pointer",appearance:"none",WebkitAppearance:"none",marginTop:mt,display:"block"}},
-opts.map(function(o,i){return React.createElement("option",{key:i,value:o,style:{background:"#05050f",color:o?"#ddd":"#445"}},o||"— EMPTY —");}));}
+var val=props.value||"",onChg=props.onChange,opts=props.options||[],color=props.color||"#99aacc",mt=props.marginTop||0;
+return React.createElement("select",{value:val,onChange:function(e){onChg(e.target.value);},style:{width:"100%",background:"#05050f",border:"1px solid "+(val?color+"99":B1),borderRadius:4,color:val?color:"#8899cc",fontFamily:MONO,fontSize:11,padding:"7px 10px",outline:"none",boxSizing:"border-box",cursor:"pointer",appearance:"none",WebkitAppearance:"none",marginTop:mt,display:"block"}},
+opts.map(function(o,i){return React.createElement("option",{key:i,value:o,style:{background:"#05050f",color:o?"#ddd":"#8899cc"}},o||"— EMPTY —");}));}
 function CharCard(props){
  var name=props.name,data=props.data,accent=props.accent,onChange=props.onChange,onNameChange=props.onNameChange;
  var editNameS=useState(false),setEditName=editNameS[1];var editName=editNameS[0];
@@ -1073,13 +1074,13 @@ function CharCard(props){
    [["VIGOR","vigor"],["GRACE","grace"],["MIND","mind"],["TECH","tech"]].map(function(pair){return React.createElement("div",{key:pair[1]},React.createElement("div",{style:{fontFamily:MONO,fontSize:12,color:"#bbb",letterSpacing:1,marginBottom:6}},pair[0]),React.createElement(Spin,{v:data[pair[1]]||0,onChange:function(v){onChange(pair[1],v);}}));})
   ),
   React.createElement(SHdr,{label:"WEAPONS",open:open.weapons,onToggle:function(){tog("weapons");},accent:accent}),
-  open.weapons&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10,marginTop:4}},w.map(function(wp,i){return React.createElement("div",{key:i,style:{background:"#080810",borderRadius:6,padding:10,border:"1px solid "+B1}},React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:1,marginBottom:7}},"WEAPON "+(i+1)),React.createElement(SlotSelect,{value:wp.name||"",onChange:function(val){onChange("weapons."+i+".name",val);},options:WPN_OPTS,color:accent}),React.createElement(SlotSelect,{value:wp.mod1||"",onChange:function(val){onChange("weapons."+i+".mod1",val);},options:MOD_OPTS,color:"#aaa",marginTop:5}),React.createElement(SlotSelect,{value:wp.mod2||"",onChange:function(val){onChange("weapons."+i+".mod2",val);},options:MOD_OPTS,color:"#aaa",marginTop:5}));})),
+  open.weapons&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10,marginTop:4}},w.map(function(wp,i){return React.createElement("div",{key:i,style:{background:"#080810",borderRadius:6,padding:10,border:"1px solid "+B1}},React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc",letterSpacing:1,marginBottom:7}},"WEAPON "+(i+1)),React.createElement(SlotSelect,{value:wp.name||"",onChange:function(val){onChange("weapons."+i+".name",val);},options:WPN_OPTS,color:accent}),React.createElement(SlotSelect,{value:wp.mod1||"",onChange:function(val){onChange("weapons."+i+".mod1",val);},options:MOD_OPTS,color:"#99aacc",marginTop:5}),React.createElement(SlotSelect,{value:wp.mod2||"",onChange:function(val){onChange("weapons."+i+".mod2",val);},options:MOD_OPTS,color:"#99aacc",marginTop:5}));})),
   React.createElement(SHdr,{label:"CYBERTECH",open:open.cyber,onToggle:function(){tog("cyber");},accent:accent}),
   open.cyber&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,marginTop:4}},(data.cybertech||Array(6).fill("")).map(function(v,i){return React.createElement(SlotSelect,{key:i,value:v,onChange:function(val){onChange("cybertech."+i,val);},options:CYBER_OPTS,color:"#cc88ff"});})),
   React.createElement(SHdr,{label:"MEMORY SLOTS",open:open.memory,onToggle:function(){tog("memory");},accent:accent}),
   open.memory&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6,marginTop:4}},(data.memory||Array(6).fill("")).map(function(v,i){return React.createElement(SlotSelect,{key:i,value:v,onChange:function(val){onChange("memory."+i,val);},options:MEM_OPTS,color:"#aaaaff"});})),
   React.createElement(SHdr,{label:"INVENTORY",open:open.inv,onToggle:function(){tog("inv");},accent:accent}),
-  open.inv&&React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:4}},(data.inventory||Array(8).fill("")).map(function(v,i){return React.createElement(SlotSelect,{key:i,value:v,onChange:function(val){onChange("inventory."+i,val);},options:INV_OPTS,color:"#aaa"});})),
+  open.inv&&React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:4}},(data.inventory||Array(8).fill("")).map(function(v,i){return React.createElement(SlotSelect,{key:i,value:v,onChange:function(val){onChange("inventory."+i,val);},options:INV_OPTS,color:"#99aacc"});})),
   React.createElement(SHdr,{label:"FACTION FAVOR",open:open.fav,onToggle:function(){tog("fav");},accent:accent}),
   open.fav&&React.createElement("div",{style:{marginTop:4}},FACTIONS.map(function(f){var val=fav[f.id]!=null?fav[f.id]:0;return React.createElement("div",{key:f.id,style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:11}},React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},React.createElement(FactionIcon,{faction:f.id,size:26}),React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:f.c}},f.label)),React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("button",{onClick:function(){onChange("fav."+f.id,Math.max(-3,val-1));},style:{width:20,height:20,background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:2,cursor:"pointer",fontSize:13,padding:0}},"−"),React.createElement(Dots,{v:val}),React.createElement("button",{onClick:function(){onChange("fav."+f.id,Math.min(3,val+1));},style:{width:20,height:20,background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:2,cursor:"pointer",fontSize:13,padding:0}},"+"))); }))
  );
@@ -1097,24 +1098,24 @@ function CrewCard(props){
   React.createElement("div",{onClick:function(){setOpen(!open);},style:{padding:"12px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",borderBottom:open?"1px solid "+B2:"none"}},
    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,flex:1}},
     React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:nc,letterSpacing:2,minWidth:36}},"NPC"+(index+1)),
-    React.createElement("div",{style:{flex:1}},React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:isEmpty?"#778":nc,letterSpacing:2}},data.name||"— UNNAMED CREW —"),data.role&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",marginTop:2}},data.role)),
+    React.createElement("div",{style:{flex:1}},React.createElement("div",{style:{fontFamily:ORB,fontSize:12,color:isEmpty?"#99aacc":nc,letterSpacing:2}},data.name||"— UNNAMED CREW —"),data.role&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc",marginTop:2}},data.role)),
     !isEmpty&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#bbb",marginRight:12}},"HP ",React.createElement("span",{style:{color:nc}},data.hp))
    ),
    React.createElement("span",{style:{color:nc+"88",fontSize:12}},open?"▲":"▼")
   ),
   open&&React.createElement("div",{style:{padding:16,display:"flex",flexDirection:"column",gap:10}},
    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
-    React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",marginBottom:5}},"NAME"),React.createElement("input",{value:data.name,onChange:function(e){upF("name",e.target.value);},placeholder:"Crew name",style:cs})),
-    React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",marginBottom:5}},"ROLE"),React.createElement("input",{value:data.role,onChange:function(e){upF("role",e.target.value);},placeholder:"Pilot / Medic / etc.",style:cs}))
+    React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc",marginBottom:5}},"NAME"),React.createElement("input",{value:data.name,onChange:function(e){upF("name",e.target.value);},placeholder:"Crew name",style:cs})),
+    React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc",marginBottom:5}},"ROLE"),React.createElement("input",{value:data.role,onChange:function(e){upF("role",e.target.value);},placeholder:"Pilot / Medic / etc.",style:cs}))
    ),
-   React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",marginBottom:5}},"HP"),
+   React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc",marginBottom:5}},"HP"),
     React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
      [-5,-1].map(function(d){return React.createElement("button",{key:d,onClick:function(){upF("hp",Math.max(0,data.hp+d));},style:{padding:"5px 12px",background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:12}},d);}),
      React.createElement("span",{style:{fontFamily:MONO,fontSize:20,color:nc,minWidth:48,textAlign:"center"}},data.hp),
      [1,5].map(function(d){return React.createElement("button",{key:d,onClick:function(){upF("hp",data.hp+d);},style:{padding:"5px 12px",background:"transparent",border:"1px solid "+B1,color:"#ccc",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:12}},"+"+d);})
     )
    ),
-   React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",marginBottom:6}},"NOTES"),React.createElement("textarea",{value:data.notes,onChange:function(e){upF("notes",e.target.value);},placeholder:"Field notes...",rows:3,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:14,padding:"9px 12px",outline:"none",resize:"vertical",boxSizing:"border-box",lineHeight:1.7}}))
+   React.createElement("div",null,React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc",marginBottom:6}},"NOTES"),React.createElement("textarea",{value:data.notes,onChange:function(e){upF("notes",e.target.value);},placeholder:"Field notes...",rows:3,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#99aacc",fontFamily:RAJ,fontSize:14,padding:"9px 12px",outline:"none",resize:"vertical",boxSizing:"border-box",lineHeight:1.7}}))
   )
  );
 }
@@ -1254,7 +1255,7 @@ function DiceRoller(props){
  var rollP=function(){var pv=rD(10),pt=pv+sv;setPr({r:pv,t:pt});};
  var rollC=function(){var cv=rD(10),ct=cv+(+cm||0);setCr({r:cv,t:ct});};
  var oc=pr&&cr?(pr.t>cr.t?"WIN":pr.t<cr.t?"LOSS":"TIE"):null;
- var occ=oc==="WIN"?"#00FFD0":oc==="LOSS"?"#FF2060":"#888";
+ var occ=oc==="WIN"?"#00FFD0":oc==="LOSS"?"#FF2060":"#99aacc";
  var dData=gs[dk]||gs.cole;
  var wpns=((dData&&dData.weapons)||[]).filter(function(w){return w.name&&w.name.trim();});
  var wpn=wpns[dw]||{name:""};
@@ -1266,7 +1267,7 @@ function DiceRoller(props){
  return React.createElement("div",{style:{position:"fixed",bottom:35,right:27,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,zIndex:100,overflow:"hidden"}},
   React.createElement("div",{onClick:function(){setCol(!col);},style:{padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid "+B2,cursor:"pointer"}},
    React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:"#FF2060",letterSpacing:3}},"DICE MATRIX"),
-   React.createElement("span",{style:{color:"#aaa",fontSize:12}},col?"▲":"▼")
+   React.createElement("span",{style:{color:"#99aacc",fontSize:12}},col?"▲":"▼")
   ),
   !col&&React.createElement("div",{style:{padding:10}},
    React.createElement("div",{style:{display:"flex",gap:4,marginBottom:10}},mBtn("challenge","CHALLENGE"),mBtn("damage","DAMAGE"),mBtn("free","FREE")),
@@ -1275,38 +1276,38 @@ function DiceRoller(props){
     React.createElement("div",{style:{display:"flex",gap:3,marginBottom:10}},["vigor","grace","mind","tech"].map(function(st){var a=cs===st,sc=STATC[st],val=(cData&&cData[st])||0;return React.createElement("button",{key:st,onClick:function(){setCs(st);setPr(null);setCr(null);},style:{flex:1,padding:"4px 2px",background:a?sc+"22":"transparent",border:"1px solid "+(a?sc:B1),color:a?sc:"#bbb",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:8,lineHeight:1.5,textAlign:"center"}},st.toUpperCase().slice(0,3)+"\n"+(val>=0?"+":"")+val);})),
     React.createElement("div",{style:{display:"flex",gap:8,marginBottom:8,alignItems:"center"}},
      React.createElement("div",{style:{flex:1}},
-      React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#aaa",letterSpacing:2,marginBottom:3,textAlign:"center"}},"PLAYER D10"),
+      React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc",letterSpacing:2,marginBottom:3,textAlign:"center"}},"PLAYER D10"),
       React.createElement("button",{onClick:rollP,style:{width:"100%",height:60,background:pr?"#00FFD011":"transparent",border:"1px solid "+(pr?"#00FFD0":B1),borderRadius:6,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1}},
-       React.createElement("span",{style:{fontFamily:ORB,fontSize:pr?26:14,color:pr?"#00FFD0":"#aaa"}},pr?pr.r:"D10"),
+       React.createElement("span",{style:{fontFamily:ORB,fontSize:pr?26:14,color:pr?"#00FFD0":"#99aacc"}},pr?pr.r:"D10"),
        pr&&React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#ccc"}},"+"+sv+"="+pr.t)
       )
      ),
-     React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#555"}},"VS"),
+     React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#7788bb"}},"VS"),
      React.createElement("div",{style:{flex:1}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:3,justifyContent:"center",marginBottom:3}},
-       React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#aaa",letterSpacing:1}},"CHALLENGE +"),
+       React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc",letterSpacing:1}},"CHALLENGE +"),
        React.createElement("input",{type:"number",value:cm,onChange:function(e){setCm(+e.target.value||0);},style:{width:30,background:"transparent",border:"1px solid "+B1,color:"#ccc",fontFamily:MONO,fontSize:9,textAlign:"center",borderRadius:2,padding:"1px",outline:"none"}})
       ),
       React.createElement("button",{onClick:rollC,style:{width:"100%",height:60,background:cr?"#cc88ff11":"transparent",border:"1px solid "+(cr?"#cc88ff":B1),borderRadius:6,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1}},
-       React.createElement("span",{style:{fontFamily:ORB,fontSize:cr?26:14,color:cr?"#cc88ff":"#aaa"}},cr?cr.r:"D10"),
+       React.createElement("span",{style:{fontFamily:ORB,fontSize:cr?26:14,color:cr?"#cc88ff":"#99aacc"}},cr?cr.r:"D10"),
        cr&&React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#ccc"}},"+"+cm+"="+cr.t)
       )
      )
     ),
     oc&&React.createElement("div",{style:{background:occ+"14",border:"1px solid "+occ+"55",borderRadius:4,padding:"7px 10px",marginBottom:8,textAlign:"center"}},
      React.createElement("div",{style:{fontFamily:ORB,fontSize:18,color:occ,letterSpacing:4}},oc),
-     React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#aaa",marginTop:1}},(pr?pr.r:"-")+"+"+sv+"="+(pr?pr.t:"-")+" vs "+(cr?cr.r:"-")+(cm?"+"+cm:"")+"="+(cr?cr.t:"-"))
+     React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aacc",marginTop:1}},(pr?pr.r:"-")+"+"+sv+"="+(pr?pr.t:"-")+" vs "+(cr?cr.r:"-")+(cm?"+"+cm:"")+"="+(cr?cr.t:"-"))
     ),
     React.createElement("button",{onClick:rollBoth,style:{width:"100%",padding:"8px",background:"#FF206018",border:"1px solid #FF206055",color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:10,letterSpacing:2}},"ROLL BOTH")
    ),
    mode==="damage"&&React.createElement("div",null,
     React.createElement("div",{style:{display:"flex",gap:4,marginBottom:8}},charBtns(dk,setDk,function(){setDw(0);setDr(null);})),
     wpns.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#666",textAlign:"center",padding:"12px 0"}},"// NO WEAPONS"):
-    React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:3,marginBottom:8}},wpns.map(function(w,i){var a=dw===i;var info=WEAPON_DB[(w.name||"").toLowerCase().trim()];return React.createElement("button",{key:i,onClick:function(){setDw(i);setDr(null);},style:{padding:"6px 10px",background:a?"#FF206022":"transparent",border:"1px solid "+(a?"#FF2060":B1),color:a?"#FF2060":"#ccc",borderRadius:3,cursor:"pointer",fontFamily:RAJ,fontSize:13,textAlign:"left",display:"flex",justifyContent:"space-between",alignItems:"center"}},w.name,info&&React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#aaa"}},(info.cnt>1?info.cnt:"")+"d"+info.die+"+"+info.stat.toUpperCase().slice(0,3)));})),
+    React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:3,marginBottom:8}},wpns.map(function(w,i){var a=dw===i;var info=WEAPON_DB[(w.name||"").toLowerCase().trim()];return React.createElement("button",{key:i,onClick:function(){setDw(i);setDr(null);},style:{padding:"6px 10px",background:a?"#FF206022":"transparent",border:"1px solid "+(a?"#FF2060":B1),color:a?"#FF2060":"#ccc",borderRadius:3,cursor:"pointer",fontFamily:RAJ,fontSize:13,textAlign:"left",display:"flex",justifyContent:"space-between",alignItems:"center"}},w.name,info&&React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#99aacc"}},(info.cnt>1?info.cnt:"")+"d"+info.die+"+"+info.stat.toUpperCase().slice(0,3)));})),
     React.createElement("button",{onClick:rollDmg,style:{width:"100%",padding:"9px",background:"#FF206018",border:"1px solid #FF206055",color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:10,letterSpacing:2,marginBottom:8}},"ROLL DAMAGE"),
     dr&&React.createElement("div",{style:{background:"#FF206011",border:"1px solid #FF206033",borderRadius:4,padding:"10px 12px"}},
-     React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#aaa",marginBottom:4}},dr.label),
-     React.createElement("div",{style:{display:"flex",gap:6,alignItems:"baseline",flexWrap:"wrap",marginBottom:4}},dr.dice.map(function(d,i){var c=d===dr.die?"#fff":d===1?"#FF2060":DC[dr.die]||"#ccc";return React.createElement("span",{key:i,style:{fontFamily:ORB,fontSize:22,color:c}},d,d===dr.die?"★":"",d===1?"✕":"");}),React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#aaa"}},"+"+dr.sv)),
+     React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aacc",marginBottom:4}},dr.label),
+     React.createElement("div",{style:{display:"flex",gap:6,alignItems:"baseline",flexWrap:"wrap",marginBottom:4}},dr.dice.map(function(d,i){var c=d===dr.die?"#fff":d===1?"#FF2060":DC[dr.die]||"#ccc";return React.createElement("span",{key:i,style:{fontFamily:ORB,fontSize:22,color:c}},d,d===dr.die?"★":"",d===1?"✕":"");}),React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc"}},"+"+dr.sv)),
      React.createElement("div",{style:{fontFamily:ORB,fontSize:28,color:"#FF2060",textAlign:"right"}},dr.total," DMG")
     )
    ),
@@ -1317,18 +1318,18 @@ function DiceRoller(props){
     ),
     React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:3,marginBottom:8}},["d4","d6","d8","d10","d12","d20","2d6","d66"].map(function(ex){var d=parseInt(ex.replace(/\D/g,""));var dc=DC[d]||"#FFD166";return React.createElement("button",{key:ex,onClick:function(){rollFree(ex);},style:{padding:"4px 7px",background:dc+"11",border:"1px solid "+dc+"44",color:dc,borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9}},ex);})),
     fr&&React.createElement("div",{style:{background:"#ffffff05",border:"1px solid "+B1,borderRadius:4,padding:"10px 12px"}},
-     fr.d66?React.createElement("div",{style:{display:"flex",gap:16,alignItems:"center",justifyContent:"center"}},[["TENS",fr.dice[0].r,"#FFD166"],["ONES",fr.dice[1].r,"#FFD166"],["=",fr.total,"#FF2060"]].map(function(p){return React.createElement("div",{key:p[0],style:{textAlign:"center"}},React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#aaa"}},p[0]),React.createElement("div",{style:{fontFamily:ORB,fontSize:30,color:p[2]}},p[1]));})):
+     fr.d66?React.createElement("div",{style:{display:"flex",gap:16,alignItems:"center",justifyContent:"center"}},[["TENS",fr.dice[0].r,"#FFD166"],["ONES",fr.dice[1].r,"#FFD166"],["=",fr.total,"#FF2060"]].map(function(p){return React.createElement("div",{key:p[0],style:{textAlign:"center"}},React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc"}},p[0]),React.createElement("div",{style:{fontFamily:ORB,fontSize:30,color:p[2]}},p[1]));})):
      React.createElement("div",null,
-      React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:fr.dice.length>1||fr.mod?4:0}},fr.dice.map(function(d,i){var isMax=d.r===d.s,isOne=d.r===1,c=isMax?"#ffffff":isOne?"#FF2060":DC[d.s]||"#ccc";return React.createElement("span",{key:i,style:{fontFamily:ORB,fontSize:24,color:c}},d.r,isMax?"★":"",isOne?"✕":"");}),fr.mod!==0&&React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#aaa"}},(fr.mod>0?"+":"")+fr.mod)),
+      React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:fr.dice.length>1||fr.mod?4:0}},fr.dice.map(function(d,i){var isMax=d.r===d.s,isOne=d.r===1,c=isMax?"#ffffff":isOne?"#FF2060":DC[d.s]||"#ccc";return React.createElement("span",{key:i,style:{fontFamily:ORB,fontSize:24,color:c}},d.r,isMax?"★":"",isOne?"✕":"");}),fr.mod!==0&&React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc"}},(fr.mod>0?"+":"")+fr.mod)),
       (fr.dice.length>1||fr.mod!==0)&&React.createElement("div",{style:{fontFamily:ORB,fontSize:26,color:"#FFD166",borderTop:"1px solid "+B2,marginTop:4,paddingTop:4}},fr.total)
      )
     )
    ),
    React.createElement("div",{style:{marginTop:10,borderTop:"1px solid "+B2,paddingTop:8}},
-    React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#778",letterSpacing:2,marginBottom:4}},"ROLL LOG"),
+    React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc",letterSpacing:2,marginBottom:4}},"ROLL LOG"),
     React.createElement("div",{ref:logRef,style:{maxHeight:80,overflowY:"auto",display:"flex",flexDirection:"column",gap:1}},
-     hist.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#556"}},"// awaiting first roll"):
-     hist.slice().reverse().map(function(h){var mc=h.mode==="CHG"?"#FF6EC7":h.mode==="DMG"?"#FF2060":"#FFD166";var oc2=h.outcome==="WIN"?"#00FFD0":h.outcome==="LOSS"?"#FF2060":h.outcome==="TIE"?"#888":null;return React.createElement("div",{key:h.id,style:{fontFamily:MONO,fontSize:9,color:"#778",display:"flex",gap:4,alignItems:"baseline",lineHeight:1.4}},React.createElement("span",{style:{color:mc,flexShrink:0,minWidth:22}},h.mode),React.createElement("span",{style:{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:oc2||"#778"}},h.label));})
+     hist.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#7788bb"}},"// awaiting first roll"):
+     hist.slice().reverse().map(function(h){var mc=h.mode==="CHG"?"#FF6EC7":h.mode==="DMG"?"#FF2060":"#FFD166";var oc2=h.outcome==="WIN"?"#00FFD0":h.outcome==="LOSS"?"#FF2060":h.outcome==="TIE"?"#99aacc":null;return React.createElement("div",{key:h.id,style:{fontFamily:MONO,fontSize:9,color:"#99aacc",display:"flex",gap:4,alignItems:"baseline",lineHeight:1.4}},React.createElement("span",{style:{color:mc,flexShrink:0,minWidth:22}},h.mode),React.createElement("span",{style:{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:oc2||"#99aacc"}},h.label));})
     )
    )
   )
@@ -1379,8 +1380,8 @@ function ClipboardPreview(props){
  var CLIP_C="#FFD166";
  return React.createElement("div",{style:{position:"fixed",bottom:96,right:16,zIndex:150,background:BG,border:"1px solid "+CLIP_C+"44",borderRadius:6,padding:"6px 10px",minWidth:130,pointerEvents:"none"}},
   React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:CLIP_C,letterSpacing:2,marginBottom:4}},cb.cut?"CUT:":"CB: "+cb.mode.toUpperCase()),
-  cb.tile&&React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#aaa",marginBottom:1}},"> TILE: "+React.createElement("span",{style:{color:"#fff"}},(cb.tile.name||cb.tile.type||"—").slice(0,16))),
-  cb.token&&cb.token.length&&React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#aaa"}},"> TOKEN: "+React.createElement("span",{style:{color:SHIP_COLORS[(cb.token&&cb.token[0])||""]||"#fff"}},((cb.token&&cb.token[0])||"—").toUpperCase()))
+  cb.tile&&React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc",marginBottom:1}},"> TILE: "+React.createElement("span",{style:{color:"#fff"}},(cb.tile.name||cb.tile.type||"—").slice(0,16))),
+  cb.token&&cb.token.length&&React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc"}},"> TOKEN: "+React.createElement("span",{style:{color:SHIP_COLORS[(cb.token&&cb.token[0])||""]||"#fff"}},((cb.token&&cb.token[0])||"—").toUpperCase()))
  );
 }
 
@@ -1390,7 +1391,7 @@ function ContextMenu(props){
  var hasTile=hexData&&hexData.type;var hasToken=hexData&&hexData.ship;var hasCb=clipboard&&(clipboard.tile||clipboard.token);
  useEffect(function(){var h=function(){onClose();};document.addEventListener("mousedown",h);return function(){document.removeEventListener("mousedown",h);};});
  var Item=function(label,action,disabled,color,icon){
-  return React.createElement("div",{key:label,onMouseEnter:function(e){if(!disabled)e.currentTarget.style.background="#ffffff0d";},onMouseLeave:function(e){e.currentTarget.style.background="transparent";},onClick:function(e){e.stopPropagation();if(!disabled){onAction(action);onClose();}},style:{padding:"6px 14px",fontFamily:MONO,fontSize:10,color:disabled?"#555":(color||"#ccc"),cursor:disabled?"not-allowed":"pointer",letterSpacing:1,display:"flex",gap:8,alignItems:"center"}},icon&&React.createElement("span",{style:{opacity:.7}},icon)," ",label);
+  return React.createElement("div",{key:label,onMouseEnter:function(e){if(!disabled)e.currentTarget.style.background="#ffffff0d";},onMouseLeave:function(e){e.currentTarget.style.background="transparent";},onClick:function(e){e.stopPropagation();if(!disabled){onAction(action);onClose();}},style:{padding:"6px 14px",fontFamily:MONO,fontSize:10,color:disabled?"#7788bb":(color||"#ccc"),cursor:disabled?"not-allowed":"pointer",letterSpacing:1,display:"flex",gap:8,alignItems:"center"}},icon&&React.createElement("span",{style:{opacity:.7}},icon)," ",label);
  };
  var Sep=function(){return React.createElement("div",{style:{borderTop:"1px solid "+B2,margin:"3px 0"}});};
  // Clamp to viewport
@@ -1559,7 +1560,7 @@ var isA=m.role==="assistant";
 return React.createElement("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:isA?"flex-start":"flex-end",animation:"in .2s ease",position:"relative",zIndex:1}},
 React.createElement("div",{style:{maxWidth:"88%",padding:"10px 14px",borderRadius:4,background:isA?MABEL_C+"10":"#ffffff08",border:"1px solid "+(isA?MABEL_C+"44":"#ffffff1a"),fontFamily:isA?MONO:RAJ,fontSize:isA?11:14,color:isA?MABEL_C:"#ddd",lineHeight:1.75,whiteSpace:"pre-wrap",wordBreak:"break-word"}},
 isA?m.typing?React.createElement("span",{style:{fontFamily:MONO,fontSize:"inherit",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}},m.displayText+"▮"):React.createElement(MadText,{text:m.content}):m.content),
-React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#445",marginTop:2,letterSpacing:1}},isA?"MABEL":"COMMANDER")
+React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#8899cc",marginTop:2,letterSpacing:1}},isA?"MABEL":"COMMANDER")
 );
 }),
 commsLoading&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:MABEL_C,animation:"pulse 1s infinite",position:"relative",zIndex:1}},"// PROCESSING..."),
@@ -1798,7 +1799,7 @@ var clockTone=clock<=4?"sardonic and dry. notice everything, say one thing.":clo
   return React.createElement("div",{style:{flex:1,display:"flex",flexDirection:"column",minHeight:0,overflow:"hidden",background:"#020c02",borderTop:"1px solid "+CB_GREEN+"55"}},
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"5px 14px",background:"#031203",borderBottom:"1px solid "+CB_GREEN+"77",flexShrink:0}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
-        React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",flexShrink:0,background:cyberSess&&cyberSess.active?"#FF2060":"#333",boxShadow:cyberSess&&cyberSess.active?"0 0 6px #FF2060":undefined,animation:cyberSess&&cyberSess.active?"dangerFlicker 2s ease-in-out infinite":"none"}}),
+        React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",flexShrink:0,background:cyberSess&&cyberSess.active?"#FF2060":"#7788bb",boxShadow:cyberSess&&cyberSess.active?"0 0 6px #FF2060":undefined,animation:cyberSess&&cyberSess.active?"dangerFlicker 2s ease-in-out infinite":"none"}}),
         React.createElement("span",{style:{fontFamily:MONO,fontSize:10,letterSpacing:2,color:"#FFD700",border:"1px solid #FFD700",borderRadius:3,padding:"1px 5px",cursor:"pointer",textShadow:"0 0 6px #FFD700"}},"NEXUS-OS  //  INTRUSION MONITOR")
       ),
       React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#FF2060cc",textShadow:"0 0 6px #FF206088",letterSpacing:2}},"UNAUTHORIZED ACCESS")
@@ -2069,10 +2070,10 @@ function MapLegend(props){
       ?React.createElement("div",{style:{marginBottom:8,paddingBottom:8,borderBottom:"1px solid "+B3+"66"}},
           React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:ac+"88",letterSpacing:2.5,marginBottom:3}},"SYSTEM DOSSIER"),
           React.createElement("div",{style:{fontFamily:ORB,fontSize:11,color:ac,letterSpacing:2,marginBottom:5,lineHeight:1.3}},cm.name),
-          React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#888",lineHeight:1.5}},cm.desc)
+          React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#99aacc",lineHeight:1.5}},cm.desc)
         )
       :React.createElement("div",{style:{marginBottom:8,paddingBottom:8,borderBottom:"1px solid "+B3+"66",
-          fontFamily:MONO,fontSize:9,color:"#445",letterSpacing:1.5}},
+          fontFamily:MONO,fontSize:9,color:"#8899cc",letterSpacing:1.5}},
           "// NO MAP LOADED"),
     React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aabb",letterSpacing:2,marginBottom:5}},"LEGEND"),
     [[RING_PHASES[0].c,"◎ OUTER RING"],[RING_PHASES[1].c,"◎ MID RING"],[RING_PHASES[2].c,"◎ INNER RING"],
@@ -2103,7 +2104,7 @@ function MissionPanel(props){
   var StatBar=function(label,val,max,c){
     return React.createElement("div",{style:{marginBottom:8}},
       React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
-        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#aaa",letterSpacing:2}},label),
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc",letterSpacing:2}},label),
         React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:c}},val+"/"+max)
       ),
       React.createElement("div",{style:{height:4,background:"#1a1a2e",borderRadius:2,overflow:"hidden"}},
@@ -2155,7 +2156,7 @@ function MissionPanel(props){
                 background:a?r.c+"18":"transparent",border:"1px solid "+(a?r.c+"40":"transparent"),transition:"all 0.15s"}},
               React.createElement("div",{style:{width:5,height:5,borderRadius:"50%",background:a?r.c:"#2a2a3a",
                 boxShadow:a?"0 0 5px "+r.c:"none",flexShrink:0,transition:"all 0.15s"}}),
-              React.createElement("span",{style:{fontFamily:MONO,fontSize:7.5,color:a?r.c:"#556",letterSpacing:1.2,flex:1}},r.label),
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:7.5,color:a?r.c:"#7788bb",letterSpacing:1.2,flex:1}},r.label),
               a&&React.createElement("span",{style:{fontFamily:MONO,fontSize:7,color:r.c+"77",letterSpacing:1}},"d"+r.die)
             );
           })
@@ -2173,16 +2174,16 @@ function MissionPanel(props){
       StatBar("FUEL",ship.fuel,ship.fuelMax,fuelC),
       React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",
           padding:"5px 8px",background:"#FFD16607",border:"1px solid #FFD16620",borderRadius:4,marginBottom:10}},
-        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#aaa",letterSpacing:2}},"SCRAPS"),
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc",letterSpacing:2}},"SCRAPS"),
         React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:"#FFD166"}},(ship.scraps||0)+"\u223f")
       ),
       React.createElement("div",{style:{padding:"7px 9px",background:shipHex?"#FF206007":"#ffffff03",
           border:"1px solid "+(shipHex?"#FF206028":B1),borderRadius:4}},
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:shipHex?"#FF206077":"#445",letterSpacing:2.5,marginBottom:shipHex?3:0}},"CURRENT POSITION"),
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:7.5,color:shipHex?"#FF206077":"#8899cc",letterSpacing:2.5,marginBottom:shipHex?3:0}},"CURRENT POSITION"),
         shipHex?React.createElement("div",null,
           React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#FF2060"}},shipHexLabel),
-          shipHexType&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#888",marginTop:1}},shipHexType)
-        ):React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#445",letterSpacing:1}},"// UNKNOWN")
+          shipHexType&&React.createElement("div",{style:{fontFamily:RAJ,fontSize:11,color:"#99aacc",marginTop:1}},shipHexType)
+        ):React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#8899cc",letterSpacing:1}},"// UNKNOWN")
       )
     )
   );
@@ -2215,7 +2216,7 @@ function SaveManager(props){
           React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:AC,boxShadow:"0 0 10px "+AC}}),
           React.createElement("span",{style:{fontFamily:ORB,fontSize:12,color:AC,letterSpacing:4}},"SAVE MANAGER")
         ),
-        React.createElement("button",{onClick:onClose,style:{background:"none",border:"1px solid #333",color:"#888",borderRadius:4,padding:"4px 12px",cursor:"pointer",fontFamily:MONO,fontSize:9}},"X CLOSE")
+        React.createElement("button",{onClick:onClose,style:{background:"none",border:"1px solid #333",color:"#99aacc",borderRadius:4,padding:"4px 12px",cursor:"pointer",fontFamily:MONO,fontSize:9}},"X CLOSE")
       ),
       React.createElement("div",{style:{padding:"11px 14px",borderBottom:"1px solid #111",display:"flex",gap:7}},
         React.createElement("input",{value:name,onChange:function(e){setName(e.target.value);},onKeyDown:function(e){if(e.key==="Enter")doSave(name);},placeholder:"Save name...",style:{flex:1,background:"#050510",border:"1px solid "+AC+"33",borderRadius:4,padding:"7px 11px",color:"#ddd",fontFamily:MONO,fontSize:10,outline:"none"}}),
@@ -2223,7 +2224,7 @@ function SaveManager(props){
       ),
       msg&&React.createElement("div",{style:{padding:"7px 18px",background:AC+"18",fontFamily:MONO,fontSize:9,color:AC,letterSpacing:2,textAlign:"center"}},msg),
       React.createElement("div",{style:{overflowY:"auto",flex:1,padding:"9px 12px",display:"flex",flexDirection:"column",gap:6}},
-        saves.length===0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#334",textAlign:"center",padding:"36px 0",letterSpacing:2}},"NO SAVES"),
+        saves.length===0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#7788bb",textAlign:"center",padding:"36px 0",letterSpacing:2}},"NO SAVES"),
         saves.map(function(slot){
           var isRen=renaming===slot.name;
           return React.createElement("div",{key:slot.id,style:{background:"#050510",border:"1px solid #1a1a2e",borderRadius:5,padding:"10px 12px"}},
@@ -2240,10 +2241,10 @@ function SaveManager(props){
               )
             ),
             React.createElement("div",{style:{display:"flex",gap:12,flexWrap:"wrap"}},
-              React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#556"}},"SESSION "+slot.session),
-              slot.cole&&React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#556"}},slot.cole),
-              slot.ship&&React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#556"}},slot.ship),
-              React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#334"}},slot.date)
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#7788bb"}},"SESSION "+slot.session),
+              slot.cole&&React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#7788bb"}},slot.cole),
+              slot.ship&&React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#7788bb"}},slot.ship),
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#7788bb"}},slot.date)
             )
           );
         })
@@ -2321,10 +2322,10 @@ function HexMap(props){
   return React.createElement("div",{ref:mapRef,style:{position:"relative",borderRadius:12,border:"1px solid "+B3,overflow:"hidden",background:"transparent",height:"calc(100vh / 1.15 - 300px)"},onClick:function(){setCtx(null);}},
     React.createElement(MissionPanel,{gameState:gsForPanel,phase:phase,setPhase:setPhase}),
 React.createElement("div",{style:{position:"absolute",top:10,right:12,zIndex:30,display:"flex",gap:8}},
-      React.createElement("button",{onClick:function(){setShowIds(!showIds);},style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:showIds?"#7744cc33":"transparent",border:"1px solid "+(showIds?"#9966cc":B3),color:showIds?"#cc88ff":"#aaa",borderRadius:4,cursor:"pointer",letterSpacing:2}},showIds?"HIDE IDs":"SHOW IDs"),React.createElement("button",{onClick:function(){setConfirmClear(true);},style:{padding:"5px 12px",background:"#FF206018",border:"1px solid #FF206055",color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,animation:"dangerPulse 1.8s ease-in-out infinite"}},"⚠ CLEAR MAP"),
+      React.createElement("button",{onClick:function(){setShowIds(!showIds);},style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:showIds?"#7744cc33":"transparent",border:"1px solid "+(showIds?"#9966cc":B3),color:showIds?"#cc88ff":"#99aacc",borderRadius:4,cursor:"pointer",letterSpacing:2}},showIds?"HIDE IDs":"SHOW IDs"),React.createElement("button",{onClick:function(){setConfirmClear(true);},style:{padding:"5px 12px",background:"#FF206018",border:"1px solid #FF206055",color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,animation:"dangerPulse 1.8s ease-in-out infinite"}},"⚠ CLEAR MAP"),
       sel.length>0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,padding:"5px 12px",background:"#cc88ff22",border:"1px solid #cc88ff55",color:"#cc88ff",borderRadius:4,letterSpacing:1}},sel.length+" SELECTED")
     ),
-    confirmClear&&React.createElement("div",{style:{position:"fixed",inset:0,background:"#00000088",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("div",{style:{background:"#0d0d1a",border:"2px solid #FF206077",borderRadius:8,padding:"28px 36px",textAlign:"center",boxShadow:"0 0 40px #FF206033"}},React.createElement("div",{style:{fontFamily:ORB,fontSize:14,color:"#FF2060",letterSpacing:3,marginBottom:8}},"⚠ CLEAR MAP"),React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#aaa",marginBottom:20,letterSpacing:1}},"This will wipe all hex data. Are you sure?"),React.createElement("div",{style:{display:"flex",gap:12,justifyContent:"center"}},React.createElement("button",{onClick:function(){onUpdate({});setConfirmClear(false);},style:{padding:"8px 20px",background:"#FF206033",border:"1px solid #FF2060",color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:10,letterSpacing:1}},"YES, WIPE IT"),React.createElement("button",{onClick:function(){setConfirmClear(false);},style:{padding:"8px 20px",background:"transparent",border:"1px solid "+B1,color:"#aaa",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:10,letterSpacing:1}},"CANCEL")))),React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100%)",viewBox:"-310 -290 620 670",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
+    confirmClear&&React.createElement("div",{style:{position:"fixed",inset:0,background:"#00000088",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement("div",{style:{background:"#0d0d1a",border:"2px solid #FF206077",borderRadius:8,padding:"28px 36px",textAlign:"center",boxShadow:"0 0 40px #FF206033"}},React.createElement("div",{style:{fontFamily:ORB,fontSize:14,color:"#FF2060",letterSpacing:3,marginBottom:8}},"⚠ CLEAR MAP"),React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc",marginBottom:20,letterSpacing:1}},"This will wipe all hex data. Are you sure?"),React.createElement("div",{style:{display:"flex",gap:12,justifyContent:"center"}},React.createElement("button",{onClick:function(){onUpdate({});setConfirmClear(false);},style:{padding:"8px 20px",background:"#FF206033",border:"1px solid #FF2060",color:"#FF2060",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:10,letterSpacing:1}},"YES, WIPE IT"),React.createElement("button",{onClick:function(){setConfirmClear(false);},style:{padding:"8px 20px",background:"transparent",border:"1px solid "+B1,color:"#99aacc",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:10,letterSpacing:1}},"CANCEL")))),React.createElement("svg",{ref:svgRef,width:"100%",height:"calc(100%)",viewBox:"-310 -290 620 670",style:{display:"block",cursor:"grab"},onMouseDown:onMD,onMouseMove:onMM,onMouseUp:onMU,onMouseLeave:onMU},
       React.createElement("defs",null,React.createElement("pattern",{id:"hatch",width:"7",height:"7",patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"},React.createElement("line",{x1:"0",y1:"0",x2:"0",y2:"7",stroke:"#1e2a3a",strokeWidth:"1.3"}))),
       React.createElement("g",{transform:"translate("+pan.x+","+pan.y+") rotate(90) scale("+mapZoom+")"},
         HEXES.map(function(hex){
@@ -2372,16 +2373,16 @@ React.createElement("div",{style:{position:"absolute",top:10,right:12,zIndex:30,
       cb&&React.createElement("div",{onClick:function(){pasteHex(ctx.hexId);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#cc88ff",letterSpacing:1}},"PASTE"+(cb.tile?" ["+cb.tile.toUpperCase()+"]":"")),
       React.createElement("div",{style:{height:1,background:B2,margin:"3px 0"}}),
       [["CLEAR TILE","tile"],["CLEAR TOKEN","token"],["CLEAR BOTH","both"]].map(function(r){return React.createElement("div",{key:r[0],onClick:function(){clearHex(ctx.hexId,r[1]);},style:{padding:"6px 14px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#FF2060",letterSpacing:1}},r[0]);}),
-      React.createElement("div",{onClick:function(){setCtx(null);},style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#445",letterSpacing:1}},"CANCEL")
+      React.createElement("div",{onClick:function(){setCtx(null);},style:{padding:"6px 14px 3px",cursor:"pointer",fontFamily:MONO,fontSize:10,color:"#8899cc",letterSpacing:1}},"CANCEL")
     ),
     ed!==null&&React.createElement("div",{style:{position:"absolute",top:12,right:12,width:268,background:BG,border:"1px solid "+B3,borderRadius:8,padding:16,zIndex:20}},
       React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
         React.createElement("span",{style:{fontFamily:ORB,fontSize:11,color:"#cc88ff",letterSpacing:2}},"SCAN REPORT"),
-        React.createElement("button",{onClick:function(){setEd(null);setConfirmClear(false);},style:{background:"transparent",border:"none",color:"#aaa",cursor:"pointer",fontSize:18,lineHeight:1,padding:0}},"✕")
+        React.createElement("button",{onClick:function(){setEd(null);setConfirmClear(false);},style:{background:"transparent",border:"none",color:"#99aacc",cursor:"pointer",fontSize:18,lineHeight:1,padding:0}},"✕")
       ),
       React.createElement("input",{value:form.name,onChange:function(e){setForm(function(p){return Object.assign({},p,{name:e.target.value});});},placeholder:"Hex designation",style:iS}),
       React.createElement(HexTypeSelect,{value:form.type,onChange:function(v){setForm(function(p){return Object.assign({},p,{type:v});});},shipName:shipName}),
-      React.createElement("textarea",{value:form.notes,onChange:function(e){setForm(function(p){return Object.assign({},p,{notes:e.target.value});});},placeholder:"Sensor data / field notes...",rows:4,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:14,padding:"9px 12px",outline:"none",resize:"none",boxSizing:"border-box",lineHeight:1.7,marginBottom:8}}),
+      React.createElement("textarea",{value:form.notes,onChange:function(e){setForm(function(p){return Object.assign({},p,{notes:e.target.value});});},placeholder:"Sensor data / field notes...",rows:4,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#99aacc",fontFamily:RAJ,fontSize:14,padding:"9px 12px",outline:"none",resize:"none",boxSizing:"border-box",lineHeight:1.7,marginBottom:8}}),
       React.createElement("label",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:14,cursor:"pointer"}},
         React.createElement("select",{value:(form.ships&&form.ships[0])||"",onChange:function(e){var v=e.target.value;setForm(function(p){return Object.assign({},p,{ships:v?[v]:[]});});},style:{background:"#080810",border:"1px solid #FF206055",color:"#FF2060",fontFamily:MONO,fontSize:9,borderRadius:3,padding:"2px 6px",outline:"none"}},React.createElement("option",{value:""},"— NO SHIP TOKEN —"),React.createElement("option",{value:"seance"},"THE INCONCEIVABLE"),React.createElement("option",{value:"twinrotor"},"TWINROTOR HAULER"),React.createElement("option",{value:"snowstorm"},"SNOWSTORM DELTA"),React.createElement("option",{value:"epsilon"},"EPSILON INTERCEPTOR"),React.createElement("option",{value:"voyager"},"A-1 VOYAGER"),React.createElement("option",{value:"orionmoth"},"ORION MOTH"),React.createElement("option",{value:"eclipsewarden"},"ECLIPSE WARDEN"),React.createElement("option",{value:"",disabled:true},"── CLASS B/C ──"),React.createElement("option",{value:"vectorace"},"VECTOR ACE FIGHTER"),React.createElement("option",{value:"duskwing"},"DUSKWING"),React.createElement("option",{value:"smuggler"},"SMUGGLER SPEEDER"),React.createElement("option",{value:"scarab"},"SCARAB INTERCEPTOR"),React.createElement("option",{value:"mantis"},"VECTOR-7 MANTIS"),React.createElement("option",{value:"beluga"},"BELUGA TRANSPORTER"),React.createElement("option",{value:"",disabled:true},"── HEAVY ──"),React.createElement("option",{value:"starpredator"},"STARPREDATOR"),React.createElement("option",{value:"shell4"},"SHELL-4 TRANSPORTER"),React.createElement("option",{value:"stingray"},"STINGRAY FRONTIER"),React.createElement("option",{value:"edgecharger"},"EDGECHARGER W"),React.createElement("option",{value:"",disabled:true},"── TITANS ──"),React.createElement("option",{value:"theclaw"},"THE CLAW"),React.createElement("option",{value:"tarrasque"},"TARRASQUE TITAN")),
         React.createElement("span",{style:{fontFamily:MONO,fontSize:12,color:"#ccc"}},"SHIP IS HERE")
@@ -2455,7 +2456,7 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
         [["netrunner","NETRUNNER"],["tactical","TACTICAL"]].map(([id,label])=>{
           const a=activeTab===id;
           const acc=id==="netrunner"?NET_ACC:CT_ACC;
-          return React.createElement("button",{key:id,onClick:()=>setActiveTab(id),style:{flex:1,padding:"6px 0",background:a?acc+"1a":"transparent",border:"none",borderBottom:a?"2px solid "+acc:"2px solid transparent",color:a?acc:"#445",fontFamily:MONO,fontSize:8,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},label);
+          return React.createElement("button",{key:id,onClick:()=>setActiveTab(id),style:{flex:1,padding:"6px 0",background:a?acc+"1a":"transparent",border:"none",borderBottom:a?"2px solid "+acc:"2px solid transparent",color:a?acc:"#8899cc",fontFamily:MONO,fontSize:8,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},label);
         })
       ),
 
@@ -2505,10 +2506,10 @@ function SidePanelDual({gs,tab,ctBrief,onCharChange}){
         // header
         React.createElement("div",{style:{fontFamily:MONO,fontSize:7,letterSpacing:2,color:CT_ACC,textShadow:combatActive?"0 0 10px "+CT_ACC+",0 0 22px "+CT_ACC+"55":"none",paddingBottom:8,marginBottom:8,borderBottom:"1px solid "+CT_ACC+"55",display:"flex",justifyContent:"space-between",alignItems:"center"}},
           React.createElement("span",null,combatActive?("⚔ ROUND "+round):"⚔ TACTICAL"),
-          React.createElement("span",{style:{fontSize:9,color:combatActive?"#FF2060":"#334",animation:combatActive?"tactPulse 1.5s ease-in-out infinite":"none",letterSpacing:1}},combatActive?"LIVE":"IDLE")
+          React.createElement("span",{style:{fontSize:9,color:combatActive?"#FF2060":"#7788bb",animation:combatActive?"tactPulse 1.5s ease-in-out infinite":"none",letterSpacing:1}},combatActive?"LIVE":"IDLE")
         ),
 
-        !combatActive&&React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#334",textAlign:"center",padding:"20px 0",letterSpacing:1,lineHeight:2.2}},"NO ACTIVE\nCOMBAT\n\nGO TO COMBAT\nTAB TO BEGIN"),
+        !combatActive&&React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#7788bb",textAlign:"center",padding:"20px 0",letterSpacing:1,lineHeight:2.2}},"NO ACTIVE\nCOMBAT\n\nGO TO COMBAT\nTAB TO BEGIN"),
 
         combatActive&&React.createElement(React.Fragment,null,
           // mode badge
@@ -2570,20 +2571,32 @@ const FACTION_ICONS={
   warg: (sz=16)=>React.createElement("svg",{width:sz,height:sz,viewBox:"0 0 16 16",fill:"currentColor",style:{display:"inline-block",flexShrink:0}},
     React.createElement("path",{d:"M8 1 L15 13 H1 Z M8 4 L12.5 12 H3.5 Z",fillRule:"evenodd"})
   ),
-  medusa: (sz=16)=>React.createElement("svg",{width:sz,height:sz,viewBox:"0 0 16 16",fill:"currentColor",style:{display:"inline-block",flexShrink:0}},
-    React.createElement("rect",{x:1,y:1,width:14,height:14,rx:2,fillOpacity:0.2,stroke:"currentColor",strokeWidth:1.5,fill:"none"}),
-    React.createElement("text",{x:8,y:12,textAnchor:"middle",fontSize:10,fontFamily:"monospace",fill:"currentColor"},">_")
+  medusa: (sz=16)=>React.createElement("svg",{width:sz,height:sz,viewBox:"0 0 20 20",fill:"none",stroke:"currentColor",style:{display:"inline-block",flexShrink:0}},
+    React.createElement("ellipse",{cx:10,cy:11,rx:5,ry:6,strokeWidth:1.4}),
+    React.createElement("ellipse",{cx:10,cy:10,rx:3,ry:2.5,fill:"currentColor",fillOpacity:0.2,strokeWidth:0}),
+    React.createElement("circle",{cx:8.2,cy:10,r:0.9,fill:"currentColor",stroke:"none"}),
+    React.createElement("circle",{cx:11.8,cy:10,r:0.9,fill:"currentColor",stroke:"none"}),
+    React.createElement("path",{d:"M8.5 13 Q10 14.2 11.5 13",strokeWidth:1,strokeLinecap:"round"}),
+    React.createElement("path",{d:"M7 5.5 Q6 3 7.5 2 Q6.5 4 8 4.5",strokeWidth:1,strokeLinecap:"round",fill:"none"}),
+    React.createElement("path",{d:"M10 5 Q10 2.5 11 1.5 Q10.5 3.5 11.5 4.5",strokeWidth:1,strokeLinecap:"round",fill:"none"}),
+    React.createElement("path",{d:"M13 5.5 Q14 3 12.5 2 Q13.5 4 12 4.5",strokeWidth:1,strokeLinecap:"round",fill:"none"}),
+    React.createElement("path",{d:"M5.5 7 Q3.5 5.5 4 4 Q4.5 6 6 6.5",strokeWidth:1,strokeLinecap:"round",fill:"none"}),
+    React.createElement("path",{d:"M14.5 7 Q16.5 5.5 16 4 Q15.5 6 14 6.5",strokeWidth:1,strokeLinecap:"round",fill:"none"}),
+    React.createElement("path",{d:"M6 17.5 Q5 19 6.5 19.5",strokeWidth:1,strokeLinecap:"round",fill:"none"}),
+    React.createElement("path",{d:"M14 17.5 Q15 19 13.5 19.5",strokeWidth:1,strokeLinecap:"round",fill:"none"})
   ),
   isf: (sz=16)=>React.createElement("svg",{width:sz,height:sz,viewBox:"0 0 16 16",fill:"currentColor",style:{display:"inline-block",flexShrink:0}},
     React.createElement("path",{d:"M8 1 L14 4 V8 C14 12 8 15 8 15 C8 15 2 12 2 8 V4 Z M8 3.5 L12 6 V8 C12 11 8 13.5 8 13.5 C8 13.5 4 11 4 8 V6 Z",fillRule:"evenodd"})
   ),
-  synth: (sz=16)=>React.createElement("svg",{width:sz,height:sz,viewBox:"0 0 16 16",fill:"currentColor",style:{display:"inline-block",flexShrink:0}},
-    React.createElement("circle",{cx:8,cy:8,r:6,fill:"none",stroke:"currentColor",strokeWidth:1.5}),
-    React.createElement("circle",{cx:8,cy:8,r:3}),
-    React.createElement("line",{x1:8,y1:2,x2:8,y2:5,stroke:"currentColor",strokeWidth:1.5}),
-    React.createElement("line",{x1:8,y1:11,x2:8,y2:14,stroke:"currentColor",strokeWidth:1.5}),
-    React.createElement("line",{x1:2,y1:8,x2:5,y2:8,stroke:"currentColor",strokeWidth:1.5}),
-    React.createElement("line",{x1:11,y1:8,x2:14,y2:8,stroke:"currentColor",strokeWidth:1.5})
+  synth: (sz=16)=>React.createElement("svg",{width:sz,height:sz,viewBox:"0 0 20 20",fill:"none",stroke:"currentColor",style:{display:"inline-block",flexShrink:0}},
+    React.createElement("circle",{cx:10,cy:10,r:8,strokeWidth:1.6}),
+    React.createElement("line",{x1:4.3,y1:4.3,x2:15.7,y2:15.7,strokeWidth:1.4}),
+    React.createElement("line",{x1:15.7,y1:4.3,x2:4.3,y2:15.7,strokeWidth:1.4}),
+    React.createElement("line",{x1:3.5,y1:3.5,x2:16.5,y2:16.5,strokeWidth:0.6,strokeOpacity:0.5}),
+    React.createElement("line",{x1:16.5,y1:3.5,x2:3.5,y2:16.5,strokeWidth:0.6,strokeOpacity:0.5}),
+    React.createElement("path",{d:"M3.5 10 Q10 4.5 16.5 10 Q10 15.5 3.5 10 Z",strokeWidth:1.4,fill:"currentColor",fillOpacity:0.15}),
+    React.createElement("circle",{cx:10,cy:10,r:2.8,strokeWidth:1.2}),
+    React.createElement("circle",{cx:10,cy:10,r:1.2,fill:"currentColor",stroke:"none"})
   ),
   alien: (sz=16)=>React.createElement("svg",{width:sz,height:sz,viewBox:"0 0 16 16",fill:"currentColor",style:{display:"inline-block",flexShrink:0}},
     React.createElement("path",{d:"M8 1 C4 1 2 4 2 7 C2 11 4 13 6 13.5 L6 15 L10 15 L10 13.5 C12 13 14 11 14 7 C14 4 12 1 8 1 Z M5.5 7 C5.5 5.9 6.1 5 7 5 C7.9 5 8.5 5.9 8.5 7 C8.5 8.1 7.9 9 7 9 C6.1 9 5.5 8.1 5.5 7 Z M9 7 C9 5.9 9.6 5 10.5 5 C11.4 5 12 5.9 12 7 C12 8.1 11.4 9 10.5 9 C9.6 9 9 8.1 9 7 Z",fillRule:"evenodd"})
@@ -2688,6 +2701,7 @@ const DIFFICULTY_C={easy:"#00FFD0",medium:"#FFD166",hard:"#FF6B35",boss:"#FF2060
 
 const STATUS_C_CT={BREACHED:"#00FFD0",SHOCKED:"#FFD166",STUNNED:"#cc88ff",OVERHEAT:"#FF6B35",BLINDED:"#aaaaaa"};
 const CT_STATUSES=["BREACHED","SHOCKED","STUNNED","OVERHEAT","BLINDED"];
+const MAX_ENEMIES=6;
 const mkEnemy=(dbEntry)=>{
   if(!dbEntry)return {id:Date.now()+Math.random(),name:"",hp:10,hpMax:10,armor:0,baseArmor:0,vig:0,gra:0,min:0,tec:0,actions:1,actionsUsed:0,shield:false,statuses:[],difficulty:"easy",exp:1,isBoss:false,moves:[],faction:"",skill:""};
   const coop_hp=dbEntry.hp+5;
@@ -2695,11 +2709,12 @@ const mkEnemy=(dbEntry)=>{
   return {id:Date.now()+Math.random(),name:dbEntry.name||"Enemy",hp:coop_hp,hpMax:coop_hp,armor:dbEntry.armor||0,baseArmor:dbEntry.armor||0,vig:dbEntry.vig||0,gra:dbEntry.gra||0,min:dbEntry.min||0,tec:dbEntry.tec||0,actions:coop_act,actionsUsed:0,shield:false,statuses:[],difficulty:dbEntry.difficulty||"easy",exp:dbEntry.exp||1,isBoss:dbEntry.isBoss||false,moves:dbEntry.moves||[],faction:dbEntry.faction||"",skill:dbEntry.skill||""};
 };
 
-function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
+function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate,onSelectEnemy,onFire}){
+  const WPN_COLOR={"laser blaster":"#00FFD0","particle cannon":"#00FFD0","particle cannons":"#00FFD0","g.r.e. missiles":"#FF6B35","gre missiles":"#FF6B35","ogre missiles":"#FF6B35","o.g.r.e. missiles":"#FF6B35","gamma gun":"#cc88ff","pulse rifle":"#FFD166","gravity rifle":"#aaddff","ignition shotgun":"#FF6B35","ion carbine":"#FF6EC7","gauss smg":"#88BBFF","revolver":"#FFD166","carbon dagger":"#FF2060","helix wire":"#FF2060","rocket hammer":"#FF6B35","neon blade":"#FF2060","plasma shield":"#aaaaff","halo discs":"#cc88ff"};
   const [active,setActive]=React.useState(false);
   const [mode,setMode]=React.useState("ground");
   const [round,setRound]=React.useState(1);
-  const [enemies,setEnemies]=React.useState([mkEnemy()]);
+  const [enemies,setEnemies]=React.useState([]);
   const [combatLog,setCombatLog]=React.useState([]);
   const [shipShields,setShipShields]=React.useState(0);
   const [actionDice,setActionDice]=React.useState([]);
@@ -2712,14 +2727,25 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
   const [rollRes,setRollRes]=React.useState(null);
   const [rollChar,setRollChar]=React.useState("cole");
   const [rollWpnIdx,setRollWpnIdx]=React.useState(0);
+  const [rollWpnSource,setRollWpnSource]=React.useState('char'); // 'char' | 'ship'
+  const [rollShipModIdx,setRollShipModIdx]=React.useState(0);
   const [enemySearch,setEnemySearch]=React.useState("");
   const [showPicker,setShowPicker]=React.useState(false);
-  React.useEffect(()=>{if(onCtUpdate)onCtUpdate({active,round,mode,enemies,coleHP,velaHP,coleEN,velaEN});},[active,round,mode,enemies,coleHP,velaHP,coleEN,velaEN]);
+  const [manifestFlash,setManifestFlash]=React.useState(false);
+  const [selectedEnemyId,setSelectedEnemyId]=React.useState(null);
+  const [endMode,setEndMode]=React.useState(null);
+  const [calibErr,setCalibErr]=React.useState(false);
+  React.useEffect(()=>{if(onCtUpdate)onCtUpdate({active,round,mode,enemies,coleHP,velaHP,coleEN,velaEN,endMode,selectedEnemyId});},[active,round,mode,enemies,coleHP,velaHP,coleEN,velaEN,endMode,selectedEnemyId]);
 
   const addLog=(txt,c)=>setCombatLog(p=>p.concat([{id:Date.now()+Math.random(),txt,c:c||"#aaaacc"}]));
 
   const startCombat=()=>{
-    setActive(true);setRound(1);
+    if(enemies.length===0){setManifestFlash(true);setTimeout(()=>setManifestFlash(false),2200);return;}
+    if(enemies.length===0){setCalibErr(true);return;}
+    setCalibErr(false);
+    setActive(true);setRound(1);if(enemies.length===1)setSelectedEnemyId(enemies[0].id);
+    // Stamp the first enemy as leader — persists on the object, not position-based
+    setEnemies(p=>p.map((e,i)=>i===0?Object.assign({},e,{isLeader:true}):e));
     setColeHP(gs.cole.hp);setColeEN(gs.cole.en);
     setVelaHP(gs.vela.hp);setVelaEN(gs.vela.en);
     setColeSt([]);setVelaSt([]);
@@ -2741,9 +2767,9 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
       if(coleHP!==null){onCharChange("cole","hp",coleHP);onCharChange("cole","en",coleEN);}
       if(velaHP!==null){onCharChange("vela","hp",velaHP);onCharChange("vela","en",velaEN);}
     }
-    setActive(false);setRound(1);setEnemies([mkEnemy()]);
+    setActive(false);setRound(1);setEnemies([]);setEndMode(null);setSelectedEnemyId(null);
     setCombatLog([]);setShipShields(0);setActionDice([]);
-    setRollRes(null);setColeSt([]);setVelaSt([]);
+    setRollRes(null);setColeSt([]);setVelaSt([]);setRollWpnSource("char");
   };
 
   const nextRound=()=>{
@@ -2777,10 +2803,22 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
 
   const rollAttack=()=>{
     const char=rollChar==="cole"?gs.cole:gs.vela;
-    const wpn=char.weapons&&char.weapons[rollWpnIdx];
-    if(!wpn||!wpn.name){setRollRes({txt:"No weapon in slot "+(rollWpnIdx+1),c:"#FF2060"});return;}
-    const wData=WEAPON_DB[wpn.name.toLowerCase()];
-    if(!wData){setRollRes({txt:"'"+wpn.name+"' not in DB",c:"#FF2060"});return;}
+    // Resolve weapon — char slot or ship module
+    var wpnName,wData;
+    if(rollWpnSource==='ship'){
+      var rawMod=(gs.ship.modules||[])[rollShipModIdx]||"";
+      wpnName=rawMod.split("—")[0].trim();
+      // Parse die from module string e.g. "Deal 8 damage" → d8, "Deal 3 damage" → d4
+      var dmgMatch=rawMod.match(/Deal (\d+) damage/i);
+      var baseDmg=dmgMatch?parseInt(dmgMatch[1]):4;
+      wData={die:baseDmg,stat:"tech",cnt:1,isShipWpn:true};
+    } else {
+      var wpn=char.weapons&&char.weapons[rollWpnIdx];
+      if(!wpn||!wpn.name){setRollRes({txt:"No weapon in slot "+(rollWpnIdx+1),c:"#FF2060"});return;}
+      wpnName=wpn.name;
+      wData=WEAPON_DB[wpnName.toLowerCase()];
+      if(!wData){setRollRes({txt:"'"+wpnName+"' not in DB",c:"#FF2060"});return;}
+    }
     const stat=char[wData.stat]||0;
     const rolls=Array.from({length:wData.cnt||1},()=>Math.ceil(Math.random()*wData.die));
     const best=Math.max(...rolls);
@@ -2789,6 +2827,60 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
     const txt=charName+" \u25b8 "+wpn.name+" ["+rolls.join(", ")+"] \u2192 best "+best+"+"+wData.stat.slice(0,3).toUpperCase()+"("+stat+") = "+total;
     setRollRes({txt,c:"#FFD166"});
     addLog(txt,"#FFD166");
+  };
+
+  const selectEnemy=(id)=>{
+    setSelectedEnemyId(id);
+    if(onSelectEnemy)onSelectEnemy(id);
+  };
+
+  const fireAtTarget=()=>{
+    if(!selectedEnemyId){addLog("// NO TARGET SELECTED","#FF2060");return;}
+    const target=enemies.find(e=>e.id===selectedEnemyId);
+    if(!target||target.hp<=0){addLog("// TARGET ALREADY DOWN","#FF2060");return;}
+    const char=rollChar==="cole"?gs.cole:gs.vela;
+    // Resolve weapon from source (char slot or ship module)
+    var wpnName,wData;
+    if(rollWpnSource==='ship'){
+      var rawMod=(gs.ship.modules||[])[rollShipModIdx]||"";
+      wpnName=rawMod.split("—")[0].trim();
+      if(!wpnName){setRollRes({txt:"No ship module selected",c:"#FF2060"});return;}
+      var dmgMatch=rawMod.match(/Deal (\d+) damage/i);
+      var baseDmg=dmgMatch?parseInt(dmgMatch[1]):4;
+      wData={die:baseDmg,stat:"tech",cnt:1};
+    } else {
+      var wpn=char.weapons&&char.weapons[rollWpnIdx];
+      if(!wpn||!wpn.name){setRollRes({txt:"No weapon in slot "+(rollWpnIdx+1),c:"#FF2060"});return;}
+      wpnName=wpn.name;
+      wData=WEAPON_DB[wpnName.toLowerCase()];
+      if(!wData){setRollRes({txt:"'"+wpnName+"' not in DB",c:"#FF2060"});return;}
+    }
+    const stat=char[wData.stat]||0;
+    const rolls=Array.from({length:wData.cnt||1},()=>Math.ceil(Math.random()*wData.die));
+    const best=Math.max(...rolls);
+    let dmg=best+stat;
+    const charName=rollChar==="cole"?"COLE":"VELA";
+    // Shield check
+    if(target.shield){
+      const shieldTxt=charName+" ▸ "+wpnName+" → SHIELD ABSORBED! ["+rolls.join(",")+"] "+best+"+"+stat+"="+dmg;
+      setRollRes({txt:shieldTxt,c:"#00FFD0"});
+      addLog(shieldTxt,"#00FFD0");
+      setEnemies(p=>p.map(e=>e.id===selectedEnemyId?Object.assign({},e,{shield:false}):e));
+      if(onFire)onFire({type:"shield",enemyId:selectedEnemyId,dmg:0,rolls,total:dmg,wpnName:wpnName,charName,wpnColor:WPN_COLOR[(wpnName||"").toLowerCase()]||"#00FFD0"});
+      return;
+    }
+    // Armor reduction
+    const armorReduce=target.armor||0;
+    const finalDmg=Math.max(0,dmg-armorReduce);
+    const newHp=Math.max(0,target.hp-finalDmg);
+    const destroyed=newHp<=0;
+    const armorNote=armorReduce>0?" (ARM -"+armorReduce+")":"";
+    const txt=charName+" ▸ "+wpnName+" ["+rolls.join(",")+"] → "+best+"+"+stat+"="+dmg+armorNote+" → "+finalDmg+" DMG"+(destroyed?" — DESTROYED!":"");
+    setRollRes({txt,c:destroyed?"#FF2060":"#FFD166"});
+    addLog(txt,destroyed?"#FF2060":"#FFD166");
+    setEnemies(p=>p.map(e=>e.id===selectedEnemyId?Object.assign({},e,{hp:newHp}):e));
+    if(onFire)onFire({type:destroyed?"destroy":"hit",enemyId:selectedEnemyId,dmg:finalDmg,rolls,total:dmg,wpnName:wpnName,charName,newHp,wpnColor:WPN_COLOR[(wpnName||"").toLowerCase()]||"#00FFD0"});
+    if(destroyed){const remaining=enemies.filter(e=>e.id!==selectedEnemyId&&e.hp>0);const nextTarget=remaining.length>=1?remaining[0]:null;setSelectedEnemyId(nextTarget?nextTarget.id:null);setTimeout(()=>setEnemies(p=>p.filter(x=>x.id!==selectedEnemyId)),1400);}
   };
 
   const rollShipDice=()=>{
@@ -2805,53 +2897,107 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
 
   // ── SETUP SCREEN ──────────────────────────────────────────────────────────
   if(!active){
-    return React.createElement("div",{style:{maxWidth:720}},
-      React.createElement("div",{style:{fontFamily:ORB,fontSize:14,fontWeight:700,color:CC,letterSpacing:3,marginBottom:18}},"\u2694  COMBAT TRACKER"),
-      React.createElement("div",{style:{display:"flex",gap:8,marginBottom:20}},
-        ["ground","ship"].map(m=>React.createElement("button",{key:m,onClick:()=>setMode(m),style:Object.assign({},btnBase,{flex:1,padding:"10px 0",background:mode===m?CC+"22":"transparent",borderColor:mode===m?CC:B1,color:mode===m?CC:"#778",letterSpacing:2,fontSize:11})},m==="ground"?"\u2694  GROUND COMBAT":"\u2381  SHIP COMBAT"))
+    return React.createElement("div",{style:{maxWidth:780,margin:"0 auto",animation:"ctIn .4s ease both"}},
+      /* HEADER PANEL */
+      React.createElement("div",{style:{background:"#05070d",border:"1px solid "+CC+"77",borderRadius:6,padding:"16px 20px",marginBottom:12,position:"relative",overflow:"hidden"}},
+        React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent 0,transparent 3px,"+CC+"06 3px,"+CC+"06 4px)",animation:"tactScan .2s linear infinite",borderRadius:6}}),
+        React.createElement("div",{style:{position:"relative",zIndex:1}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}},
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontFamily:ORB,fontSize:17,fontWeight:900,color:CC,letterSpacing:4,textShadow:"0 0 28px "+CC+"55"}},"⚔  COMBAT SYSTEM"),
+              React.createElement("div",{style:{fontFamily:MONO,fontSize:7,color:CC+"55",letterSpacing:2,marginTop:4}},"TCS-7  //  TACTICAL ENGAGEMENT COMPUTER  //  GHOST SIGNAL")
+            ),
+            React.createElement("div",{style:{textAlign:"right",lineHeight:1.9}},
+              ["v2.77-β","BUILD 441","READY"].map((l,i)=>React.createElement("div",{key:i,style:{fontFamily:MONO,fontSize:8,color:i===2?CC+"99":"#8899cc",letterSpacing:1}},l))
+            )
+          ),
+          React.createElement("div",{style:{height:1,background:"linear-gradient(90deg,transparent,"+CC+"88,transparent)",marginBottom:10}}),
+          React.createElement("div",{style:{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}},
+            ...[
+              {c:"#00FF88",d:"0s",dt:1.3,label:"SYS ONLINE"},
+              {c:CC,d:"0.4s",dt:1.65,label:"WPN ARMED"},
+              {c:"#00FFD0",d:"0.8s",dt:2.0,label:"SHIELDS STBY"},
+              {c:"#FFD166",d:"1.2s",dt:1.45,label:"COMMS OK"}
+            ].map(({c,d,dt,label})=>React.createElement("span",{key:label,style:{display:"inline-flex",alignItems:"center",gap:5}},
+              React.createElement("span",{style:{width:7,height:7,borderRadius:"50%",background:c,boxShadow:"0 0 10px "+c,display:"inline-block",animation:"blink "+dt+"s step-end infinite",animationDelay:d}}),
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:c+"cc",letterSpacing:1.5}},label)
+            )),
+            React.createElement("div",{style:{marginLeft:"auto",fontFamily:MONO,fontSize:8,color:"#7788bb",letterSpacing:1}},"▸ "+(gs&&gs.ship&&gs.ship.name||"THE INCONCEIVABLE"))
+          )
+        )
       ),
-      React.createElement("div",{style:{marginBottom:20}},
+      /* ENGAGEMENT TYPE */
+      React.createElement("div",{style:{marginBottom:12}},
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#8899cc",letterSpacing:3,marginBottom:6,paddingLeft:2}},"// ENGAGEMENT TYPE"),
+        React.createElement("div",{style:{display:"flex",gap:8}},
+          ["ground","ship"].map(m=>React.createElement("button",{key:m,onClick:()=>setMode(m),style:Object.assign({},btnBase,{flex:1,padding:"14px 0",background:mode===m?"linear-gradient(135deg,"+CC+"22,"+CC+"0a)":"transparent",borderColor:mode===m?CC:B1+"55",color:mode===m?CC:"#8899cc",letterSpacing:3,fontSize:11,fontFamily:ORB,boxShadow:mode===m?"0 0 18px "+CC+"22,inset 0 0 14px "+CC+"0a":"none",textShadow:mode===m?"0 0 10px "+CC:"none",transition:"all .2s"})},m==="ground"?"⚔  GROUND COMBAT":"⎁  SHIP COMBAT"))
+        )
+      ),
+      /* HOSTILE MANIFEST */
+      React.createElement("div",{onClick:()=>setManifestFlash(false),style:{background:"#04060e",border:"1px solid "+(manifestFlash?"#FF2060aa":CC+"33"),borderRadius:6,padding:"14px 16px",marginBottom:12,animation:manifestFlash?"manifestAlert 0.55s ease-in-out 4":"none",transition:"border-color 0.3s ease"}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778",letterSpacing:2}},"ENEMIES"),
-          React.createElement("button",{onClick:()=>setShowPicker(!showPicker),style:Object.assign({},btnBase,{padding:"4px 12px",background:showPicker?CC+"22":"transparent",borderColor:showPicker?CC:B1,color:showPicker?CC:"#778",fontSize:9})},showPicker?"CLOSE PICKER":"+ ADD FROM DATABASE")
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+            React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:CC,letterSpacing:3}},"HOSTILE MANIFEST"),
+            enemies.length>0&&React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:CC+"aa",background:CC+"11",border:"1px solid "+CC+"33",padding:"1px 8px",borderRadius:10}},enemies.length+" UNIT"+(enemies.length!==1?"S":""))
+          ),
+          React.createElement("button",{onClick:()=>{if(enemies.length<MAX_ENEMIES)setShowPicker(!showPicker);},disabled:enemies.length>=MAX_ENEMIES&&!showPicker,style:Object.assign({},btnBase,{padding:"5px 12px",background:showPicker?CC+"22":enemies.length>=MAX_ENEMIES?"transparent":showPicker?"transparent":"transparent",borderColor:showPicker?CC:enemies.length>=MAX_ENEMIES?B1+"22":B1+"55",color:showPicker?CC:enemies.length>=MAX_ENEMIES?"#7788bb44":"#8899cc",fontSize:9,letterSpacing:2,cursor:enemies.length>=MAX_ENEMIES&&!showPicker?"not-allowed":"pointer"})},showPicker?"✕ CLOSE":enemies.length>=MAX_ENEMIES?"MAX (6/6)":"+ ADD FROM DATABASE")
         ),
-        showPicker&&React.createElement("div",{style:{background:"#02040a",border:"1px solid "+CC+"44",borderRadius:4,padding:"10px",marginBottom:10}},
-          React.createElement("input",{placeholder:"Search enemies...",value:enemySearch,onChange:e=>setEnemySearch(e.target.value),autoFocus:true,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:3,color:"#ddd",fontFamily:MONO,fontSize:11,padding:"6px 10px",outline:"none",boxSizing:"border-box",marginBottom:8}}),
+        showPicker&&React.createElement("div",{style:{background:"#020408",border:"1px solid "+CC+"33",borderRadius:4,padding:"10px",marginBottom:10}},
+          React.createElement("input",{placeholder:"// SEARCH ENEMY DATABASE...",value:enemySearch,onChange:ev=>setEnemySearch(ev.target.value),autoFocus:true,style:{width:"100%",background:"transparent",border:"1px solid "+B1+"44",borderRadius:3,color:"#ddd",fontFamily:MONO,fontSize:10,padding:"7px 10px",outline:"none",boxSizing:"border-box",marginBottom:8,caretColor:CC}}),
           React.createElement("div",{style:{maxHeight:200,overflowY:"auto",display:"flex",flexDirection:"column",gap:3}},
-            Object.entries(ENEMY_DB).filter(([k])=>!enemySearch||k.toLowerCase().includes(enemySearch.toLowerCase())).map(([k,e])=>{
-              const fc=FACTION_COLORS[e.faction]||"#aaa";
-              const dc=DIFFICULTY_C[e.difficulty]||"#aaa";
-              return React.createElement("div",{key:k,onClick:()=>{setEnemies(p=>p.concat([Object.assign({},mkEnemy(e),{name:k})]));},style:{display:"flex",gap:8,alignItems:"center",padding:"5px 8px",cursor:"pointer",borderRadius:3,background:"#0a0a16",border:"1px solid #ffffff08"},
-                onMouseEnter:e2=>{e2.currentTarget.style.background="#ffffff0d";},
-                onMouseLeave:e2=>{e2.currentTarget.style.background="#0a0a16";}},
+            Object.entries(ENEMY_DB).filter(([k])=>!enemySearch||k.toLowerCase().includes(enemySearch.toLowerCase())).map(([k,en])=>{
+              const fc=FACTION_COLORS[en.faction]||"#99aacc";
+              const dc=DIFFICULTY_C[en.difficulty]||"#99aacc";
+              return React.createElement("div",{key:k,onClick:()=>{if(enemies.length<MAX_ENEMIES){setEnemies(p=>{const sameName=p.filter(x=>x.baseName===k||x.name===k||x.name.startsWith(k+" "));const num=sameName.length+1;const displayName=sameName.length===0?k:k+" "+String(num).padStart(2,"0");const updated=sameName.length===1?p.map(x=>(x.baseName===k||x.name===k)?Object.assign({},x,{name:k+" 01"}):x):p;return updated.concat([Object.assign({},mkEnemy(en),{name:displayName,baseName:k})]);});if(enemies.length+1>=MAX_ENEMIES)setShowPicker(false);}},style:{display:"flex",gap:8,alignItems:"center",padding:"6px 10px",cursor:"pointer",borderRadius:3,background:"#0a0a16",border:"1px solid #ffffff08"},
+                onMouseEnter:ev2=>{ev2.currentTarget.style.background="#ffffff0d";ev2.currentTarget.style.borderColor=CC+"33";},
+                onMouseLeave:ev2=>{ev2.currentTarget.style.background="#0a0a16";ev2.currentTarget.style.borderColor="#ffffff08";}},
                 React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#ddd",flex:1}},k),
-                React.createElement("span",{style:{display:"inline-flex",alignItems:"center",gap:3,color:fc,background:fc+"18",padding:"1px 5px",borderRadius:2}},FACTION_ICONS[e.faction]&&FACTION_ICONS[e.faction](10),React.createElement("span",{style:{fontFamily:MONO,fontSize:7}},e.faction.toUpperCase())),
-                React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:dc,background:dc+"18",padding:"1px 5px",borderRadius:2}},e.difficulty),
-                React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#778"}},"HP "+(e.hp+5)),
-                e.isBoss&&React.createElement("span",{style:{color:"#FF2060",fontSize:10}},"👑")
+                React.createElement("span",{style:{display:"inline-flex",alignItems:"center",gap:3,color:fc,background:fc+"18",padding:"1px 5px",borderRadius:2}},FACTION_ICONS[en.faction]&&FACTION_ICONS[en.faction](10),React.createElement("span",{style:{fontFamily:MONO,fontSize:7}},en.faction.toUpperCase())),
+                React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:dc,background:dc+"18",padding:"1px 5px",borderRadius:2}},en.difficulty),
+                React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc"}},"HP "+(en.hp+5)),
+                en.isBoss&&React.createElement("span",{style:{color:"#FF2060",fontSize:10}},"\ud83d\udc51")
               );
             })
           )
         ),
-        enemies.length>0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:5,marginBottom:8}},
-          enemies.map((e)=>{
-            const fc=FACTION_COLORS[e.faction]||"#445";
-            const dc=DIFFICULTY_C[e.difficulty]||"#445";
-            return React.createElement("div",{key:e.id,style:{display:"flex",gap:8,alignItems:"center",padding:"6px 10px",background:"#04060e",border:"1px solid "+(e.isBoss?"#FF206044":dc+"33"),borderRadius:4}},
+        enemies.length>0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:5}},
+          enemies.map((en)=>{
+            const fc=FACTION_COLORS[en.faction]||"#8899cc";
+            const dc=DIFFICULTY_C[en.difficulty]||"#8899cc";
+            return React.createElement("div",{key:en.id,style:{display:"flex",gap:8,alignItems:"center",padding:"8px 12px",background:"#06080f",border:"1px solid "+(en.isBoss?"#FF206033":dc+"22"),borderRadius:4}},
+              React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:CC+"44"}},"\u25b8"),
               React.createElement("div",{style:{flex:1}},
                 React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center"}},
-                  React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:e.isBoss?"#FF2060":"#ddd"}},(e.isBoss?"👑 ":"")+e.name),
-                  e.faction&&React.createElement("span",{style:{display:"inline-flex",alignItems:"center",gap:2,color:fc,background:fc+"18",padding:"1px 4px",borderRadius:2}},FACTION_ICONS[e.faction]&&FACTION_ICONS[e.faction](9),React.createElement("span",{style:{fontFamily:MONO,fontSize:7}},e.faction.toUpperCase())),
-                  React.createElement("span",{style:{fontFamily:MONO,fontSize:7,color:"#445"}},"\u25b8 HP "+e.hpMax+" \u00b7 ARM "+e.armor)
+                  React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:en.isBoss?"#FF2060":"#ccc"}},(en.isBoss?"\ud83d\udc51 ":"")+en.name),
+                  en.faction&&React.createElement("span",{style:{display:"inline-flex",alignItems:"center",gap:2,color:fc,background:fc+"18",padding:"1px 4px",borderRadius:2}},FACTION_ICONS[en.faction]&&FACTION_ICONS[en.faction](9),React.createElement("span",{style:{fontFamily:MONO,fontSize:7}},en.faction.toUpperCase())),
+                  React.createElement("span",{style:{fontFamily:MONO,fontSize:7,color:"#7788bb"}},"HP "+en.hpMax+"  \u00b7  ARM "+en.armor)
                 )
               ),
-              React.createElement("button",{onClick:()=>setEnemies(p=>p.filter(x=>x.id!==e.id)),style:{background:"transparent",border:"none",color:"#FF206066",cursor:"pointer",fontFamily:MONO,fontSize:12,padding:"0 4px"}},"✕")
+              React.createElement("div",{style:{display:"flex",gap:3,alignItems:"center",flexShrink:0}},
+                FACTIONS.map(f=>React.createElement("button",{key:f.id||"none",onClick:(ev)=>{ev.stopPropagation();setEnemies(p=>p.map(x=>x.id===en.id?Object.assign({},x,{faction:f.id}):x));},title:f.label,style:{width:20,height:18,borderRadius:2,background:en.faction===f.id?f.c+"44":"transparent",border:"1px solid "+(en.faction===f.id?f.c:f.c+"33"),cursor:"pointer",padding:0,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:f.id==="wanted"&&en.faction===f.id?"0 0 8px "+f.c+",0 0 16px "+f.c+"66":"none",animation:f.id==="wanted"&&en.faction===f.id?"reticlePulse 1.2s ease-in-out infinite":"none"}},
+                  LETTER_MAP[f.id]
+                  ? React.createElement("span",{style:{fontFamily:"'Orbitron',sans-serif",fontSize:8,fontWeight:900,color:en.faction===f.id?f.c:f.c+"88",lineHeight:1}},LETTER_MAP[f.id])
+                  : React.createElement("span",{style:{fontFamily:"monospace",fontSize:f.id==="wanted"?8:9,fontWeight:900,color:f.id?f.c:"#8899cc",lineHeight:1,display:"block"}},f.id==="corsair"?"C":f.id==="warg"?"W":f.id==="medusa"?"M":f.id==="isf"?"I":f.id==="synth"?"S":f.id==="alien"?"A":f.id==="wanted"?"〒":"—")
+                ))
+              ),
+              React.createElement("button",{onClick:()=>setEnemies(p=>p.filter(x=>x.id!==en.id)),style:{background:"transparent",border:"1px solid #FF206033",color:"#FF206066",cursor:"pointer",fontFamily:MONO,fontSize:10,padding:"3px 8px",borderRadius:3}},"✕")
             );
           })
         ),
-        enemies.length===0&&!showPicker&&React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#334",textAlign:"center",padding:"14px 0",letterSpacing:1}},"// NO ENEMIES — USE DATABASE PICKER ABOVE")
+        enemies.length===0&&!showPicker&&React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#7788bb",textAlign:"center",padding:"22px 0",letterSpacing:2,lineHeight:2.5}},
+          "// NO HOSTILE UNITS DESIGNATED",React.createElement("br"),
+          "// ACCESS DATABASE PICKER TO CONFIGURE MANIFEST",React.createElement("br"),
+          React.createElement("span",{style:{animation:"blink 1.8s step-end infinite",color:CC+"aa"}},"\u25ae\u25ae\u25ae  AWAITING ORDERS  \u25ae\u25ae\u25ae")
+        )
       ),
-      React.createElement("button",{onClick:startCombat,style:Object.assign({},btnBase,{width:"100%",padding:"14px 0",background:CC+"22",borderColor:CC,color:CC,fontSize:12,letterSpacing:3,textAlign:"center",display:"block"})},"\u25b6  INITIATE COMBAT")
+      /* CALIBRATION ERROR MODAL */
+      calibErr&&React.createElement("div",{style:{background:"#0a0005",border:"1px solid #FF2060",borderRadius:6,padding:"16px 18px",marginBottom:12,animation:"ctFlash 1.5s ease-in-out 1"}},
+        React.createElement("div",{style:{fontFamily:ORB,fontSize:10,color:"#FF2060",letterSpacing:3,marginBottom:8}},"⚠  TCS-7 CALIBRATION FAILURE"),
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#FF6060cc",letterSpacing:1,lineHeight:2}},"// HOSTILE MANIFEST: EMPTY",React.createElement("br"),"// MINIMUM CONTACT COUNT: 1",React.createElement("br"),"// CANNOT INITIATE WITHOUT CONFIRMED TARGETS"),
+        React.createElement("button",{onClick:()=>setCalibErr(false),style:{marginTop:10,fontFamily:MONO,fontSize:9,letterSpacing:2,color:"#FF2060",background:"transparent",border:"1px solid #FF206055",borderRadius:3,padding:"5px 14px",cursor:"pointer"}},"✓ ACKNOWLEDGED")
+      ),
+      /* INITIATE COMBAT */
+      React.createElement("button",{onClick:startCombat,style:{width:"100%",padding:"18px 0",background:"linear-gradient(135deg,"+CC+"22,"+CC+"0a)",border:"1px solid "+CC,color:CC,fontFamily:ORB,fontSize:13,fontWeight:900,letterSpacing:5,cursor:"pointer",borderRadius:6,boxShadow:"0 0 30px "+CC+"22,inset 0 0 20px "+CC+"08",textShadow:"0 0 20px "+CC+"88",display:"block"}},"▶  INITIATE COMBAT")
     );
   }
 
@@ -2868,7 +3014,7 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
       React.createElement("div",{style:{fontFamily:ORB,fontSize:11,color:accent,letterSpacing:2,marginBottom:10}},char.name||(who==="cole"?"COLE":"VELA")),
       React.createElement("div",{style:{marginBottom:8}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778"}},"HP"),
+          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc"}},"HP"),
           React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:crit?"#FF2060":accent}},hp+"/"+hpMax)
         ),
         React.createElement("div",{style:{height:6,background:"#1a1a2e",borderRadius:3,overflow:"hidden"}},
@@ -2880,7 +3026,7 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
       ),
       React.createElement("div",{style:{marginBottom:10}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778"}},"EN"),
+          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc"}},"EN"),
           React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#aaaaff"}},en+"/"+enMax)
         ),
         React.createElement("div",{style:{height:4,background:"#1a1a2e",borderRadius:3,overflow:"hidden"}},
@@ -2893,9 +3039,9 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
       React.createElement("div",{style:{display:"flex",gap:3,flexWrap:"wrap"}},
         CT_STATUSES.map(st=>{
           const act=sts.includes(st);
-          const sc=STATUS_C_CT[st]||"#aaa";
+          const sc=STATUS_C_CT[st]||"#99aacc";
           const set=who==="cole"?setColeSt:setVelaSt;
-          return React.createElement("button",{key:st,onClick:()=>set(p=>p.includes(st)?p.filter(s=>s!==st):p.concat([st])),style:{padding:"2px 5px",background:act?sc+"22":"transparent",border:"1px solid "+(act?sc:B1),color:act?sc:"#334",borderRadius:2,fontFamily:MONO,fontSize:8,cursor:"pointer",letterSpacing:1}},st);
+          return React.createElement("button",{key:st,onClick:()=>set(p=>p.includes(st)?p.filter(s=>s!==st):p.concat([st])),style:{padding:"2px 5px",background:act?sc+"22":"transparent",border:"1px solid "+(act?sc:B1),color:act?sc:"#7788bb",borderRadius:2,fontFamily:MONO,fontSize:8,cursor:"pointer",letterSpacing:1}},st);
         })
       )
     );
@@ -2906,20 +3052,25 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
     const hpPct=Math.max(0,Math.min(100,e.hp/(e.hpMax||10)*100));
     const dead=e.hp<=0;
     const crit=hpPct<=25&&!dead;
-    return React.createElement("div",{key:e.id,style:{background:dead?"#110008":BG,border:"1px solid "+(dead?"#FF206033":crit?"#FF206066":"#FF204044"),borderRadius:8,padding:14,flex:"0 0 auto",minWidth:160,maxWidth:200,opacity:dead?0.55:1}},
-      React.createElement("div",{style:{fontFamily:ORB,fontSize:10,color:dead?"#FF2060":"#FF6080",letterSpacing:1,marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}},
-        React.createElement("span",null,e.name||"ENEMY"),
-        dead&&React.createElement("span",{style:{fontSize:8,color:"#FF2060",letterSpacing:2}},"DOWN")
+    const targeted=selectedEnemyId===e.id&&!dead;
+    return React.createElement("div",{key:e.id,onClick:()=>{if(!dead)selectEnemy(targeted?null:e.id);},style:{background:dead?"#110008":targeted?"#FF6B3509":BG,border:"1px solid "+(dead?"#FF206033":targeted?CC:crit?"#FF206066":"#FF204044"),borderRadius:8,padding:14,flex:"0 0 auto",minWidth:160,maxWidth:200,opacity:dead?0.55:1,cursor:dead?"default":"pointer",boxShadow:targeted?"0 0 14px "+CC+"22,inset 0 0 10px "+CC+"0a":"none",transition:"border-color .15s,box-shadow .15s"}},
+      React.createElement("div",{style:{fontFamily:ORB,fontSize:10,color:dead?"#FF2060":targeted?CC:"#FF6080",letterSpacing:1,marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}},
+        React.createElement("span",null,(targeted?"⊕ ":"")+(e.name||"ENEMY")),
+        React.createElement("div",{style:{display:"flex",gap:4,alignItems:"center"}},
+          targeted&&React.createElement("span",{style:{fontFamily:MONO,fontSize:7,color:CC,letterSpacing:2,animation:"blink 1s step-end infinite"}},"LOCKED"),
+          dead&&React.createElement("span",{style:{fontSize:8,color:"#FF2060",letterSpacing:2}},"DOWN"),
+          React.createElement("button",{onClick:(ev)=>{ev.stopPropagation();setEnemies(p=>p.filter(x=>x.id!==e.id));if(selectedEnemyId===e.id)setSelectedEnemyId(null);},title:"Remove enemy",style:{background:"transparent",border:"1px solid #FF206033",color:"#FF206055",cursor:"pointer",fontFamily:"monospace",fontSize:10,padding:"1px 5px",borderRadius:2,lineHeight:1}},"✕")
+        )
       ),
       !dead&&React.createElement("div",null,
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778"}},"HP"),
+          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc"}},"HP"),
           React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:crit?"#FF2060":"#FF8080"}},e.hp+"/"+(e.hpMax||10))
         ),
         React.createElement("div",{style:{height:5,background:"#1a1a2e",borderRadius:3,overflow:"hidden",marginBottom:6}},
           React.createElement("div",{style:{width:hpPct+"%",height:"100%",background:crit?"#FF2060":"#FF4060",transition:"width .3s"}})
         ),
-        e.armor>0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#778",marginBottom:4}},"ARM: "+e.armor),
+        e.armor>0&&React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aacc",marginBottom:4}},"ARM: "+e.armor),
         e.shield&&React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#00FFD0",marginBottom:4}},"\u2295 SHIELD"),
         React.createElement("div",{style:{display:"flex",gap:3,marginBottom:6}},
           [-5,-2,-1,1].map(d=>React.createElement("button",{key:d,onClick:()=>adjEHP(e.id,d),style:{flex:1,padding:"3px 0",background:d<0?"#FF206011":"transparent",border:"1px solid "+(d<0?"#FF206044":B1),color:d<0?"#FF6080":"#bbb",borderRadius:2,cursor:"pointer",fontFamily:MONO,fontSize:9}},d>0?"+"+d:d))
@@ -2927,10 +3078,18 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
         React.createElement("div",{style:{display:"flex",gap:3,flexWrap:"wrap"}},
           CT_STATUSES.map(st=>{
             const act=e.statuses&&e.statuses.includes(st);
-            const sc=STATUS_C_CT[st]||"#aaa";
-            return React.createElement("button",{key:st,onClick:()=>toggleESt(e.id,st),style:{padding:"2px 4px",background:act?sc+"22":"transparent",border:"1px solid "+(act?sc:B1),color:act?sc:"#334",borderRadius:2,fontFamily:MONO,fontSize:7,cursor:"pointer"}},st.slice(0,3));
+            const sc=STATUS_C_CT[st]||"#99aacc";
+            return React.createElement("button",{key:st,onClick:()=>toggleESt(e.id,st),style:{padding:"2px 4px",background:act?sc+"22":"transparent",border:"1px solid "+(act?sc:B1),color:act?sc:"#7788bb",borderRadius:2,fontFamily:MONO,fontSize:7,cursor:"pointer"}},st.slice(0,3));
           })
         )
+      ),
+      React.createElement("div",{style:{display:"flex",gap:3,flexWrap:"wrap",marginTop:8,paddingTop:6,borderTop:"1px solid #ffffff08"}},
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:7,color:"#7788bb",letterSpacing:1,alignSelf:"center",marginRight:2}},"FACTION"),
+        FACTIONS.map(f=>React.createElement("button",{key:f.id||"none",onClick:(ev)=>{ev.stopPropagation();setEField(e.id,"faction",f.id);},title:f.label,style:{width:20,height:18,borderRadius:2,background:e.faction===f.id?f.c+"44":"transparent",border:"1px solid "+(e.faction===f.id?f.c:f.c+"33"),cursor:"pointer",padding:0,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:f.id==="wanted"&&e.faction===f.id?"0 0 8px "+f.c+",0 0 16px "+f.c+"66":"none",animation:f.id==="wanted"&&e.faction===f.id?"reticlePulse 1.2s ease-in-out infinite":"none"}},
+          LETTER_MAP[f.id]
+          ? React.createElement("span",{style:{fontFamily:"'Orbitron',sans-serif",fontSize:8,fontWeight:900,color:e.faction===f.id?f.c:f.c+"88",lineHeight:1}},LETTER_MAP[f.id])
+          : React.createElement("span",{style:{fontFamily:"monospace",fontSize:f.id==="wanted"?8:9,fontWeight:900,color:f.id?f.c:"#8899cc",lineHeight:1,display:"block"}},f.id==="corsair"?"C":f.id==="warg"?"W":f.id==="medusa"?"M":f.id==="isf"?"I":f.id==="synth"?"S":f.id==="alien"?"A":f.id==="wanted"?"〒":"—")
+        ))
       ),
       dead&&React.createElement("button",{onClick:()=>setEnemies(p=>p.filter(x=>x.id!==e.id)),style:Object.assign({},btnBase,{width:"100%",padding:"4px 0",background:"transparent",borderColor:"#FF206033",color:"#FF206066",fontSize:9,marginTop:4,display:"block"}),"textAlign":"center"},"REMOVE")
     );
@@ -2942,17 +3101,22 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
     React.createElement("div",{style:{display:"flex",gap:14,flexWrap:"wrap",marginBottom:12}},
       React.createElement("div",{style:{flex:1,minWidth:140}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778"}},"HULL"),
+          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc"}},"HULL"),
           React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#00FFD0"}},gs.ship.hull+"/"+gs.ship.hullMax)
         ),
         React.createElement("div",{style:{height:6,background:"#1a1a2e",borderRadius:3,overflow:"hidden"}},
           React.createElement("div",{style:{width:(gs.ship.hull/gs.ship.hullMax*100)+"%",height:"100%",background:"#00FFD0"}})
         ),
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#445",marginTop:5}},gs.ship.control||"")
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#8899cc",marginTop:5}},gs.ship.control||""),
+        React.createElement("div",{style:{overflow:"hidden",marginTop:6,height:12,background:"#00FFD008",borderRadius:2,borderTop:"1px solid #00FFD018"}},
+          React.createElement("div",{style:{display:"inline-flex",gap:0,whiteSpace:"nowrap",animation:"tickerScroll 18s linear infinite",fontFamily:MONO,fontSize:7,color:"#00FFD044",letterSpacing:1}},
+            ["SYS.HULL_INTEGRITY: 100%","  //  ","NAV.VECTOR: 174.3° AZIMUTH","  //  ","FUEL.OXIDIZER: NOMINAL","  //  ","SHIELD.CAP: CHARGED","  //  ","TCS.LOCK: STANDBY","  //  ","ENG.OUTPUT: 2×d6","  //  ","CARGO.MANIFEST: ENCRYPTED","  //  ","COMMS.FREQ: 447.82 MHz","  //  ","SYS.HULL_INTEGRITY: 100%","  //  ","NAV.VECTOR: 174.3° AZIMUTH","  //  ","FUEL.OXIDIZER: NOMINAL","  //  ","SHIELD.CAP: CHARGED","  //  ","TCS.LOCK: STANDBY","  //  ","ENG.OUTPUT: 2×d6","  //  ","CARGO.MANIFEST: ENCRYPTED","  //  ","COMMS.FREQ: 447.82 MHz"].map((t,i)=>React.createElement("span",{key:i},t))
+          )
+        )
       ),
       React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:5}},
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#778"}},"SHIELDS"),
-        React.createElement("div",{style:{fontFamily:ORB,fontSize:20,color:shipShields>0?"#00FFD0":"#334",lineHeight:1}},shipShields),
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc"}},"SHIELDS"),
+        React.createElement("div",{style:{fontFamily:ORB,fontSize:20,color:shipShields>0?"#00FFD0":"#7788bb",lineHeight:1}},shipShields),
         React.createElement("div",{style:{display:"flex",gap:4,marginTop:2}},
           React.createElement("button",{onClick:()=>setShipShields(p=>Math.max(0,p-1)),style:Object.assign({},btnBase,{padding:"3px 10px",background:"transparent",borderColor:B1,color:"#bbb",fontSize:13})},"-"),
           React.createElement("button",{onClick:()=>setShipShields(p=>p+1),style:Object.assign({},btnBase,{padding:"3px 10px",background:"transparent",borderColor:B1,color:"#bbb",fontSize:13})},"+" )
@@ -2960,61 +3124,126 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
       ),
       React.createElement("div",{style:{flex:1}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
-          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778"}},"ACTION DICE"),
-          React.createElement("button",{onClick:rollShipDice,style:Object.assign({},btnBase,{padding:"3px 8px",background:"transparent",borderColor:B1,color:"#778",fontSize:9})},"\u21ba ROLL")
+          React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc"}},"ACTION DICE"),
+          React.createElement("button",{onClick:rollShipDice,style:Object.assign({},btnBase,{padding:"3px 8px",background:"transparent",borderColor:B1,color:"#99aacc",fontSize:9})},"\u21ba ROLL")
         ),
         React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
           actionDice.map(d=>React.createElement("div",{key:d.id,onClick:()=>toggleDie(d.id),style:{width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:ORB,fontSize:15,fontWeight:700,color:d.used?"#2a2a2a":"#FFD166",background:d.used?"#0a0a0a":"#FFD16614",border:"2px solid "+(d.used?"#222":"#FFD166"),borderRadius:4,cursor:"pointer",textDecoration:d.used?"line-through":"none",transition:"all .2s"}},d.val))
         ),
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#334",marginTop:5}},"tap to spend")
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#7788bb",marginTop:5}},"tap to spend")
       )
     ),
     React.createElement("div",null,
-      React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#445",letterSpacing:1,marginBottom:5}},"MODULES"),
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}},
+      React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#8899cc",letterSpacing:1}},"MODULES"),
+      React.createElement("div",{style:{overflow:"hidden",width:160,height:10,background:"#00FFD006",borderRadius:2}},
+        React.createElement("div",{style:{display:"inline-flex",whiteSpace:"nowrap",animation:"tickerScroll 24s linear infinite 2s",fontFamily:MONO,fontSize:7,color:"#00FFD033",letterSpacing:1}},
+          ["MOD.LINK: ACTIVE","  //  ","COOLDOWN: 0ms","  //  ","POWER: 94%","  //  ","SYNC: OK","  //  ","TARGETING: PASSIVE","  //  ","AMMO: FULL","  //  ","MOD.LINK: ACTIVE","  //  ","COOLDOWN: 0ms","  //  ","POWER: 94%","  //  ","SYNC: OK","  //  ","TARGETING: PASSIVE","  //  ","AMMO: FULL"].map((t,i)=>React.createElement("span",{key:i},t))
+        )
+      )
+    ),
       React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
-        (gs.ship.modules||[]).filter(m=>m).map((m,i)=>React.createElement("div",{key:i,style:{fontFamily:MONO,fontSize:9,color:"#00FFD0",background:"#00FFD011",border:"1px solid #00FFD033",borderRadius:3,padding:"3px 8px"}},m))
+        (gs.ship.modules||[]).filter(m=>m).map((m,i)=>{var mname=m.split("—")[0].trim();var wc=WPN_COLOR[mname.toLowerCase()]||"#00FFD0";var isA=rollWpnSource==="ship"&&rollShipModIdx===i;return React.createElement("div",{key:i,onClick:()=>{setRollWpnSource("ship");setRollShipModIdx(i);},style:{fontFamily:MONO,fontSize:9,color:isA?wc:"#00FFD0",background:isA?wc+"22":"#00FFD011",border:"1px solid "+(isA?wc:"#00FFD033"),borderRadius:3,padding:"4px 10px",cursor:"pointer",boxShadow:isA?"0 0 10px "+wc+"44":"none",transition:"all .15s"}},React.createElement("span",{style:{marginRight:4,opacity:0.6}},"⎁"),mname,isA&&React.createElement("span",{style:{marginLeft:6,fontSize:7,color:wc+"99",letterSpacing:1}},"▶ SELECTED"));})
       )
     )
   );
 
-  // ── ROLL PANEL ────────────────────────────────────────────────────────────
-  const rollPanel=React.createElement("div",{style:{background:BG,border:"1px solid "+B2,borderRadius:8,padding:14,marginBottom:16}},
-    React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#778",letterSpacing:2,marginBottom:10}},"QUICK ROLL"),
-    React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}},
-      React.createElement("div",{style:{display:"flex",gap:4}},
-        ["cole","vela"].map(c=>{var cc=c==="cole"?"#FFD166":"#cc88ff";return React.createElement("button",{key:c,onClick:()=>setRollChar(c),style:Object.assign({},btnBase,{padding:"5px 12px",background:rollChar===c?cc+"22":"transparent",borderColor:rollChar===c?cc:B1,color:rollChar===c?cc:"#778",fontSize:10})},c==="cole"?"COLE":"VELA");})
-      ),
-      React.createElement("div",{style:{display:"flex",gap:4}},
-        [0,1].map(i=>{
-          const char=gs[rollChar];
-          const wpn=char.weapons&&char.weapons[i];
-          const label=wpn&&wpn.name?wpn.name:"WPN "+(i+1);
-          return React.createElement("button",{key:i,onClick:()=>setRollWpnIdx(i),style:Object.assign({},btnBase,{padding:"5px 10px",background:rollWpnIdx===i?CC+"22":"transparent",borderColor:rollWpnIdx===i?CC:B1,color:rollWpnIdx===i?CC:"#778",fontSize:9})},label);
-        })
-      ),
-      React.createElement("button",{onClick:rollAttack,style:Object.assign({},btnBase,{padding:"7px 18px",background:CC+"22",borderColor:CC,color:CC,fontSize:11,letterSpacing:2})},"\u25b6 ROLL")
-    ),
-    rollRes&&React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:rollRes.c,marginTop:10,padding:"7px 12px",background:rollRes.c+"11",borderRadius:4,border:"1px solid "+rollRes.c+"44"}},rollRes.txt)
-  );
+  // ── ROLL PANEL ─────────────────────────────────────────────────────────────────────────────
+  const lockedTarget=selectedEnemyId?enemies.find(e=>e.id===selectedEnemyId):null;
 
+  // Build weapon list: both slots for selected character
+  const activeChar=gs[rollChar];
+  const charWpns=(activeChar.weapons||[]).filter(w=>w&&w.name).map((w,i)=>({label:w.name,idx:i,type:'char'}));
+
+  // WEAPON COLOR by type — defined at CombatTracker scope
+  const selectedWpnName=rollWpnSource==='ship'
+    ?((gs.ship.modules||[])[rollShipModIdx]||"").split("—")[0].trim()
+    :(activeChar.weapons&&activeChar.weapons[rollWpnIdx]&&activeChar.weapons[rollWpnIdx].name)||"";
+  const wpnColor=WPN_COLOR[selectedWpnName.toLowerCase()]||CC;
+
+  const rollPanel=React.createElement("div",{style:{background:BG,border:"1px solid "+(lockedTarget?wpnColor+"55":B2),borderRadius:8,padding:14,marginBottom:16,boxShadow:lockedTarget?"0 0 12px "+wpnColor+"18":"none",transition:"border-color .2s,box-shadow .2s"}},
+    // Row 1: char selector + FIRE button side by side (always visible at top)
+    React.createElement("div",{style:{display:"flex",gap:8,alignItems:"stretch",marginBottom:10}},
+      React.createElement("div",{style:{display:"flex",gap:4,flexShrink:0}},
+        ["cole","vela"].map(c=>{var cc=c==="cole"?"#FFD166":"#cc88ff";return React.createElement("button",{key:c,onClick:()=>{setRollChar(c);setRollWpnIdx(0);},style:Object.assign({},btnBase,{padding:"5px 10px",background:rollChar===c?cc+"22":"transparent",borderColor:rollChar===c?cc:B1,color:rollChar===c?cc:"#99aacc",fontSize:9})},c==="cole"?"COLE":"VELA");})
+      ),
+      React.createElement("button",{
+        onClick:lockedTarget?fireAtTarget:()=>{addLog("// LOCK A TARGET FIRST — click an enemy","#FF2060");},
+        style:{flex:1,padding:"10px 0",
+          background:lockedTarget?"linear-gradient(135deg,"+wpnColor+"44,"+wpnColor+"18)":"#06060e",
+          border:"2px solid "+(lockedTarget?wpnColor:B1+"22"),
+          borderRadius:5,color:lockedTarget?wpnColor:"#7788bb55",
+          fontFamily:ORB,fontSize:14,fontWeight:900,letterSpacing:6,cursor:"pointer",
+          boxShadow:lockedTarget?"0 0 24px "+wpnColor+"55,0 0 48px "+wpnColor+"18,inset 0 0 16px "+wpnColor+"0a":"none",
+          textShadow:lockedTarget?"0 0 16px "+wpnColor+",0 0 32px "+wpnColor+"88":"none",
+          transition:"all .25s",
+          animation:lockedTarget?"ctFlash 1.8s ease-in-out infinite":"none"}},
+        lockedTarget?"⚡  FIRE  "+lockedTarget.name.toUpperCase():"⚡  FIRE  — SELECT TARGET"
+      )
+    ),
+    // Row 2: weapon selector
+    React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",marginBottom:lockedTarget?6:0}},
+      charWpns.length===0
+        ?React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#7788bb"}},"// no weapons equipped")
+        :React.createElement(React.Fragment,null,
+          charWpns.map(w=>{
+            var wc=WPN_COLOR[w.label.toLowerCase()]||CC;
+            var isActive=rollWpnSource==='char'&&rollWpnIdx===w.idx;
+            var wInfo=WEAPON_DB[w.label.toLowerCase()];
+            return React.createElement("button",{key:"c"+w.idx,onClick:()=>{setRollWpnSource('char');setRollWpnIdx(w.idx);},
+              style:{padding:"5px 10px",background:isActive?"linear-gradient(135deg,"+wc+"22,"+wc+"08)":"transparent",
+                border:"1px solid "+(isActive?wc:B1+"44"),borderRadius:4,
+                color:isActive?wc:"#8899cc",cursor:"pointer",fontFamily:MONO,fontSize:9,
+                display:"flex",gap:6,alignItems:"center",
+                boxShadow:isActive?"0 0 8px "+wc+"22":"none",transition:"all .15s"}},
+              React.createElement("span",null,w.label),
+              wInfo&&React.createElement("span",{style:{fontSize:7,color:isActive?wc+"88":"#7788bb"}},
+                (wInfo.cnt>1?wInfo.cnt+"×":"")+"d"+wInfo.die));
+          }),
+          (gs.ship.modules||[]).filter(m=>m&&m.trim()).map((m,i)=>{
+            var mname=m.split("—")[0].trim();
+            var wc=WPN_COLOR[mname.toLowerCase()]||"#FF6B35";
+            var isActive=rollWpnSource==='ship'&&rollShipModIdx===i;
+            return React.createElement("button",{key:"s"+i,onClick:()=>{setRollWpnSource('ship');setRollShipModIdx(i);},
+              style:{padding:"5px 10px",background:isActive?"linear-gradient(135deg,"+wc+"22,"+wc+"08)":"transparent",
+                border:"1px solid "+(isActive?wc:B1+"44"),borderRadius:4,
+                color:isActive?wc:"#8899cc",cursor:"pointer",fontFamily:MONO,fontSize:9,
+                display:"flex",gap:6,alignItems:"center",
+                boxShadow:isActive?"0 0 8px "+wc+"22":"none",transition:"all .15s"}},
+              React.createElement("span",null,"⎁ "+mname));
+          })
+        )
+    ),
+    rollRes&&React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:rollRes.c,marginTop:8,padding:"6px 10px",background:rollRes.c+"11",borderRadius:4,border:"1px solid "+rollRes.c+"33",lineHeight:1.7}},rollRes.txt)
+  )
   // ── COMBAT LOG ────────────────────────────────────────────────────────────
   const logPanel=React.createElement("div",{style:{background:"#05050f",border:"1px solid "+B2,borderRadius:8,padding:12,maxHeight:160,overflowY:"auto"}},
-    React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#334",letterSpacing:2,marginBottom:6}},"// COMBAT LOG"),
+    React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#7788bb",letterSpacing:2,marginBottom:6}},"// COMBAT LOG"),
     combatLog.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#223"}},"// no entries"):
     combatLog.slice().reverse().map(l=>React.createElement("div",{key:l.id,style:{fontFamily:MONO,fontSize:9,color:l.c,marginBottom:3,lineHeight:1.6}},l.txt))
   );
 
   // ── ACTIVE COMBAT LAYOUT ──────────────────────────────────────────────────
-  return React.createElement("div",{style:{maxWidth:900}},
-    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:8}},
-      React.createElement("div",{style:{display:"flex",gap:10,alignItems:"center"}},
-        React.createElement("div",{style:{fontFamily:ORB,fontSize:13,fontWeight:700,color:CC,letterSpacing:3}},"\u2694  COMBAT"),
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#778",background:B2+"55",padding:"4px 10px",borderRadius:3,letterSpacing:2}},"ROUND "+round),
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:mode==="ship"?"#00FFD0":CC,background:(mode==="ship"?"#00FFD0":CC)+"11",padding:"3px 8px",borderRadius:3,border:"1px solid "+(mode==="ship"?"#00FFD033":CC+"33"),letterSpacing:2}},mode==="ship"?"\u2381 SHIP":"\u2694 GROUND")
+  return React.createElement("div",{style:{maxWidth:900,margin:"0 auto"}},
+    /* STICKY COMBAT HEADER WITH FIRE BUTTON */
+    React.createElement("div",{style:{background:"#06080e",border:"1px solid "+CC+"33",borderRadius:6,padding:"10px 14px",marginBottom:12,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}},
+      React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center",flex:1,flexWrap:"wrap"}},
+        React.createElement("div",{style:{fontFamily:ORB,fontSize:12,fontWeight:700,color:CC,letterSpacing:3}},"⚔  COMBAT"),
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#99aacc",background:B2+"33",padding:"3px 8px",borderRadius:3,letterSpacing:2}},"ROUND "+round),
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:mode==="ship"?"#00FFD0":CC,background:(mode==="ship"?"#00FFD0":CC)+"11",padding:"2px 6px",borderRadius:3,border:"1px solid "+(mode==="ship"?"#00FFD033":CC+"33")}},mode==="ship"?"⎁ SHIP":"⚔ GROUND"),
+        React.createElement("div",{style:{display:"flex",gap:3}},
+          ["cole","vela"].map(c=>{var cc=c==="cole"?"#FFD166":"#cc88ff";return React.createElement("button",{key:c,onClick:()=>{setRollChar(c);setRollWpnIdx(0);},style:Object.assign({},btnBase,{padding:"3px 8px",background:rollChar===c?cc+"22":"transparent",borderColor:rollChar===c?cc:B1+"44",color:rollChar===c?cc:"#7788bb",fontSize:8})},c==="cole"?"COLE":"VELA");})),
+        React.createElement("div",{style:{display:"flex",gap:3,flexWrap:"wrap"}},
+          /* Character weapons */
+          (gs[rollChar].weapons||[]).filter(w=>w&&w.name).map((w,i)=>{var wc=WPN_COLOR[(w.name||"").toLowerCase()]||CC;var isA=rollWpnSource==='char'&&rollWpnIdx===i;return React.createElement("button",{key:"c"+i,onClick:()=>{setRollWpnSource('char');setRollWpnIdx(i);},style:Object.assign({},btnBase,{padding:"3px 8px",background:isA?wc+"22":"transparent",borderColor:isA?wc:B1+"44",color:isA?wc:"#7788bb",fontSize:8})},w.name);}),
+          /* Ship module weapons */
+          (gs.ship.modules||[]).filter(m=>m&&m.trim()).map((m,i)=>{var mname=m.split("—")[0].trim();var wc=WPN_COLOR[mname.toLowerCase()]||"#FF6B35";var isA=rollWpnSource==='ship'&&rollShipModIdx===i;return React.createElement("button",{key:"s"+i,onClick:()=>{setRollWpnSource('ship');setRollShipModIdx(i);},style:Object.assign({},btnBase,{padding:"3px 8px",background:isA?wc+"22":"transparent",borderColor:isA?wc:B1+"44",color:isA?wc:"#7788bb",fontSize:8})},"⎁ "+mname);}))
       ),
-      React.createElement("div",{style:{display:"flex",gap:6}},
-        React.createElement("button",{onClick:nextRound,style:Object.assign({},btnBase,{background:"#00FFD022",borderColor:"#00FFD0",color:"#00FFD0",fontSize:10})},"\u25b6 NEXT ROUND"),
-        React.createElement("button",{onClick:endCombat,style:Object.assign({},btnBase,{background:"#FF206011",borderColor:"#FF2060",color:"#FF2060",fontSize:10})},"\u2b1b END")
+      React.createElement("button",{onClick:lockedTarget?fireAtTarget:()=>addLog("// LOCK A TARGET — click an enemy card","#FF2060"),style:{padding:"10px 24px",background:lockedTarget?"linear-gradient(135deg,"+wpnColor+"44,"+wpnColor+"18)":"linear-gradient(135deg,#FF206018,#FF206008)",border:"2px solid "+(lockedTarget?wpnColor:"#FF206055"),borderRadius:5,color:lockedTarget?wpnColor:"#FF206099",fontFamily:ORB,fontSize:14,fontWeight:900,letterSpacing:5,cursor:"pointer",boxShadow:lockedTarget?"0 0 24px "+wpnColor+"55,inset 0 0 16px "+wpnColor+"0a":"0 0 8px #FF206022",textShadow:lockedTarget?"0 0 16px "+wpnColor:"none",transition:"all .2s",animation:lockedTarget?"ctFlash 1.8s ease-in-out infinite":"none",whiteSpace:"nowrap"}},"⚡ FIRE"+(lockedTarget?" · "+lockedTarget.name.toUpperCase():" · NO TARGET")),
+      React.createElement("div",{style:{display:"flex",gap:4}},
+        React.createElement("button",{onClick:nextRound,style:Object.assign({},btnBase,{background:"#00FFD011",borderColor:"#00FFD044",color:"#00FFD0",fontSize:9,padding:"4px 8px"})},"▶ RND"),
+        React.createElement("button",{onClick:()=>{setEndMode("flee");setTimeout(endCombat,1900);},style:Object.assign({},btnBase,{background:"#FFD16611",borderColor:"#FFD16644",color:"#FFD166",fontSize:9,padding:"4px 8px"})},"FLED"),
+        React.createElement("button",{onClick:()=>{setEndMode("cancel");setTimeout(endCombat,1500);},style:Object.assign({},btnBase,{background:"#FF206011",borderColor:"#FF206044",color:"#FF2060",fontSize:9,padding:"4px 8px"})},"✕")
       )
     ),
     React.createElement("div",{style:{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}},
@@ -3023,15 +3252,15 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate}){
     ),
     enemies.length>0&&React.createElement("div",{style:{marginBottom:16}},
       React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#778",letterSpacing:2}},"ENEMIES"),
-        React.createElement("button",{onClick:()=>setEnemies(p=>p.concat([mkEnemy()])),style:Object.assign({},btnBase,{background:"transparent",borderColor:B1,color:"#556",fontSize:9,padding:"4px 10px"})},"+")
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc",letterSpacing:2}},"ENEMIES"),
+        React.createElement("button",{onClick:()=>setEnemies(p=>p.concat([mkEnemy()])),style:Object.assign({},btnBase,{background:"transparent",borderColor:B1,color:"#7788bb",fontSize:9,padding:"4px 10px"})},"+")
       ),
       React.createElement("div",{style:{display:"flex",gap:12,flexWrap:"wrap"}},
         enemies.map(e=>enemyPanel(e))
       )
     ),
+    mode!=="ship"&&rollPanel,
     mode==="ship"&&shipPanel,
-    rollPanel,
     logPanel
   );
 }
@@ -3052,7 +3281,7 @@ function App(){
 var smOpenS=useState(false),setSmOpen=smOpenS[1];var smOpen=smOpenS[0];
 var ringPhaseS=useState((function(){try{return localStorage.getItem("gs_ring_phase")||"outer";}catch(e){return "outer";}})()),setRingPhase=ringPhaseS[1];var ringPhase=ringPhaseS[0];
 var cyberSessS=useState(null),setCyberSess=cyberSessS[1];var cyberSess=cyberSessS[0];
-var ctBriefS=useState({active:false,round:1,mode:"ground",enemies:[],coleHP:null,velaHP:null,coleEN:null,velaEN:null}),setCtBrief=ctBriefS[1];var ctBrief=ctBriefS[0];
+var ctBriefS=useState({active:false,round:1,mode:"ground",enemies:[],coleHP:null,velaHP:null,coleEN:null,velaEN:null,selectedEnemyId:null,lastFire:null}),setCtBrief=ctBriefS[1];var ctBrief=ctBriefS[0];
 
  useEffect(function(){try{localStorage.setItem("gs_ring_phase",ringPhase);}catch(e){};},[ringPhase]);
 useEffect(function(){try{localStorage.setItem("gs_state",JSON.stringify(gs));}catch(e){}setSaved(true);setTimeout(function(){setSaved(false);},1200);},[gs]);
@@ -3257,11 +3486,11 @@ function HelpOverlay({onClose}) {
         React.createElement("div",null,
           React.createElement("div",{style:{fontFamily:ORB,fontSize:14,color:BLUE,letterSpacing:4}},
             "◈ GHOST SIGNAL — NAVIGATION GUIDE"),
-          React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#445",marginTop:3,letterSpacing:2}},
+          React.createElement("div",{style:{fontFamily:MONO,fontSize:9,color:"#8899cc",marginTop:3,letterSpacing:2}},
             "TAP A SECTION · TAP OUTSIDE TO CLOSE")
         ),
         React.createElement("button",{onClick:onClose,style:{background:"transparent",border:"none",
-          color:"#445",cursor:"pointer",fontFamily:ORB,fontSize:16,padding:"0 4px"}},"✕")
+          color:"#8899cc",cursor:"pointer",fontFamily:ORB,fontSize:16,padding:"0 4px"}},"✕")
       ),
       // Tab strip
       React.createElement("div",{style:{display:"flex",overflowX:"auto",
@@ -3272,7 +3501,7 @@ function HelpOverlay({onClose}) {
           return React.createElement("button",{key:s.tab,onClick:function(){setActiveIdx(i);},
             style:{fontFamily:MONO,fontSize:8,letterSpacing:2,padding:"10px 10px",
               background:a?s.color+"18":"transparent",
-              color:a?s.color:"#445",
+              color:a?s.color:"#8899cc",
               border:"none",borderBottom:a?"2px solid "+s.color:"2px solid transparent",
               cursor:"pointer",whiteSpace:"nowrap",transition:"all .15s"}
           },s.tab);
@@ -3282,7 +3511,7 @@ function HelpOverlay({onClose}) {
       React.createElement("div",{style:{padding:"20px 24px",overflowY:"auto",flex:1}},
         React.createElement("div",{style:{fontFamily:ORB,fontSize:11,color:sec.color,
           letterSpacing:3,marginBottom:6}},sec.tab),
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#778",
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc",
           marginBottom:16,letterSpacing:1}},sec.desc),
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
           sec.tips.map(function(tip,i){
@@ -3302,7 +3531,7 @@ function HelpOverlay({onClose}) {
         // Global shortcuts
         i===0&&React.createElement("div",{style:{marginTop:20,padding:"12px 14px",
           background:"#ffffff06",border:"1px solid #ffffff11",borderRadius:3}},
-          React.createElement("div",{style:{fontFamily:ORB,fontSize:9,color:"#445",
+          React.createElement("div",{style:{fontFamily:ORB,fontSize:9,color:"#8899cc",
             letterSpacing:3,marginBottom:8}},"GLOBAL"),
           React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}},
             [
@@ -3316,7 +3545,7 @@ function HelpOverlay({onClose}) {
                 React.createElement("span",{style:{fontFamily:ORB,fontSize:8,
                   color:BLUE,flexShrink:0,marginTop:1}},r[0]),
                 React.createElement("span",{style:{fontFamily:MONO,fontSize:9,
-                  color:"#445",lineHeight:1.5}},r[1])
+                  color:"#8899cc",lineHeight:1.5}},r[1])
               );
             })
           )
@@ -3325,7 +3554,7 @@ function HelpOverlay({onClose}) {
       // Footer
       React.createElement("div",{style:{padding:"10px 20px",borderTop:"1px solid "+BLUE+"18",
         display:"flex",justifyContent:"space-between",alignItems:"center"}},
-        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#334",letterSpacing:2}},
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#7788bb",letterSpacing:2}},
           "GHOST SIGNAL · ASTROPRISMA CAMPAIGN COMPANION"),
         React.createElement("button",{onClick:onClose,
           style:{fontFamily:MONO,fontSize:9,padding:"4px 14px",
@@ -3361,15 +3590,15 @@ function HelpOverlay({onClose}) {
   !boot&&tab!=="COMMS"&&React.createElement(MabelMini,{msgs:comms,onSend:sendToMabel,loading:commsLoading}),
   React.createElement("div",{style:{position:"relative",zIndex:2,maxWidth:1100,margin:"0 auto",padding:"0 16px 0",height:"100vh",display:"flex",flexDirection:"column",boxSizing:"border-box"}},
     React.createElement("div",{style:{display:"flex",gap:0,borderBottom:"1px solid #44445a",marginBottom:0,position:"sticky",top:0,background:BG,zIndex:10,paddingTop:16}},
-     TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#556",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);}),React.createElement("button",{onClick:function(){setSmOpen(true);},style:{marginLeft:6,padding:"5px 13px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"SAVE"),
+     TABS.map(function(t){var a=tab===t;var tc=TAB_C[t];return React.createElement("button",{key:t,onClick:function(){setTab(t);},style:{flex:1,padding:"10px 0",background:a?tc+"14":"transparent",border:"none",borderBottom:a?"2px solid "+tc:"2px solid transparent",color:a?tc:"#7788bb",fontFamily:MONO,fontSize:10,letterSpacing:2,cursor:"pointer",transition:"all .2s"}},t);}),React.createElement("button",{onClick:function(){setSmOpen(true);},style:{marginLeft:6,padding:"5px 13px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"SAVE"),
     React.createElement("button",{onClick:function(){setShowHelp(true);},title:"Navigation Help",style:{marginLeft:6,padding:"5px 10px",background:"#88BBFF18",border:"1px solid #88BBFF55",color:"#88BBFF",borderRadius:4,cursor:"pointer",fontFamily:"'Orbitron',sans-serif",fontSize:11,fontWeight:700,letterSpacing:1}},"?")
     ),
     React.createElement("div",{style:{paddingTop:20,flex:1,overflowY:"auto",minHeight:0,paddingBottom:60}},
      React.createElement("div",{style:{display:tab==="MAP"?"block":"none"}},
        React.createElement("div",{style:{marginBottom:10,border:"1px solid "+B2,borderRadius:6,overflow:"hidden"}},
          React.createElement("div",{onClick:function(){setPresetsOpen(function(p){return !p;});},style:{padding:"7px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",background:"#0a0a1a",userSelect:"none"}},
-           React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#778",letterSpacing:2}},"▸  LOAD MAP PRESET"),
-           React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#556"}},presetsOpen?"▲":"▼")
+           React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#99aacc",letterSpacing:2}},"▸  LOAD MAP PRESET"),
+           React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#7788bb"}},presetsOpen?"▲":"▼")
     ),
     presetsOpen&&React.createElement("div",{style:{padding:"10px 12px",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:6,background:"#07071299"}},
       CAMPAIGN_MAPS.filter(function(cm){return !!MAP_PRESETS[cm.id];}).map(function(cm){return React.createElement("div",{key:cm.id,style:{display:"flex",gap:4,alignItems:"center"}},React.createElement("button",{onClick:function(){setGs(function(p){return Object.assign({},p,{hexMap:savedPresets[cm.id]||MAP_PRESETS[cm.id],campaignMap:cm});});setPresetsOpen(false);},style:{flex:1,padding:"7px 10px",background:"#7744cc0d",border:"1px solid #9966cc33",color:"#cc88ff",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:1,textAlign:"left"}},cm.name),React.createElement("button",{onClick:function(){var updated=Object.assign({},savedPresets);updated[cm.id]=gs.hexMap;setSavedPresets(updated);try{localStorage.setItem("gs_saved_presets",JSON.stringify(updated));}catch(e){}},style:{padding:"5px 8px",background:"#00FFD011",border:"1px solid #00FFD033",color:"#00FFD0",borderRadius:4,cursor:"pointer",fontFamily:MONO,fontSize:8,letterSpacing:1,flexShrink:0}},"OVERWRITE"));})
@@ -3399,13 +3628,13 @@ function HelpOverlay({onClose}) {
         [["SCRAPS","scraps"],["SERUM","serum"]].map(function(pr){return React.createElement("div",{key:pr[1]},React.createElement("div",{style:{fontFamily:MONO,fontSize:12,color:"#bbb",letterSpacing:1,marginBottom:6}},pr[0]),React.createElement(Spin,{v:gs.ship[pr[1]]||0,onChange:function(v){upS(pr[1],v);}}));})
        ),
        React.createElement("div",{style:{marginTop:18}},
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"MODULES"),
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc",letterSpacing:2,marginBottom:8}},"MODULES"),
         (gs.ship.modules||[]).map(function(m,i){return React.createElement(SlotSelect,{key:i,value:m||"",onChange:function(val){upS("modules."+i,val);},options:["","G.R.E. Missiles — Deal 8 damage (5-6)","Particle Cannons — Deal 3 damage, stacks (3-5)","Shield Generator — Absorb 3 damage per combat","Jump Drive — Escape any hex without fuel cost","EMP Array — Disable enemy systems (3-5)","Repair Drones — Restore 2 hull per turn","Cloaking Field — Avoid first detection roll","Cargo Expander — +2 cargo slots","Tractor Beam — Retrieve floating salvage","Point Defense — Negate one missile per turn"],color:"#cc88ff",marginTop:i===0?0:6});})
        ),
        React.createElement("div",{style:{marginTop:18}},
-        React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2,marginBottom:8}},"CARGO"),
+        React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc",letterSpacing:2,marginBottom:8}},"CARGO"),
         React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}},
-         (gs.ship.cargo||Array(6).fill("")).map(function(v,i){return React.createElement(SlotSelect,{key:i,value:v||"",onChange:function(val){upS("cargo."+i,val);},options:INV_OPTS,color:"#aaa"});})
+         (gs.ship.cargo||Array(6).fill("")).map(function(v,i){return React.createElement(SlotSelect,{key:i,value:v||"",onChange:function(val){upS("cargo."+i,val);},options:INV_OPTS,color:"#99aacc"});})
         )
        )
       )
@@ -3413,25 +3642,25 @@ function HelpOverlay({onClose}) {
      tab==="LOGS"&&React.createElement("div",{style:{maxWidth:680}},
       React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}},
        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:14}},
-        React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#aaa",letterSpacing:2}},"SESSION"),
+        React.createElement("span",{style:{fontFamily:MONO,fontSize:11,color:"#99aacc",letterSpacing:2}},"SESSION"),
         React.createElement(Spin,{v:gs.session||0,min:0,onChange:upSession})
        ),
        React.createElement("button",{onClick:function(){addLog({type:"note",text:"",session:gs.session,ts:new Date().toISOString()});},style:{padding:"6px 16px",background:"#FF6EC722",border:"1px solid #FF6EC755",color:"#FF6EC7",borderRadius:3,cursor:"pointer",fontFamily:MONO,fontSize:9,letterSpacing:2}},"+NEW ENTRY")
       ),
-            gs.logs.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#334",textAlign:"center",padding:"32px 0"}},"// NO LOG ENTRIES"):
+            gs.logs.length===0?React.createElement("div",{style:{fontFamily:MONO,fontSize:11,color:"#7788bb",textAlign:"center",padding:"32px 0"}},"// NO LOG ENTRIES"):
       gs.logs.slice().reverse().map(function(log){
        return React.createElement("div",{key:log.id,style:{background:"#06060f",border:"1px solid "+B2,borderRadius:6,padding:"12px 14px",marginBottom:8}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
          React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#FF6EC7",letterSpacing:2}},"SESSION "+log.session),
          React.createElement("button",{onClick:function(){setGs(function(p){return Object.assign({},p,{logs:p.logs.filter(function(l){return l.id!==log.id;})});});},style:{background:"transparent",border:"none",color:"#444",cursor:"pointer",fontFamily:MONO,fontSize:11}},"✕")
         ),
-        React.createElement("textarea",{value:log.text||"",onChange:function(e){setGs(function(p){return Object.assign({},p,{logs:p.logs.map(function(l){return l.id===log.id?Object.assign({},l,{text:e.target.value}):l;})});});},placeholder:"Log entry...",rows:3,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#aaa",fontFamily:RAJ,fontSize:14,padding:"8px 10px",outline:"none",resize:"vertical",boxSizing:"border-box",lineHeight:1.7}})
+        React.createElement("textarea",{value:log.text||"",onChange:function(e){setGs(function(p){return Object.assign({},p,{logs:p.logs.map(function(l){return l.id===log.id?Object.assign({},l,{text:e.target.value}):l;})});});},placeholder:"Log entry...",rows:3,style:{width:"100%",background:"transparent",border:"1px solid "+B1,borderRadius:4,color:"#99aacc",fontFamily:RAJ,fontSize:14,padding:"8px 10px",outline:"none",resize:"vertical",boxSizing:"border-box",lineHeight:1.7}})
        );
       })
      ),
      tab==="COMMS"&&React.createElement(CommsTab,{gameState:gs,msgs:comms,setMsgs:setComms,commsLoading:commsLoading,onSend:sendToMabel}),
     tab==="CYBER"&&React.createElement(CybersphereTab,{gs:gs,cyberSess:cyberSess,setCyberSess:setCyberSess,onCharChange:upC,onStatBoost:upCStat,onMabelSend:sendToMabel,onNetrunMemory:appendNetrunMemory}),
-    tab==="COMBAT"&&React.createElement("div",{style:{position:"relative",background:"#06080e",border:"1px solid #FF6B3555",minHeight:"calc(100vh / 1.15 - 120px)",overflow:"hidden",boxSizing:"border-box"}},React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(0deg,transparent 0,transparent 39px,#FF6B3508 39px,#FF6B3508 40px),repeating-linear-gradient(90deg,transparent 0,transparent 39px,#FF6B3508 39px,#FF6B3508 40px)",zIndex:0}}),React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(255,107,53,.012) 3px,rgba(255,107,53,.012) 4px)",animation:"tactScan .18s linear infinite",zIndex:1}}),React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"radial-gradient(ellipse at center,transparent 50%,#000 100%)",zIndex:2}}),React.createElement(CornerBracket,{pos:"tl",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"tr",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"bl",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"br",color:"#FF6B35"}),React.createElement("div",{style:{position:"relative",zIndex:3,padding:"16px 18px",overflowY:"auto",maxHeight:"calc(100vh / 1.15 - 120px)"}},React.createElement(React.Fragment,null,React.createElement(CombatBattleScreen,{ctBrief:ctBrief,gs:gs}),React.createElement(CombatTracker,{gs:gs,onCharChange:upC,onShipChange:upS,onCtUpdate:setCtBrief}))))
+    tab==="COMBAT"&&React.createElement("div",{style:{position:"relative",background:"#06080e",border:"1px solid #FF6B3555",minHeight:"calc(100vh / 1.15 - 120px)",overflow:"hidden",boxSizing:"border-box"}},React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(0deg,transparent 0,transparent 39px,#FF6B3508 39px,#FF6B3508 40px),repeating-linear-gradient(90deg,transparent 0,transparent 39px,#FF6B3508 39px,#FF6B3508 40px)",zIndex:0}}),React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(255,107,53,.012) 3px,rgba(255,107,53,.012) 4px)",animation:"tactScan .18s linear infinite",zIndex:1}}),React.createElement("div",{style:{pointerEvents:"none",position:"absolute",inset:0,background:"radial-gradient(ellipse at center,transparent 50%,#000 100%)",zIndex:2}}),React.createElement(CornerBracket,{pos:"tl",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"tr",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"bl",color:"#FF6B35"}),React.createElement(CornerBracket,{pos:"br",color:"#FF6B35"}),React.createElement("div",{style:{position:"relative",zIndex:3,padding:"16px 18px",overflowY:"auto",maxHeight:"calc(100vh / 1.15 - 120px)"}},React.createElement(React.Fragment,null,React.createElement(CombatBattleScreen,{ctBrief:ctBrief,gs:gs,tab:tab,onSelectEnemy:function(id){setCtBrief(function(p){return Object.assign({},p,{selectedEnemyId:id});});},onFire:function(fire){setCtBrief(function(p){return Object.assign({},p,{lastFire:fire});});}}),React.createElement(CombatTracker,{gs:gs,onCharChange:upC,onShipChange:upS,onCtUpdate:function(update){setCtBrief(function(p){return Object.assign({},p,update);});},onSelectEnemy:function(id){setCtBrief(function(p){return Object.assign({},p,{selectedEnemyId:id});});},onFire:function(fire){setCtBrief(function(p){return Object.assign({},p,{lastFire:fire});});}}))))
     ),
    !boot&&React.createElement(SidePanelDual,{gs:gs,tab:tab,ctBrief:ctBrief,onCharChange:upC})
    ),
