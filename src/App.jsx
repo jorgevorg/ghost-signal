@@ -3162,24 +3162,9 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate,onSelectEnemy,on
   const wpnColor=WPN_COLOR[selectedWpnName.toLowerCase()]||CC;
 
   const rollPanel=React.createElement("div",{style:{background:BG,border:"1px solid "+(lockedTarget?wpnColor+"55":B2),borderRadius:8,padding:14,marginBottom:16,boxShadow:lockedTarget?"0 0 12px "+wpnColor+"18":"none",transition:"border-color .2s,box-shadow .2s"}},
-    // Row 1: char selector + FIRE button side by side (always visible at top)
-    React.createElement("div",{style:{display:"flex",gap:8,alignItems:"stretch",marginBottom:10}},
-      React.createElement("div",{style:{display:"flex",gap:4,flexShrink:0}},
-        ["cole","vela"].map(c=>{var cc=c==="cole"?"#FFD166":"#cc88ff";return React.createElement("button",{key:c,onClick:()=>{setRollChar(c);setRollWpnIdx(0);},style:Object.assign({},btnBase,{padding:"5px 10px",background:rollChar===c?cc+"22":"transparent",borderColor:rollChar===c?cc:B1,color:rollChar===c?cc:"#99aacc",fontSize:9})},c==="cole"?"COLE":"VELA");})
-      ),
-      React.createElement("button",{
-        onClick:lockedTarget?fireAtTarget:()=>{addLog("// LOCK A TARGET FIRST — click an enemy","#FF2060");},
-        style:{flex:1,padding:"10px 0",
-          background:lockedTarget?"linear-gradient(135deg,"+wpnColor+"44,"+wpnColor+"18)":"#06060e",
-          border:"2px solid "+(lockedTarget?wpnColor:B1+"22"),
-          borderRadius:5,color:lockedTarget?wpnColor:"#7788bb55",
-          fontFamily:ORB,fontSize:14,fontWeight:900,letterSpacing:6,cursor:"pointer",
-          boxShadow:lockedTarget?"0 0 24px "+wpnColor+"55,0 0 48px "+wpnColor+"18,inset 0 0 16px "+wpnColor+"0a":"none",
-          textShadow:lockedTarget?"0 0 16px "+wpnColor+",0 0 32px "+wpnColor+"88":"none",
-          transition:"all .25s",
-          animation:lockedTarget?"ctFlash 1.8s ease-in-out infinite":"none"}},
-        lockedTarget?"⚡  FIRE  "+lockedTarget.name.toUpperCase():"⚡  FIRE  — SELECT TARGET"
-      )
+    // Row 1: char selector only — FIRE is in sticky header
+    React.createElement("div",{style:{display:"flex",gap:4,marginBottom:10}},
+      ["cole","vela"].map(c=>{var cc=c==="cole"?"#FFD166":"#cc88ff";return React.createElement("button",{key:c,onClick:()=>{setRollChar(c);setRollWpnIdx(0);},style:Object.assign({},btnBase,{padding:"5px 10px",background:rollChar===c?cc+"22":"transparent",borderColor:rollChar===c?cc:B1,color:rollChar===c?cc:"#99aacc",fontSize:9})},c==="cole"?"COLE":"VELA");})
     ),
     // Row 2: weapon selector
     React.createElement("div",{style:{display:"flex",gap:4,flexWrap:"wrap",marginBottom:lockedTarget?6:0}},
@@ -3239,7 +3224,7 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate,onSelectEnemy,on
           /* Ship module weapons */
           (gs.ship.modules||[]).filter(m=>m&&m.trim()).map((m,i)=>{var mname=m.split("—")[0].trim();var wc=WPN_COLOR[mname.toLowerCase()]||"#FF6B35";var isA=rollWpnSource==='ship'&&rollShipModIdx===i;return React.createElement("button",{key:"s"+i,onClick:()=>{setRollWpnSource('ship');setRollShipModIdx(i);},style:Object.assign({},btnBase,{padding:"3px 8px",background:isA?wc+"22":"transparent",borderColor:isA?wc:B1+"44",color:isA?wc:"#7788bb",fontSize:8})},"⎁ "+mname);}))
       ),
-      React.createElement("button",{onClick:lockedTarget?fireAtTarget:()=>addLog("// LOCK A TARGET — click an enemy card","#FF2060"),style:{padding:"10px 24px",background:lockedTarget?"linear-gradient(135deg,"+wpnColor+"44,"+wpnColor+"18)":"linear-gradient(135deg,#FF206018,#FF206008)",border:"2px solid "+(lockedTarget?wpnColor:"#FF206055"),borderRadius:5,color:lockedTarget?wpnColor:"#FF206099",fontFamily:ORB,fontSize:14,fontWeight:900,letterSpacing:5,cursor:"pointer",boxShadow:lockedTarget?"0 0 24px "+wpnColor+"55,inset 0 0 16px "+wpnColor+"0a":"0 0 8px #FF206022",textShadow:lockedTarget?"0 0 16px "+wpnColor:"none",transition:"all .2s",animation:lockedTarget?"ctFlash 1.8s ease-in-out infinite":"none",whiteSpace:"nowrap"}},"⚡ FIRE"+(lockedTarget?" · "+lockedTarget.name.toUpperCase():" · NO TARGET")),
+      React.createElement("button",{onClick:lockedTarget?fireAtTarget:()=>addLog("// LOCK A TARGET — click an enemy card","#FF2060"),style:{padding:"10px 24px",background:lockedTarget?"linear-gradient(135deg,"+wpnColor+"44,"+wpnColor+"18)":"linear-gradient(135deg,#FF206018,#FF206008)",border:"2px solid "+(lockedTarget?wpnColor:"#FF206055"),borderRadius:5,color:lockedTarget?wpnColor:"#FF206099",fontFamily:ORB,fontSize:13,fontWeight:900,letterSpacing:4,cursor:"pointer",boxShadow:lockedTarget?"0 0 24px "+wpnColor+"55,inset 0 0 16px "+wpnColor+"0a":"0 0 8px #FF206022",textShadow:lockedTarget?"0 0 16px "+wpnColor:"none",transition:"all .2s",animation:lockedTarget?"ctFlash 1.8s ease-in-out infinite":"none",whiteSpace:"nowrap"}},lockedTarget?"FIRE @ "+lockedTarget.name.toUpperCase():"⚡  FIRE  — SELECT TARGET"),
       React.createElement("div",{style:{display:"flex",gap:4}},
         React.createElement("button",{onClick:nextRound,style:Object.assign({},btnBase,{background:"#00FFD011",borderColor:"#00FFD044",color:"#00FFD0",fontSize:9,padding:"4px 8px"})},"▶ RND"),
         React.createElement("button",{onClick:()=>{setEndMode("flee");setTimeout(endCombat,1900);},style:Object.assign({},btnBase,{background:"#FFD16611",borderColor:"#FFD16644",color:"#FFD166",fontSize:9,padding:"4px 8px"})},"FLED"),

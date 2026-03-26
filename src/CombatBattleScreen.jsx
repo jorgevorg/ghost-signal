@@ -775,14 +775,17 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
     })();
     setCommsLine('');
     setCommsLoading2(true);
+    const systemPrompt = active
+      ? `You are MABEL, advising your crew during an open communication channel with an enemy vessel. The enemy is ${faction}, currently ${disposition}. Speak in 2-3 sentences as a tactical advisor. Be specific about what you know about this faction. You can be suspicious, wry, or cautiously optimistic depending on disposition. Never be generic. No asterisk actions.`
+      : `You are MABEL, the ship AI aboard The Inconceivable. Your crew is opening diplomatic comms with a ${faction} vessel BEFORE combat has started. This is a chance to resolve things without firing. Speak in 2-3 sentences — assess the situation, note any leverage or risk, and advise on approach. Be dry, specific, and characterful. No asterisk actions.`;
     fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 200,
-        system: `You are MABEL, advising your crew during an open communication channel with an enemy vessel. The enemy is ${faction}, currently ${disposition}. Speak in 2-3 sentences as a tactical advisor. Be specific about what you know about this faction. You can be suspicious, wry, or cautiously optimistic depending on disposition. Never be generic. No asterisk actions.`,
-        messages: [{ role: 'user', content: `Opening comms with ${selectedEnemy.name} (${faction}, ${disposition}). HP: ${selectedEnemy.hp}/${selectedEnemy.hpMax || selectedEnemy.hp}. Advise.` }],
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `Opening comms with ${selectedEnemy.name} (${faction}${active ? ', '+disposition : ', no shots fired yet'}). HP: ${selectedEnemy.hp}/${selectedEnemy.hpMax || selectedEnemy.hp}. Advise.` }],
       }),
     })
       .then(r => r.json())
@@ -1165,10 +1168,16 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
           </div>
         )}
         <div style={{ flex:1 }}/>
-        {active && !allDefeated && !playerDown && !commsOpen && selectedEnemy && (
+        {!commsOpen && selectedEnemy && selectedEnemy.hp > 0 && (
           <button onClick={()=>setCommsOpen(true)}
-            style={{ fontFamily:MONO,fontSize:7,letterSpacing:2,padding:'4px 11px', background:hailAvailable?'rgba(0,255,208,0.06)':'transparent', border:'1px solid '+(hailAvailable?TEAL:'rgba(255,255,255,0.08)'), color:hailAvailable?TEAL:'rgba(255,255,255,0.13)', cursor:'pointer',borderRadius:2, animation:hailAvailable?'hailPulse 1.8s ease-in-out infinite':'none', transition:'all 0.2s' }}>
-            HAIL
+            style={{ fontFamily:MONO,fontSize:7,letterSpacing:2,padding:'4px 11px',
+              background: hailAvailable ? 'rgba(0,255,208,0.06)' : active ? 'transparent' : 'rgba(0,255,208,0.04)',
+              border:'1px solid '+(hailAvailable||!active ? TEAL : 'rgba(255,255,255,0.08)'),
+              color: hailAvailable||!active ? TEAL : 'rgba(255,255,255,0.35)',
+              cursor:'pointer', borderRadius:2,
+              animation: hailAvailable ? 'hailPulse 1.8s ease-in-out infinite' : !active ? 'hailPulse 2.4s ease-in-out infinite' : 'none',
+              transition:'all 0.2s' }}>
+            {active ? 'HAIL' : '⬡ OPEN COMMS'}
           </button>
         )}
         {commsOpen && (
