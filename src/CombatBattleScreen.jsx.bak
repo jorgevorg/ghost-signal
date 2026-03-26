@@ -1,0 +1,691 @@
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+
+const ACC   = '#FF6B35';
+const TEAL  = '#00FFD0';
+const VELA  = '#cc88ff';
+const RED   = '#FF2060';
+const YEL   = '#FFD166';
+const BLUE  = '#00BFFF';
+const MONO  = "'Share Tech Mono', monospace";
+const ORB   = "'Orbitron', sans-serif";
+
+const FACTION_COLOR = {
+  CORSAIR: YEL, ISF: BLUE, WARG: RED, MEDUSA: VELA, SYNTH: TEAL, NONE: '#9090b8',
+};
+
+const factionShipSrc = (faction, isBoss) => {
+  if (faction === 'WARG')    return '/ships/flagship.webp';
+  if (faction === 'ISF')     return '/ships/vector-ace.webp';
+  if (faction === 'CORSAIR') return isBoss ? '/ships/smuggler-interceptor.webp' : '/ships/smuggler-speeder.webp';
+  return null;
+};
+
+// ── Vector LCD-style exhaust flame ─────────────────────────────────────────
+// dir: 'left' = flame extends left (player ship rear), 'right' = flame extends right (enemy rear)
+function VectorFlame({ color, dir, size = 60 }) {
+  const flip = dir === 'right' ? 'scaleX(-1)' : 'scaleX(1)';
+  const w = size;
+  const h = Math.round(size * 0.32);
+  const hh = h / 2;
+
+  return (
+    <svg
+      width={w} height={h}
+      viewBox={`0 0 ${w} ${h}`}
+      style={{
+        display: 'block',
+        transform: flip,
+        overflow: 'visible',
+      }}
+    >
+      <defs>
+        <linearGradient id={`fg-${dir}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="transparent" />
+          <stop offset="30%"  stopColor={color} stopOpacity="0.18" />
+          <stop offset="65%"  stopColor={color} stopOpacity="0.65" />
+          <stop offset="85%"  stopColor={color} stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0.95" />
+        </linearGradient>
+        <linearGradient id={`fc-${dir}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="transparent" />
+          <stop offset="50%"  stopColor={color} stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
+        </linearGradient>
+      </defs>
+
+      {/* Outer flame — wide tapered shape */}
+      <polygon
+        points={`0,${hh}  ${w * 0.55},${hh - hh * 0.6}  ${w},${hh}  ${w * 0.55},${hh + hh * 0.6}`}
+        fill={`url(#fg-${dir})`}
+        style={{ animation: `flameMorph 0.18s ease-in-out infinite alternate` }}
+      />
+      {/* Mid flame */}
+      <polygon
+        points={`${w * 0.15},${hh}  ${w * 0.65},${hh - hh * 0.35}  ${w},${hh}  ${w * 0.65},${hh + hh * 0.35}`}
+        fill={`url(#fc-${dir})`}
+        style={{ animation: `flameMorph 0.14s ease-in-out 0.04s infinite alternate` }}
+      />
+      {/* Inner bright core — thin spike */}
+      <polygon
+        points={`${w * 0.5},${hh}  ${w * 0.82},${hh - 1.5}  ${w},${hh}  ${w * 0.82},${hh + 1.5}`}
+        fill="#ffffff"
+        opacity="0.9"
+      />
+
+    </svg>
+  );
+}
+
+// ── Fallback ships for factions without images ─────────────────────────────
+// ALL ships drawn NOSE-UP (y=0 is front) so rotation math matches real images
+function FallbackShip({ faction, size = 64 }) {
+  const c = FACTION_COLOR[faction] || '#9090b8';
+  const s = size;
+
+  if (faction === 'MEDUSA') return (
+    <svg width={s} height={s} viewBox="0 0 100 100" style={{ display:'block', filter:`drop-shadow(0 0 8px ${c}99)` }}>
+      {/* Nose spike pointing UP */}
+      <polygon points="50,2 38,30 62,30" fill={c}/>
+      {/* Main body ellipse — narrow top to wide middle */}
+      <ellipse cx="50" cy="52" rx="16" ry="36" fill={c} opacity="0.9"/>
+      {/* Swept side wings — rear */}
+      <polygon points="34,55 10,90 28,80 38,65" fill={c} opacity="0.75"/>
+      <polygon points="66,55 90,90 72,80 62,65" fill={c} opacity="0.75"/>
+      {/* Antenna array at nose */}
+      <line x1="50" y1="2" x2="42" y2="-8" stroke={c} strokeWidth="2"/>
+      <line x1="50" y1="2" x2="50" y2="-10" stroke={c} strokeWidth="2"/>
+      <line x1="50" y1="2" x2="58" y2="-8" stroke={c} strokeWidth="2"/>
+      {/* Eye glow */}
+      <ellipse cx="50" cy="38" rx="6" ry="4" fill="#000" opacity="0.6"/>
+      <ellipse cx="50" cy="38" rx="3" ry="2" fill={c}/>
+    </svg>
+  );
+
+  if (faction === 'SYNTH') return (
+    <svg width={s} height={s} viewBox="0 0 100 100" style={{ display:'block', filter:`drop-shadow(0 0 8px ${c}99)` }}>
+      {/* Angular geometric hull — nose up */}
+      <polygon points="50,5 70,35 68,75 50,82 32,75 30,35" fill={c} opacity="0.9"/>
+      {/* Wide mid wings */}
+      <polygon points="30,40 5,55 5,65 30,60" fill={c} opacity="0.7"/>
+      <polygon points="70,40 95,55 95,65 70,60" fill={c} opacity="0.7"/>
+      {/* Core circuit diamond */}
+      <polygon points="50,38 60,50 50,62 40,50" fill="#000" opacity="0.5"/>
+      <polygon points="50,42 57,50 50,58 43,50" fill={c}/>
+      {/* Rear vents */}
+      <line x1="40" y1="80" x2="40" y2="92" stroke={c} strokeWidth="2" opacity="0.8"/>
+      <line x1="50" y1="82" x2="50" y2="96" stroke={c} strokeWidth="2.5" opacity="0.9"/>
+      <line x1="60" y1="80" x2="60" y2="92" stroke={c} strokeWidth="2" opacity="0.8"/>
+    </svg>
+  );
+
+  // NONE — hand-drawn top-down sci-fi fighter. Nose UP. No Vostoks were harmed.
+  return (
+    <svg width={s} height={s} viewBox="0 0 100 100" style={{ display:'block', filter:`drop-shadow(0 0 10px ${c}99)` }}>
+      <defs>
+        <linearGradient id={`nf_hull_${c.slice(1)}`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor={c} stopOpacity="0.08"/>
+          <stop offset="0.5" stopColor={c} stopOpacity="0.35"/>
+          <stop offset="1" stopColor={c} stopOpacity="0.08"/>
+        </linearGradient>
+        <linearGradient id={`nf_eng_${c.slice(1)}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={c} stopOpacity="0.6"/>
+          <stop offset="1" stopColor={c} stopOpacity="0.05"/>
+        </linearGradient>
+        <radialGradient id={`nf_core_${c.slice(1)}`} cx="50%" cy="45%" r="18%">
+          <stop offset="0" stopColor={c} stopOpacity="0.9"/>
+          <stop offset="1" stopColor={c} stopOpacity="0"/>
+        </radialGradient>
+      </defs>
+
+      {/* ── MAIN FUSELAGE — narrow spine, nose up ── */}
+      {/* Nose tip */}
+      <polygon points="50,4 46,18 54,18" fill={c} opacity="0.95"/>
+      {/* Forward hull */}
+      <polygon points="46,18 54,18 57,38 43,38" fill={c} opacity="0.8"/>
+      {/* Mid hull — widest point */}
+      <polygon points="43,38 57,38 60,58 40,58" fill={`url(#nf_hull_${c.slice(1)})`} stroke={c} strokeWidth="0.8" strokeOpacity="0.9"/>
+      {/* Aft hull */}
+      <polygon points="40,58 60,58 58,74 42,74" fill={c} opacity="0.5"/>
+      {/* Tail */}
+      <polygon points="42,74 58,74 55,88 45,88" fill={c} opacity="0.4"/>
+
+      {/* ── SWEPT FORWARD WINGS ── */}
+      {/* Left wing — sweeps forward and out */}
+      <polygon points="43,38 20,25 14,35 38,50 40,58" fill={c} opacity="0.6"/>
+      {/* Right wing */}
+      <polygon points="57,38 80,25 86,35 62,50 60,58" fill={c} opacity="0.6"/>
+
+      {/* ── WING DETAIL LINES ── */}
+      <line x1="43" y1="38" x2="20" y2="25" stroke={c} strokeWidth="0.6" strokeOpacity="0.4"/>
+      <line x1="38" y1="44" x2="16" y2="33" stroke={c} strokeWidth="0.4" strokeOpacity="0.3"/>
+      <line x1="57" y1="38" x2="80" y2="25" stroke={c} strokeWidth="0.6" strokeOpacity="0.4"/>
+      <line x1="62" y1="44" x2="84" y2="33" stroke={c} strokeWidth="0.4" strokeOpacity="0.3"/>
+
+      {/* ── CANARDS — small forward stabilizers ── */}
+      <polygon points="46,22 34,18 32,24 44,26" fill={c} opacity="0.65"/>
+      <polygon points="54,22 66,18 68,24 56,26" fill={c} opacity="0.65"/>
+
+      {/* ── WINGTIP HARDPOINTS ── */}
+      <rect x="10" y="30" width="8" height="12" rx="2" fill={c} opacity="0.5"/>
+      <rect x="82" y="30" width="8" height="12" rx="2" fill={c} opacity="0.5"/>
+      {/* Hardpoint guns */}
+      <rect x="12" y="24" width="2" height="8" rx="1" fill={c} opacity="0.8"/>
+      <rect x="86" y="24" width="2" height="8" rx="1" fill={c} opacity="0.8"/>
+
+      {/* ── AFT SPLIT FINS ── */}
+      <polygon points="42,72 32,88 40,88 45,76" fill={c} opacity="0.55"/>
+      <polygon points="58,72 68,88 60,88 55,76" fill={c} opacity="0.55"/>
+
+      {/* ── ENGINE PODS — flanking the tail ── */}
+      <rect x="37" y="76" width="8" height="16" rx="3" fill={c} opacity="0.45"/>
+      <rect x="55" y="76" width="8" height="16" rx="3" fill={c} opacity="0.45"/>
+      {/* Engine glow */}
+      <ellipse cx="41" cy="92" rx="4" ry="2.5" fill={`url(#nf_eng_${c.slice(1)})`}/>
+      <ellipse cx="59" cy="92" rx="4" ry="2.5" fill={`url(#nf_eng_${c.slice(1)})`}/>
+
+      {/* ── COCKPIT ── */}
+      <ellipse cx="50" cy="28" rx="4" ry="7" fill="#000" opacity="0.7"/>
+      <ellipse cx="50" cy="27" rx="2.5" ry="5" fill={c} opacity="0.4"/>
+      {/* Core sensor glow */}
+      <circle cx="50" cy="46" r="5" fill={`url(#nf_core_${c.slice(1)})`}/>
+      <circle cx="50" cy="46" r="2" fill={c} opacity="0.8"/>
+
+      {/* ── HULL PANEL LINES ── */}
+      <line x1="47" y1="18" x2="45" y2="58" stroke={c} strokeWidth="0.4" strokeOpacity="0.35"/>
+      <line x1="53" y1="18" x2="55" y2="58" stroke={c} strokeWidth="0.4" strokeOpacity="0.35"/>
+      <line x1="43" y1="38" x2="57" y2="38" stroke={c} strokeWidth="0.5" strokeOpacity="0.5"/>
+      <line x1="40" y1="58" x2="60" y2="58" stroke={c} strokeWidth="0.5" strokeOpacity="0.4"/>
+    </svg>
+  );
+}
+
+// ── Ship display with correct rotation + flame positioning ─────────────────
+// facing: 'right' = player (nose right), 'left' = enemy (nose left)
+function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, isPlayer }) {
+  const imgSrc = isPlayer ? '/ships/duskwing.webp' : factionShipSrc(faction, isBoss);
+  const color  = isPlayer ? TEAL : (FACTION_COLOR[faction] || '#9090b8');
+  const w = size || (isBoss ? 88 : 68);
+
+  // Ships are top-down with nose UP.
+  // Player (facing right):  rotate +90deg → nose points right, rear points left
+  // Enemy  (facing left):   rotate -90deg → nose points left,  rear points right
+  const rotateDeg = facing === 'right' ? 90 : -90;
+
+  // Flame comes from the REAR:
+  // Player (facing right, rear=left):  flame div goes to the LEFT of the ship image
+  // Enemy  (facing left,  rear=right): flame div goes to the RIGHT of the ship image
+  const flameDir  = facing === 'right' ? 'left' : 'right';
+  const flameSize = Math.round(w * 0.75);
+
+  const hitFilter = hit
+    ? `drop-shadow(0 0 18px ${RED}ff) drop-shadow(0 0 6px ${RED}) brightness(2)`
+    : isPlayer
+    ? `drop-shadow(0 0 10px ${TEAL}88)`
+    : `drop-shadow(0 0 8px ${color}66)`;
+
+  return (
+    <div style={{
+      position: 'relative',
+      display: 'flex',
+      flexDirection: facing === 'right' ? 'row' : 'row-reverse',
+      alignItems: 'center',
+      opacity: defeated ? 0.1 : 1,
+      transition: 'opacity 1.4s',
+      transform: defeated ? 'rotate(22deg) translateY(12px)' : 'none',
+    }}>
+
+      {/* Flame — on the REAR side */}
+      {!defeated && (
+        <div style={{ flexShrink: 0 }}>
+          <VectorFlame color={isPlayer ? TEAL : color} dir={flameDir} size={flameSize} />
+        </div>
+      )}
+
+      {/* Ship image or fallback — rotate the WHOLE wrapper so stripes rotate with the ship */}
+      <div style={{
+        position: 'relative', flexShrink: 0,
+        width: w, height: w,
+        transform: `rotate(${rotateDeg}deg)`,
+        filter: hitFilter,
+        transition: 'filter 0.15s',
+      }}>
+        {imgSrc ? (
+          <>
+            <img
+              src={imgSrc}
+              alt={faction || 'ship'}
+              style={{
+                width: w, height: w,
+                objectFit: 'contain',
+                display: 'block',
+                imageRendering: 'crisp-edges',
+              }}
+            />
+            {/* Red racing stripes — now rotate with ship because wrapper rotates */}
+            {isPlayer && (
+              <div style={{
+                position: 'absolute', inset: 0, pointerEvents: 'none',
+                backgroundImage: `
+                  linear-gradient(0deg,
+                    transparent 0%, transparent 30%,
+                    ${RED}55 30%, ${RED}55 34%,
+                    transparent 34%, transparent 58%,
+                    ${RED}33 58%, ${RED}33 61%,
+                    transparent 61%
+                  )
+                `,
+                mixBlendMode: 'screen',
+                borderRadius: 4,
+              }} />
+            )}
+          </>
+        ) : (
+          <FallbackShip faction={faction} size={w} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Projectile bolt ────────────────────────────────────────────────────────
+function Projectile({ fromLeft, color, onDone }) {
+  useEffect(() => { const t = setTimeout(onDone, 620); return () => clearTimeout(t); }, []);
+  return (
+    <div style={{
+      position: 'absolute',
+      top: '50%', left: fromLeft ? '26%' : '74%',
+      width: 54, height: 4,
+      background: `linear-gradient(${fromLeft?'90deg':'270deg'}, ${color}ff, ${color}66, transparent)`,
+      borderRadius: 3,
+      transform: 'translateY(-50%)',
+      animation: `bolt${fromLeft?'R':'L'} 0.56s ease-in forwards`,
+      boxShadow: `0 0 10px 2px ${color}88`,
+      zIndex: 20,
+    }} />
+  );
+}
+
+// ── Explosion ──────────────────────────────────────────────────────────────
+function Explosion({ x, y, color }) {
+  return (
+    <>
+      <div style={{
+        position: 'absolute', left: x+'%', top: y+'%',
+        transform: 'translate(-50%,-50%)',
+        width: 52, height: 52, borderRadius: '50%',
+        background: `radial-gradient(circle, #ffffffcc 0%, ${color}ff 25%, ${color}44 60%, transparent 80%)`,
+        animation: 'explode 0.55s ease-out forwards',
+        zIndex: 25,
+      }}/>
+      {[...Array(5)].map((_,i) => (
+        <div key={i} style={{
+          position: 'absolute', left: x+'%', top: y+'%',
+          width: 5, height: 5, borderRadius: '50%', background: color,
+          transform: 'translate(-50%,-50%)',
+          animation: `spark${i%3} 0.5s ease-out forwards`,
+          zIndex: 24,
+        }}/>
+      ))}
+    </>
+  );
+}
+
+// ── Star ───────────────────────────────────────────────────────────────────
+function Star({ x, y, size, speed, opacity, bright }) {
+  return (
+    <div style={{
+      position: 'absolute', left: x+'%', top: y+'%',
+      width: size, height: size, borderRadius: '50%',
+      background: bright ? 'radial-gradient(circle,#fff,#88bbff88)' : '#fff',
+      opacity,
+      boxShadow: bright ? '0 0 4px 1px #88bbffaa' : 'none',
+      animation: `starDrift ${speed}s linear infinite`,
+    }}/>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────
+export default function CombatBattleScreen({ ctBrief, gs }) {
+  const { active, enemies = [], coleHP, velaHP, round } = ctBrief || {};
+
+  const prevColeHP  = useRef(coleHP);
+  const prevVelaHP  = useRef(velaHP);
+  const prevEnemyHP = useRef({});
+
+  const [projectiles, setProjectiles] = useState([]);
+  const [explosions,  setExplosions]  = useState([]);
+  const [hitPlayer,   setHitPlayer]   = useState(false);
+  const [hitEnemy,    setHitEnemy]    = useState({});
+  const [shipState,   setShipState]   = useState('hidden'); // 'hidden'|'warping'|'landed'
+  const prevActive = useRef(false);
+
+  const stars = useMemo(() => Array.from({length:70}, (_,i) => ({
+    id: i,
+    x: Math.random()*100, y: Math.random()*100,
+    size: Math.random()<0.08 ? 3 : Math.random()<0.25 ? 2 : 1,
+    speed: 14 + Math.random()*28,
+    opacity: 0.12 + Math.random()*0.65,
+    bright: Math.random()<0.1,
+  })), []);
+
+  // Warp-in trigger: when combat goes inactive→active, run the animation
+  useEffect(() => {
+    if (active && !prevActive.current) {
+      setShipState('warping');
+      const t = setTimeout(() => setShipState('landed'), 1100);
+      prevActive.current = true;
+      return () => clearTimeout(t);
+    }
+    if (!active) {
+      setShipState('hidden');
+      prevActive.current = false;
+    }
+  }, [active]);
+
+  const addProjectile = (fromLeft, color) => {
+    const id = Date.now()+Math.random();
+    setProjectiles(p=>[...p,{id,fromLeft,color}]);
+  };
+  const addExplosion = (x, y, color) => {
+    const id = Date.now()+Math.random();
+    setExplosions(p=>[...p,{id,x,y,color}]);
+    setTimeout(()=>setExplosions(p=>p.filter(e=>e.id!==id)), 620);
+  };
+
+  useEffect(() => {
+    if (!active) return;
+    const coleDmg = (prevColeHP.current??coleHP) > (coleHP??0);
+    const velaDmg = (prevVelaHP.current??velaHP) > (velaHP??0);
+    if (coleDmg||velaDmg) {
+      addProjectile(false, RED);
+      setHitPlayer(true);
+      addExplosion(22, 50, RED);
+      setTimeout(()=>setHitPlayer(false), 320);
+    }
+    prevColeHP.current = coleHP;
+    prevVelaHP.current = velaHP;
+  }, [coleHP, velaHP, active]);
+
+  useEffect(() => {
+    if (!active||!enemies.length) return;
+    enemies.forEach(e => {
+      const prev = prevEnemyHP.current[e.id];
+      if (prev!==undefined && e.hp<prev) {
+        addProjectile(true, TEAL);
+        addExplosion(78, 50, TEAL);
+        setHitEnemy(h=>({...h,[e.id]:true}));
+        setTimeout(()=>setHitEnemy(h=>({...h,[e.id]:false})), 320);
+      }
+      prevEnemyHP.current[e.id] = e.hp;
+    });
+  }, [enemies, active]);
+
+  const liveEnemies   = enemies.filter(e=>e.hp>0);
+  const primaryEnemy  = liveEnemies[0]||enemies[0];
+  const enemyDefeated = primaryEnemy&&primaryEnemy.hp<=0;
+  const enemyHit      = primaryEnemy&&hitEnemy[primaryEnemy.id];
+  const allDefeated   = enemies.length>0 && enemies.every(e=>e.hp<=0);
+  const playerDown    = coleHP===0 && velaHP===0;
+
+  const SCREEN_H = 200;
+
+  return (
+    <div style={{
+      position: 'relative', width: '100%', height: SCREEN_H,
+      background: '#010208', overflow: 'hidden',
+      borderBottom: '1px solid #FF6B3533',
+    }}>
+      <style>{`
+        @keyframes starDrift{from{transform:translateX(0)}to{transform:translateX(-60px)}}
+        @keyframes boltR{from{left:26%;opacity:1}to{left:80%;opacity:0}}
+        @keyframes boltL{from{left:74%;opacity:1}to{left:20%;opacity:0}}
+        @keyframes explode{
+          0%{transform:translate(-50%,-50%) scale(0.1);opacity:1}
+          55%{transform:translate(-50%,-50%) scale(1.7);opacity:0.8}
+          100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}
+        }
+        @keyframes spark0{to{transform:translate(calc(-50% + 24px),calc(-50% - 20px));opacity:0}}
+        @keyframes spark1{to{transform:translate(calc(-50% - 22px),calc(-50% - 14px));opacity:0}}
+        @keyframes spark2{to{transform:translate(calc(-50% + 8px),calc(-50% + 24px));opacity:0}}
+        @keyframes idleDrift{0%,100%{transform:translateY(0px)}50%{transform:translateY(-4px)}}
+        @keyframes flameMorph{
+          from{transform:scaleY(0.82) scaleX(0.95)}
+          to{transform:scaleY(1.18) scaleX(1.05)}
+        }
+        @keyframes roundPulse{0%,100%{opacity:0.5}50%{opacity:1}}
+        @keyframes warpIn{
+          0%  {transform:translateX(260px) scaleX(1.6);opacity:0;filter:blur(18px) brightness(5);}
+          18% {transform:translateX(80px)  scaleX(1.2);opacity:0.5;filter:blur(8px) brightness(2.5);}
+          52% {transform:translateX(-14px) scaleX(0.97);opacity:0.92;filter:blur(1px) brightness(1.4);}
+          70% {transform:translateX(7px)  scaleX(1.01);opacity:1;filter:blur(0) brightness(1.1);}
+          84% {transform:translateX(-4px);}
+          93% {transform:translateX(2px);}
+          100%{transform:translateX(0)   scaleX(1);opacity:1;filter:blur(0) brightness(1);}
+        }
+        @keyframes warpTrail1{
+          0%  {transform:translateX(320px) scaleX(1.7);opacity:0;}
+          15% {opacity:0.22;}
+          55% {transform:translateX(30px);opacity:0.08;}
+          100%{transform:translateX(0);opacity:0;}
+        }
+        @keyframes warpTrail2{
+          0%  {transform:translateX(380px) scaleX(1.9);opacity:0;}
+          20% {opacity:0.14;}
+          60% {transform:translateX(60px);opacity:0.04;}
+          100%{transform:translateX(0);opacity:0;}
+        }
+        @keyframes unknownPulse{0%,100%{opacity:0.35;box-shadow:0 0 12px #FF206033}50%{opacity:0.6;box-shadow:0 0 24px #FF206066}}
+      `}</style>
+
+      {/* Starfield */}
+      <div style={{position:'absolute',inset:0,overflow:'hidden'}}>
+        {stars.map(s=><Star key={s.id} {...s}/>)}
+      </div>
+
+      {/* CRT scanlines */}
+      <div style={{
+        position:'absolute',inset:0,pointerEvents:'none',zIndex:40,
+        background:'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.2) 2px,rgba(0,0,0,0.2) 4px)',
+      }}/>
+      {/* CRT phosphor glow */}
+      <div style={{
+        position:'absolute',inset:0,pointerEvents:'none',zIndex:39,
+        background:'radial-gradient(ellipse at 50% 50%,rgba(0,255,180,0.022) 0%,transparent 68%)',
+      }}/>
+      {/* CRT barrel vignette */}
+      <div style={{
+        position:'absolute',inset:0,pointerEvents:'none',zIndex:41,
+        background:'radial-gradient(ellipse at 50% 50%,transparent 50%,rgba(0,0,0,0.75) 100%)',
+      }}/>
+      {/* CRT horizontal edge fade */}
+      <div style={{
+        position:'absolute',inset:0,pointerEvents:'none',zIndex:41,
+        background:'linear-gradient(to bottom,rgba(0,0,0,0.2) 0%,transparent 10%,transparent 90%,rgba(0,0,0,0.2) 100%)',
+      }}/>
+
+      {/* HUD */}
+      <div style={{
+        position:'absolute',top:7,left:0,right:0,
+        display:'flex',justifyContent:'center',alignItems:'center',gap:16,
+        pointerEvents:'none',zIndex:42,
+      }}>
+        {active&&!allDefeated&&!playerDown&&(
+          <div style={{fontFamily:MONO,fontSize:9,color:ACC,letterSpacing:3,
+            textShadow:`0 0 8px ${ACC}`,animation:'roundPulse 2s ease-in-out infinite'}}>
+            ROUND {round}
+          </div>
+        )}
+        {allDefeated&&<div style={{fontFamily:ORB,fontSize:12,color:ACC,letterSpacing:5,
+          textShadow:`0 0 20px ${ACC},0 0 40px ${ACC}88`}}>★ VICTORY ★</div>}
+        {playerDown&&!allDefeated&&<div style={{fontFamily:ORB,fontSize:12,color:RED,letterSpacing:5,
+          textShadow:`0 0 20px ${RED}`}}>✕ DEFEAT ✕</div>}
+      </div>
+
+      {/* ── PLAYER SHIP — left side, vertically centered ── */}
+      <div style={{
+        position:'absolute',
+        left:'6%', top:0, bottom:0,
+        justifyContent:'center',
+        display:'flex',flexDirection:'column',alignItems:'center',gap:6,
+        zIndex:10,
+        animation: hitPlayer?'none':'idleDrift 4.2s ease-in-out infinite',
+      }}>
+        <ShipDisplay
+          isPlayer={true}
+          size={active?72:60}
+          facing="right"
+          hit={hitPlayer}
+          defeated={playerDown&&!allDefeated}
+        />
+        {active&&(
+          <div style={{fontFamily:MONO,fontSize:7,color:TEAL+'bb',letterSpacing:2,
+            textAlign:'center',textShadow:`0 0 6px ${TEAL}66`,marginTop:2}}>
+            {(gs?.ship?.name || 'THE INCONCEIVABLE').toUpperCase()}
+          </div>
+        )}
+        {active&&coleHP!==null&&(
+          <div style={{display:'flex',gap:8}}>
+            <span style={{fontFamily:MONO,fontSize:7,color:TEAL,textShadow:`0 0 5px ${TEAL}`}}>{(gs?.cole?.name||'COLE').split(' ')[0].toUpperCase()} {coleHP}</span>
+            <span style={{fontFamily:MONO,fontSize:7,color:VELA,textShadow:`0 0 5px ${VELA}`}}>{(gs?.vela?.name||'VELA').split(' ')[0].toUpperCase()} {velaHP}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── ENEMY SHIP — right side, vertically centered ── */}
+      {primaryEnemy ? (() => {
+        const eColor = FACTION_COLOR[primaryEnemy.faction] || '#9090b8';
+        const eSize  = primaryEnemy.isBoss ? 90 : 70;
+        const isWarping = shipState === 'warping';
+        const isLanded  = shipState === 'landed';
+        const isHidden  = shipState === 'hidden';
+
+        return (
+          <div style={{position:'absolute',right:'6%',top:0,bottom:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6,zIndex:10}}>
+
+            {/* UNKNOWN CONTACT — shown before combat starts */}
+            {isHidden && (
+              <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:8}}>
+                <div style={{
+                  width:80,height:80,border:`2px solid ${RED}66`,borderRadius:4,
+                  background:'#0a0005',
+                  display:'flex',alignItems:'center',justifyContent:'center',
+                  flexDirection:'column',gap:4,
+                  animation:'unknownPulse 2.2s ease-in-out infinite',
+                }}>
+                  <div style={{fontFamily:MONO,fontSize:18,color:`${RED}88`,letterSpacing:2}}>?</div>
+                  <div style={{fontFamily:MONO,fontSize:6,color:`${RED}55`,letterSpacing:2}}>UNKNOWN</div>
+                </div>
+                <div style={{fontFamily:MONO,fontSize:7,color:`${RED}44`,letterSpacing:2}}>CONTACT</div>
+              </div>
+            )}
+
+            {/* WARP-IN + LANDED — shown during and after animation */}
+            {(isWarping || isLanded) && (
+              <div style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
+
+                {/* Trail ghost 2 — furthest behind */}
+                {isWarping && (
+                  <div style={{position:'absolute',inset:0,display:'flex',justifyContent:'center',alignItems:'center',
+                    animation:'warpTrail2 1.1s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',
+                    filter:`blur(6px) hue-rotate(30deg)`,opacity:0}}>
+                    <ShipDisplay faction={primaryEnemy.faction} isBoss={primaryEnemy.isBoss} size={eSize} facing="left"/>
+                  </div>
+                )}
+                {/* Trail ghost 1 */}
+                {isWarping && (
+                  <div style={{position:'absolute',inset:0,display:'flex',justifyContent:'center',alignItems:'center',
+                    animation:'warpTrail1 1.0s cubic-bezier(0.22,1,0.36,1) forwards',pointerEvents:'none',
+                    filter:`blur(3px)`,opacity:0}}>
+                    <ShipDisplay faction={primaryEnemy.faction} isBoss={primaryEnemy.isBoss} size={eSize} facing="left"/>
+                  </div>
+                )}
+
+                {/* Main ship */}
+                <div style={{
+                  animation: isWarping
+                    ? 'warpIn 0.95s cubic-bezier(0.22,1,0.36,1) forwards'
+                    : (enemyDefeated||enemyHit ? 'none' : 'idleDrift 3.8s ease-in-out 0.5s infinite'),
+                }}>
+                  <ShipDisplay
+                    faction={primaryEnemy.faction}
+                    isBoss={primaryEnemy.isBoss}
+                    size={eSize}
+                    facing="left"
+                    hit={enemyHit}
+                    defeated={enemyDefeated}
+                  />
+                </div>
+
+                {/* Enemy name + HP labels */}
+                <div style={{fontFamily:MONO,fontSize:7,color:eColor+'bb',letterSpacing:1,textAlign:'center',
+                  maxWidth:90,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
+                  textShadow:`0 0 6px ${eColor}55`,marginTop:2}}>
+                  {primaryEnemy.name?.toUpperCase()}
+                </div>
+                <div style={{fontFamily:MONO,fontSize:7,color:RED,textShadow:`0 0 5px ${RED}88`}}>
+                  {primaryEnemy.hp}/{primaryEnemy.hpMax} HP
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })() : !active&&(
+        <div style={{
+          position:'absolute',left:'50%',top:'50%',
+          transform:'translate(-50%,-50%)',
+          display:'flex',flexDirection:'column',alignItems:'center',gap:8,
+        }}>
+          <div style={{animation:'idleDrift 4s ease-in-out infinite'}}>
+            <ShipDisplay isPlayer={true} size={64} facing="right"/>
+          </div>
+          <div style={{fontFamily:MONO,fontSize:8,color:ACC+'44',letterSpacing:4}}>STANDING BY</div>
+        </div>
+      )}
+
+      {/* Extra live enemy indicators */}
+      {active&&liveEnemies.length>1&&(
+        <div style={{position:'absolute',top:8,right:10,zIndex:42,display:'flex',gap:4}}>
+          {liveEnemies.slice(1,5).map(e=>{
+            const ec=FACTION_COLOR[e.faction]||'#9090b8';
+            return <div key={e.id} style={{
+              width:16,height:16,borderRadius:'50%',
+              background:ec+'18',border:'1px solid '+ec+'88',
+              display:'flex',alignItems:'center',justifyContent:'center',
+              fontFamily:MONO,fontSize:6,color:ec,
+            }}>+1</div>;
+          })}
+        </div>
+      )}
+
+      {/* Center divider */}
+      {active&&primaryEnemy&&!enemyDefeated&&(
+        <div style={{
+          position:'absolute',left:'50%',top:'12%',bottom:'12%',
+          width:1,
+          background:`linear-gradient(to bottom,transparent,${ACC}44,transparent)`,
+          zIndex:5,
+        }}/>
+      )}
+
+      {/* Projectiles */}
+      {projectiles.map(p=>(
+        <Projectile key={p.id} fromLeft={p.fromLeft} color={p.color}
+          onDone={()=>setProjectiles(prev=>prev.filter(x=>x.id!==p.id))}/>
+      ))}
+
+      {/* Explosions */}
+      {explosions.map(e=><Explosion key={e.id} x={e.x} y={e.y} color={e.color}/>)}
+
+      {/* Corner brackets */}
+      {[['top','left'],['top','right'],['bottom','left'],['bottom','right']].map(([v,h])=>(
+        <div key={v+h} style={{
+          position:'absolute',[v]:5,[h]:5,width:10,height:10,
+          borderStyle:'solid',borderColor:ACC+'55',borderWidth:0,
+          [`border${v.charAt(0).toUpperCase()+v.slice(1)}Width`]:1,
+          [`border${h.charAt(0).toUpperCase()+h.slice(1)}Width`]:1,
+          zIndex:42,
+        }}/>
+      ))}
+    </div>
+  );
+}

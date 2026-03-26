@@ -554,7 +554,7 @@ function Star({ x, y, size, speed, opacity, bright }) {
 
 // ── Main component ─────────────────────────────────────────────────────────
 export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) {
-  const { active, enemies = [], coleHP, velaHP, round } = ctBrief || {};
+  const { active, enemies = [], coleHP, velaHP, coleEN, velaEN, round, selectedEnemyId } = ctBrief || {};
 
   const prevColeHP  = useRef(coleHP);
   const prevVelaHP  = useRef(velaHP);
@@ -572,6 +572,10 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
   const [shieldFlash, setShieldFlash] = useState(null);     // enemyId
   const [destroyAnim, setDestroyAnim] = useState(new Set()); // Set of enemyIds
   const [combatResult,setCombatResult]= useState(null);      // {txt,color,key}
+  const [commsOpen,    setCommsOpen]   = useState(false);
+  const [mabelLine,    setMabelLine]   = useState('');
+  const [commsLine,    setCommsLine]   = useState('');
+  const [commsLoading2,setCommsLoading2] = useState(false);
   const prevActive   = useRef(false);
   const prevEnemyIds = useRef([]);
   const prevTab      = useRef(tab);
@@ -707,6 +711,46 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
       }, travelMs);
     }
     setTimeout(() => setCombatResult(null), travelMs + 1800);
+
+    // ── MABEL ship-computer reaction ────────────────────────────────────
+    if (fire.type === 'hit' || fire.type === 'destroy' || fire.type === 'shield') {
+      const tgt = displayEnemies.find(e => e.id === eid);
+      const disposition = tgt ? (() => {
+        const pct = tgt.hp / Math.max(1, tgt.hpMax || tgt.hp);
+        if (pct > 0.6) return 'DEFIANT'; if (pct > 0.35) return 'ENGAGED';
+        if (pct > 0.15) return 'RATTLED'; return 'DESPERATE';
+      })() : 'UNKNOWN';
+      const combatState = {
+        round: ctBrief?.round || 1,
+        active: true,
+        mode: ctBrief?.mode || 'ship',
+        playerHP: { cole: ctBrief?.coleHP ?? 20, vela: ctBrief?.velaHP ?? 20 },
+        shipHull: ctBrief?.gs?.ship?.hull ?? 20,
+        enemies: displayEnemies.map(e => ({ name: e.name, faction: e.faction, hp: e.hp, hpMax: e.hpMax || e.hp })),
+        lastAction: fire.type === 'destroy'
+          ? `Fired ${fire.wpnName || 'weapon'} at ${tgt?.name || 'target'} — DESTROYED`
+          : fire.type === 'shield'
+          ? `Fired ${fire.wpnName || 'weapon'} at ${tgt?.name || 'target'} — shield absorbed`
+          : `Fired ${fire.wpnName || 'weapon'} at ${tgt?.name || 'target'} for ${fire.dmg} damage (${disposition})`,
+        commsOpen: false,
+      };
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 120,
+          system: "You are MABEL, the AI ship computer aboard The Inconceivable. You are monitoring an active combat situation. Respond in 1-2 sharp sentences max. You are terse, dry, slightly sardonic, loyal. React specifically to what just happened — reference the actual enemy faction, HP numbers, or action taken. Never say 'I understand' or 'certainly'. No asterisk actions.",
+          messages: [{ role: 'user', content: JSON.stringify(combatState) }],
+        }),
+      })
+        .then(r => r.json())
+        .then(d => {
+          const t = d.content && d.content.find(b => b.type === 'text');
+          if (t && t.text) setMabelLine(t.text.slice(0, 120));
+        })
+        .catch(() => {});
+    }
   }, [ctBrief?.lastFire]);
 
   // Tab enter: warp in player ship from the left
@@ -720,6 +764,36 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
     }
     prevTab.current = tab;
   }, [tab]);
+
+  // ── MABEL COMMS channel — fires when overlay opens ───────────────────────
+  useEffect(() => {
+    if (!commsOpen || !selectedEnemy) return;
+    const faction = selectedEnemy.faction || 'UNKNOWN';
+    const disposition = (() => {
+      const pct = selectedEnemy.hp / Math.max(1, selectedEnemy.hpMax || selectedEnemy.hp);
+      if (pct > 0.6) return 'DEFIANT'; if (pct > 0.35) return 'ENGAGED';
+      if (pct > 0.15) return 'RATTLED'; return 'DESPERATE';
+    })();
+    setCommsLine('');
+    setCommsLoading2(true);
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 200,
+        system: `You are MABEL, advising your crew during an open communication channel with an enemy vessel. The enemy is ${faction}, currently ${disposition}. Speak in 2-3 sentences as a tactical advisor. Be specific about what you know about this faction. You can be suspicious, wry, or cautiously optimistic depending on disposition. Never be generic. No asterisk actions.`,
+        messages: [{ role: 'user', content: `Opening comms with ${selectedEnemy.name} (${faction}, ${disposition}). HP: ${selectedEnemy.hp}/${selectedEnemy.hpMax || selectedEnemy.hp}. Advise.` }],
+      }),
+    })
+      .then(r => r.json())
+      .then(d => {
+        const t = d.content && d.content.find(b => b.type === 'text');
+        if (t && t.text) setCommsLine(t.text);
+      })
+      .catch(() => setCommsLine('[SIGNAL DEGRADED]'))
+      .finally(() => setCommsLoading2(false));
+  }, [commsOpen]);
 
   const addBeam = (x1pct, y1pct, x2pct, y2pct, color, weaponType='laser') => {
     const id = Date.now() + Math.random();
@@ -836,8 +910,9 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
       {/* ── TOP BAR ── */}
       <div style={{ height:34, background:'#04070b', borderBottom:'1px solid rgba(255,255,255,0.04)', display:'flex', alignItems:'center', padding:'0 10px', gap:8, zIndex:50, flexShrink:0 }}>
         <div style={{ width:5, height:5, borderRadius:'50%', background: active ? TEAL : 'rgba(255,255,255,0.1)', boxShadow: active ? '0 0 6px ' + TEAL : 'none', flexShrink:0, transition:'all 0.5s' }} />
-        <span style={{ fontFamily:MONO, fontSize:7, color: active ? TEAL+'cc' : 'rgba(255,255,255,0.13)', letterSpacing:2 }}>
-          {active ? 'MABEL // COMBAT ACTIVE' : 'MABEL // GHOST SIGNAL // STANDBY'}
+        <span style={{ fontFamily:MONO, fontSize:7, color: active ? TEAL+'cc' : 'rgba(255,255,255,0.13)', letterSpacing:2,
+          flex:1, overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', maxWidth:420 }}>
+          {mabelLine && active ? mabelLine : active ? 'MABEL // COMBAT ACTIVE' : 'MABEL // GHOST SIGNAL // STANDBY'}
         </span>
         <div style={{ flex:1 }}/>
         {allDefeated   && <span style={{ fontFamily:ORB, fontSize:9, color:ACC, letterSpacing:4, textShadow:'0 0 14px '+ACC }}>★ VICTORY ★</span>}
@@ -1009,6 +1084,8 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
                     <div style={{ fontFamily:MONO,fontSize:4,color:TEAL+'55',letterSpacing:1 }}>ONLINE</div>
                   </div>
                   <div style={{ fontFamily:ORB,fontSize:7,color:TEAL,letterSpacing:2 }}>MABEL</div>
+                  {commsLoading2 && <div style={{ fontFamily:MONO,fontSize:5,color:TEAL+'55',letterSpacing:1,animation:'roundPulse 1s ease-in-out infinite' }}>CONNECTING...</div>}
+                  {commsLine && !commsLoading2 && <div style={{ fontFamily:MONO,fontSize:6,color:TEAL+'cc',lineHeight:1.5,textAlign:'center',marginTop:2,padding:'0 2px' }}>{commsLine}</div>}
                 </div>
                 <div style={{ flex:1,border:'1px solid rgba(255,255,255,0.07)',borderRadius:3,padding:'8px',display:'flex',flexDirection:'column',alignItems:'center',gap:5,background:'rgba(255,255,255,0.01)' }}>
                   <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.17)',letterSpacing:2 }}>ENEMY SIGNAL</div>
