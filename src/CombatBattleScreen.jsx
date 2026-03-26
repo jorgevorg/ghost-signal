@@ -669,7 +669,14 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
     const ax = wingTop.x/100*SCREEN_ACTUAL_W, ay = wingTop.y/100*SCREEN_H;
     const bx = aimX/100*SCREEN_ACTUAL_W,      by = aimY/100*SCREEN_H;
     const distPx = Math.sqrt((bx-ax)**2 + (by-ay)**2);
-    const travelMs = Math.round(40 + distPx * 0.5);
+    // Weapon type determines travel time — must match the animation component formulas
+    const isMissileWpn = fire.wpnName && (
+      fire.wpnName.toLowerCase().includes('missile') ||
+      fire.wpnName.toLowerCase().includes('rocket')
+    );
+    const travelMs = isMissileWpn
+      ? Math.round(120 + distPx * 1.1)   // matches MissileSwarm formula
+      : Math.round(40  + distPx * 0.5);  // matches BeamWeapon formula
 
     if (fire.type === 'shield') {
       // Two beams, delayed explosion on shield
