@@ -226,11 +226,9 @@ function ShipDisplay({ faction, isBoss, size, facing = 'right', defeated, hit, i
   const leaderColor = eColor || color;
   const hitFilter = hit
     ? `drop-shadow(0 0 18px ${RED}ff) drop-shadow(0 0 6px ${RED}) brightness(2)`
-    : isLeader && !isPlayer
-    ? `sepia(1) saturate(8) hue-rotate(${_hueFor(leaderColor)}deg) brightness(1.05)`
     : isPlayer
     ? `drop-shadow(0 0 10px ${TEAL}88)`
-    : `drop-shadow(0 0 8px ${color}66)`;
+    : `sepia(1) saturate(8) hue-rotate(${_hueFor(leaderColor)}deg) brightness(${isLeader ? 1.08 : 0.95}) drop-shadow(0 0 6px ${leaderColor}55)`;
 
   return (
     <div style={{
@@ -657,13 +655,13 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
     // Wing gun origins — corrected for actual container width (~1032px not 900px)
     // SVG screenW must match actual container width or positions shift right
     // Ship nose x = 17% of 1032px. Wing Y: ship centered ~45% from top when labels show
-    const wingTop    = { x: 15.8, y: 38 };
-    const wingBottom = { x: 15.8, y: 52.2 };
+    const wingTop    = { x: 15.8, y: 40 };
+    const wingBottom = { x: 15.8, y: 54 };
     const SCREEN_ACTUAL_W = 1032;
 
     // Random hit across ship body — center ± small scatter
-    const aimX = targetX + (Math.random() - 0.5) * 4;  // ±2% horizontal scatter
-    const aimY = targetY + (Math.random() - 0.5) * 10; // ±5% vertical scatter
+    const aimX = targetX + (Math.random() - 0.5) * 14; // ±7% horizontal — full sprite body
+    const aimY = targetY + (Math.random() - 0.5) * 16; // ±8% vertical — full sprite body
 
     // Travel time in px — MUST match BeamWeapon formula exactly
     const SCREEN_H = 240;
@@ -864,7 +862,8 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
   const velaMaxHP   = gs?.vela?.hpMax ?? 20;
   const shipHull    = gs?.ship?.hull    ?? 20;
   const shipHullMax = gs?.ship?.hullMax ?? 20;
-  const shipSize    = eCount <= 1 ? 68 : eCount === 2 ? 58 : eCount === 3 ? 48 : eCount === 4 ? 41 : 35;
+  // Size locked: 4-enemy size (41px) is ideal. Cap there to prevent dead-enemy scale-up.
+  const shipSize    = eCount >= 5 ? 35 : 41;
 
   const MiniBar = ({ val, max, color, h = 3 }) => (
     React.createElement('div', { style: { height: h, background: '#ffffff10', borderRadius: 1.5, overflow: 'hidden' } },
@@ -905,6 +904,7 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
         @keyframes reticlePulse{0%,100%{opacity:0.5}50%{opacity:1}}
         @keyframes destroyFlash{0%{filter:brightness(1)}15%{filter:brightness(4) saturate(0)}35%{filter:brightness(0.3) saturate(0)}60%{filter:brightness(2) saturate(0)}100%{filter:brightness(0) saturate(0);opacity:0}}
         @keyframes commsSlideIn{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
+        @keyframes reticleScan{0%,100%{opacity:0.12}50%{opacity:0.35}}
       `}</style>
 
       {/* ── TOP BAR ── */}
@@ -923,16 +923,16 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
       <div style={{ display:'flex', flexDirection:'row', height:272, overflow:'hidden' }}>
 
         {/* LEFT PANEL: Crew */}
-        <div style={{ width:100, flexShrink:0, background:'#03060a', borderRight:'1px solid rgba(255,255,255,0.03)', padding:'7px 6px', display:'flex', flexDirection:'column', gap:6, zIndex:45, overflow:'hidden' }}>
+        <div style={{ width:100, flexShrink:0, background:'#06090e', border:'1px solid rgba(255,107,53,0.14)', borderRight:'1px solid rgba(255,107,53,0.14)', padding:'7px 6px', display:'flex', flexDirection:'column', gap:6, zIndex:45, overflow:'hidden' }}>
           <div style={{ fontFamily:MONO, fontSize:6, color:'rgba(255,255,255,0.1)', letterSpacing:2 }}>CREW</div>
 
-          <div style={{ display:'flex', flexDirection:'column', gap:3, padding:'5px', background:'rgba(255,255,255,0.01)', borderRadius:2, border:'1px solid rgba(0,255,208,0.08)' }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:3, padding:'5px', background:'rgba(255,255,255,0.01)', borderRadius:2, border:'1px solid rgba(255,209,102,0.12)' }}>
             <div style={{ display:'flex', alignItems:'center', gap:3 }}>
-              <div style={{ width:4, height:4, borderRadius:'50%', background: coleHPDisp > 0 ? TEAL : 'rgba(255,255,255,0.13)', flexShrink:0 }} />
-              <span style={{ fontFamily:ORB, fontSize:7, color: coleHPDisp > 0 ? TEAL : 'rgba(255,255,255,0.2)', letterSpacing:1, flex:1 }}>COLE</span>
-              <span style={{ fontFamily:MONO, fontSize:7, color: coleHPDisp > 0 ? TEAL+'99' : 'rgba(255,255,255,0.13)' }}>{coleHPDisp}</span>
+              <div style={{ width:4, height:4, borderRadius:'50%', background: coleHPDisp > 0 ? YEL : 'rgba(255,255,255,0.13)', flexShrink:0 }} />
+              <span style={{ fontFamily:ORB, fontSize:7, color: coleHPDisp > 0 ? YEL : 'rgba(255,255,255,0.2)', letterSpacing:1, flex:1 }}>COLE</span>
+              <span style={{ fontFamily:MONO, fontSize:7, color: coleHPDisp > 0 ? YEL+'99' : 'rgba(255,255,255,0.13)' }}>{coleHPDisp}</span>
             </div>
-            <MiniBar val={coleHPDisp} max={coleMaxHP} color={TEAL} h={3} />
+            <MiniBar val={coleHPDisp} max={coleMaxHP} color={YEL} h={3} />
             <div style={{ fontFamily:MONO, fontSize:5, color:'rgba(255,255,255,0.1)', letterSpacing:1 }}>HP</div>
           </div>
 
@@ -1047,7 +1047,34 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
                       </>
                     )}
                     {isSelected && !isDefeated && (
-                      <div style={{ position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)', width:shipSize+20,height:shipSize+20, border:'1px solid '+eColor, borderRadius:'50%', animation:'reticlePulse 1.2s ease-in-out infinite', pointerEvents:'none', zIndex:14 }}/>
+                      <div style={{ position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)',pointerEvents:'none',zIndex:14,animation:'reticlePulse 1.2s ease-in-out infinite' }}>
+                        <svg width={shipSize+32} height={shipSize+32} viewBox="0 0 100 100" style={{overflow:'visible',display:'block'}}>
+                          {/* Corner bracket TL */}
+                          <path d="M 6 24 L 6 6 L 24 6" fill="none" stroke={eColor} strokeWidth="2.2" strokeLinecap="square" opacity="0.9"/>
+                          {/* Corner bracket TR */}
+                          <path d="M 76 6 L 94 6 L 94 24" fill="none" stroke={eColor} strokeWidth="2.2" strokeLinecap="square" opacity="0.9"/>
+                          {/* Corner bracket BL */}
+                          <path d="M 6 76 L 6 94 L 24 94" fill="none" stroke={eColor} strokeWidth="2.2" strokeLinecap="square" opacity="0.9"/>
+                          {/* Corner bracket BR */}
+                          <path d="M 94 76 L 94 94 L 76 94" fill="none" stroke={eColor} strokeWidth="2.2" strokeLinecap="square" opacity="0.9"/>
+                          {/* Axis ticks */}
+                          <line x1="50" y1="1" x2="50" y2="10" stroke={eColor} strokeWidth="1" strokeOpacity="0.45"/>
+                          <line x1="50" y1="90" x2="50" y2="99" stroke={eColor} strokeWidth="1" strokeOpacity="0.45"/>
+                          <line x1="1" y1="50" x2="10" y2="50" stroke={eColor} strokeWidth="1" strokeOpacity="0.45"/>
+                          <line x1="90" y1="50" x2="99" y2="50" stroke={eColor} strokeWidth="1" strokeOpacity="0.45"/>
+                          {/* Center ring */}
+                          <circle cx="50" cy="50" r="5" fill="none" stroke={eColor} strokeWidth="0.8" strokeOpacity="0.35"/>
+                          {/* Center dot */}
+                          <circle cx="50" cy="50" r="1.5" fill={eColor} opacity="0.6"/>
+                          {/* Scanning sweep line */}
+                          <line x1="10" y1="50" x2="90" y2="50" stroke={eColor} strokeWidth="0.6" strokeOpacity="0.12" style={{animation:'reticleScan 2.4s ease-in-out infinite'}}/>
+                          {/* Corner accent dots */}
+                          <circle cx="6" cy="6" r="1.5" fill={eColor} opacity="0.5"/>
+                          <circle cx="94" cy="6" r="1.5" fill={eColor} opacity="0.5"/>
+                          <circle cx="6" cy="94" r="1.5" fill={eColor} opacity="0.5"/>
+                          <circle cx="94" cy="94" r="1.5" fill={eColor} opacity="0.5"/>
+                        </svg>
+                      </div>
                     )}
                     {active && !isDefeated && (
                       <div style={{ position:'absolute',bottom:-14,left:'50%',transform:'translateX(-50%)', fontFamily:MONO,fontSize:6,color:eColor,letterSpacing:1,whiteSpace:'nowrap',textShadow:'0 0 6px '+eColor+'77',pointerEvents:'none' }}>
