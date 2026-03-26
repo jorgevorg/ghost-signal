@@ -1135,7 +1135,33 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
                   {selectedEnemy && <div style={{ fontFamily:MONO,fontSize:6,color:enemyDispositionColor(selectedEnemy),letterSpacing:2 }}>{enemyDisposition(selectedEnemy)}</div>}
                 </div>
               </div>
-              <div style={{ display:'flex',gap:6,marginTop:8,justifyContent:'center',flexWrap:'wrap' }}>
+              {/* MABEL advisory text — framed terminal block */}
+              <div style={{ margin:'8px 0 4px', padding:'8px 10px',
+                background:'rgba(0,255,208,0.03)',
+                border:'1px solid rgba(0,255,208,0.18)',
+                borderRadius:3, minHeight:38 }}>
+                <div style={{ fontFamily:MONO,fontSize:6,color:TEAL+'55',letterSpacing:2,marginBottom:5 }}>
+                  M.A.B.E.L // ADVISORY
+                </div>
+                {commsLoading2
+                  ? <div style={{ display:'flex',gap:4,alignItems:'center' }}>
+                      {[0,1,2].map(i=>(
+                        <div key={i} style={{ width:4,height:4,borderRadius:'50%',
+                          background:TEAL,
+                          animation:`hailPulse 1s ease-in-out ${i*0.18}s infinite` }}/>
+                      ))}
+                      <span style={{ fontFamily:MONO,fontSize:7,color:TEAL+'77',marginLeft:4,letterSpacing:1 }}>
+                        PROCESSING...
+                      </span>
+                    </div>
+                  : <div style={{ fontFamily:MONO,fontSize:9,color:TEAL+'dd',
+                      lineHeight:1.7,letterSpacing:0.5,textAlign:'left',wordBreak:'break-word' }}>
+                      {commsLine || '// Establishing channel...'}
+                    </div>
+                }
+              </div>
+
+              <div style={{ display:'flex',gap:6,marginTop:4,justifyContent:'center',flexWrap:'wrap' }}>
                 {['NEGOTIATE','DEMAND','BLUFF','REJECT'].map(opt=>(
                   <button key={opt} onClick={()=>setCommsOpen(false)}
                     style={{ fontFamily:MONO,fontSize:6,letterSpacing:2,padding:'4px 9px',background:'transparent', border:'1px solid '+(opt==='REJECT'?RED:opt==='DEMAND'?YEL:TEAL)+'33', color:opt==='REJECT'?RED:opt==='DEMAND'?YEL:TEAL, cursor:'pointer',borderRadius:2 }}>
@@ -1170,14 +1196,15 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
         <div style={{ flex:1 }}/>
         {!commsOpen && selectedEnemy && selectedEnemy.hp > 0 && (
           <button onClick={()=>setCommsOpen(true)}
-            style={{ fontFamily:MONO,fontSize:7,letterSpacing:2,padding:'4px 11px',
-              background: hailAvailable ? 'rgba(0,255,208,0.06)' : active ? 'transparent' : 'rgba(0,255,208,0.04)',
-              border:'1px solid '+(hailAvailable||!active ? TEAL : 'rgba(255,255,255,0.08)'),
-              color: hailAvailable||!active ? TEAL : 'rgba(255,255,255,0.35)',
+            style={{ fontFamily:MONO,fontSize:7,letterSpacing:2,padding:'5px 14px',
+              background: hailAvailable ? 'rgba(0,255,208,0.1)' : 'rgba(0,255,208,0.05)',
+              border:`1px solid ${TEAL}${hailAvailable ? 'cc' : '66'}`,
+              color: `${TEAL}${hailAvailable ? 'ff' : 'bb'}`,
               cursor:'pointer', borderRadius:2,
-              animation: hailAvailable ? 'hailPulse 1.8s ease-in-out infinite' : !active ? 'hailPulse 2.4s ease-in-out infinite' : 'none',
-              transition:'all 0.2s' }}>
-            {active ? 'HAIL' : '⬡ OPEN COMMS'}
+              boxShadow: hailAvailable ? `0 0 10px ${TEAL}44` : 'none',
+              animation: hailAvailable ? 'hailPulse 1.8s ease-in-out infinite' : 'none',
+              transition:'all 0.2s', fontWeight: 600 }}>
+            {active ? '⬡ HAIL' : '⬡ OPEN COMMS'}
           </button>
         )}
         {commsOpen && (

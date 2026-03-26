@@ -102,13 +102,17 @@ function FactionBanner({ faction, color, commsOpen }) {
 }
 
 // ── Talk waveform ──────────────────────────────────────────────────────────
-function TalkWave({ color, visible }) {
-  if (!visible) return null;
+function TalkWave({ color, visible, loading }) {
   return (
-    <div style={{ display:'flex', gap:2, alignItems:'center', justifyContent:'center', height:10 }}>
+    <div style={{ display:'flex', gap:2, alignItems:'center', justifyContent:'center',
+      height:10, opacity: visible || loading ? 1 : 0, transition:'opacity 0.25s' }}>
       {[0,1,2,3,4].map(i => (
         <div key={i} style={{ width:2, borderRadius:1, background:color,
-          animation:`talkWave 0.6s ease-in-out ${i*0.1}s infinite`, opacity:0.85 }}/>
+          animation: loading
+            ? `talkWave 0.25s ease-in-out ${i*0.05}s infinite`
+            : `talkWave 0.6s ease-in-out ${i*0.1}s infinite`,
+          minHeight: loading ? '100%' : undefined,
+          opacity:0.85 }}/>
       ))}
     </div>
   );
@@ -242,7 +246,7 @@ export default function PortraitPanel({
       <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
         <div style={{ fontFamily:MONO, fontSize:5, color:`${TEAL}55`, letterSpacing:2 }}>M.A.B.E.L</div>
         <MabelFace size={54} talking={mabelTalking} loading={mabelLoading}/>
-        <TalkWave color={TEAL} visible={mabelTalking}/>
+        <TalkWave color={TEAL} visible={mabelTalking} loading={mabelLoading}/>
         <QuipBubble text={mabelLine} color={TEAL} loading={mabelLoading}/>
       </div>
 

@@ -2944,20 +2944,38 @@ function CombatTracker({gs,onCharChange,onShipChange,onCtUpdate,onSelectEnemy,on
         ),
         showPicker&&React.createElement("div",{style:{background:"#020408",border:"1px solid "+CC+"33",borderRadius:4,padding:"10px",marginBottom:10}},
           React.createElement("input",{placeholder:"// SEARCH ENEMY DATABASE...",value:enemySearch,onChange:ev=>setEnemySearch(ev.target.value),autoFocus:true,style:{width:"100%",background:"transparent",border:"1px solid "+B1+"44",borderRadius:3,color:"#ddd",fontFamily:MONO,fontSize:10,padding:"7px 10px",outline:"none",boxSizing:"border-box",marginBottom:8,caretColor:CC}}),
-          React.createElement("div",{style:{maxHeight:200,overflowY:"auto",display:"flex",flexDirection:"column",gap:3}},
-            Object.entries(ENEMY_DB).filter(([k])=>!enemySearch||k.toLowerCase().includes(enemySearch.toLowerCase())).map(([k,en])=>{
-              const fc=FACTION_COLORS[en.faction]||"#99aacc";
-              const dc=DIFFICULTY_C[en.difficulty]||"#99aacc";
-              return React.createElement("div",{key:k,onClick:()=>{if(enemies.length<MAX_ENEMIES){setEnemies(p=>{const sameName=p.filter(x=>x.baseName===k||x.name===k||x.name.startsWith(k+" "));const num=sameName.length+1;const displayName=sameName.length===0?k:k+" "+String(num).padStart(2,"0");const updated=sameName.length===1?p.map(x=>(x.baseName===k||x.name===k)?Object.assign({},x,{name:k+" 01"}):x):p;return updated.concat([Object.assign({},mkEnemy(en),{name:displayName,baseName:k})]);});if(enemies.length+1>=MAX_ENEMIES)setShowPicker(false);}},style:{display:"flex",gap:8,alignItems:"center",padding:"6px 10px",cursor:"pointer",borderRadius:3,background:"#0a0a16",border:"1px solid #ffffff08"},
-                onMouseEnter:ev2=>{ev2.currentTarget.style.background="#ffffff0d";ev2.currentTarget.style.borderColor=CC+"33";},
-                onMouseLeave:ev2=>{ev2.currentTarget.style.background="#0a0a16";ev2.currentTarget.style.borderColor="#ffffff08";}},
-                React.createElement("span",{style:{fontFamily:MONO,fontSize:10,color:"#ddd",flex:1}},k),
-                React.createElement("span",{style:{display:"inline-flex",alignItems:"center",gap:3,color:fc,background:fc+"18",padding:"1px 5px",borderRadius:2}},FACTION_ICONS[en.faction]&&FACTION_ICONS[en.faction](10),React.createElement("span",{style:{fontFamily:MONO,fontSize:7}},en.faction.toUpperCase())),
-                React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:dc,background:dc+"18",padding:"1px 5px",borderRadius:2}},en.difficulty),
-                React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#99aacc"}},"HP "+(en.hp+5)),
-                en.isBoss&&React.createElement("span",{style:{color:"#FF2060",fontSize:10}},"\ud83d\udc51")
-              );
-            })
+                    React.createElement("div",{style:{display:"flex",gap:8,minHeight:180}},
+            React.createElement("div",{style:{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:2,maxHeight:210}},
+              Object.entries(ENEMY_DB).filter(([k])=>!enemySearch||k.toLowerCase().includes(enemySearch.toLowerCase())).map(([k,en])=>{
+                const fc=FACTION_COLORS[en.faction]||"#99aacc";
+                const dc=DIFFICULTY_C[en.difficulty]||"#99aacc";
+                const atMax=enemies.length>=MAX_ENEMIES;
+                return React.createElement("div",{key:k,onClick:()=>{if(!atMax){setEnemies(p=>{const sameName=p.filter(x=>x.baseName===k||x.name===k||x.name.startsWith(k+" "));const displayName=sameName.length===0?k:k+" "+String(sameName.length+1).padStart(2,"0");const updated=sameName.length===1?p.map(x=>(x.baseName===k||x.name===k)?Object.assign({},x,{name:k+" 01"}):x):p;return updated.concat([Object.assign({},mkEnemy(en),{name:displayName,baseName:k})]);});if(enemies.length+1>=MAX_ENEMIES)setShowPicker(false);}},
+                  style:{display:"flex",gap:6,alignItems:"center",padding:"4px 8px",cursor:atMax?"not-allowed":"pointer",borderRadius:2,background:"#0a0a16",border:"1px solid #ffffff06",opacity:atMax?0.4:1},
+                  onMouseEnter:ev2=>{if(!atMax){ev2.currentTarget.style.background="#ffffff0d";ev2.currentTarget.style.borderColor=CC+"33";}},
+                  onMouseLeave:ev2=>{ev2.currentTarget.style.background="#0a0a16";ev2.currentTarget.style.borderColor="#ffffff06";}},
+                  React.createElement("span",{style:{width:6,height:6,borderRadius:"∞",background:fc,flexShrink:0}}),
+                  React.createElement("span",{style:{fontFamily:MONO,fontSize:9,color:"#ddd",flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},k),
+                  React.createElement("span",{style:{fontFamily:MONO,fontSize:7,color:dc,flexShrink:0}},"HP "+(en.hp+5)),
+                  React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:CC+"66",flexShrink:0}},"+")
+                );
+              })
+            ),
+            React.createElement("div",{style:{width:1,background:CC+"18",flexShrink:0}}),
+            React.createElement("div",{style:{width:168,flexShrink:0,display:"flex",flexDirection:"column",gap:3,overflowY:"auto",maxHeight:210}},
+              React.createElement("div",{style:{fontFamily:MONO,fontSize:6,color:CC+"44",letterSpacing:2,marginBottom:3,paddingBottom:3,borderBottom:"1px solid "+CC+"18"}},"MANIFEST  "+enemies.length+"/"+MAX_ENEMIES),
+              enemies.length===0
+                ? React.createElement("div",{style:{fontFamily:MONO,fontSize:8,color:"#7788bb",textAlign:"center",padding:"24px 0",opacity:0.5}},"// EMPTY")
+                : enemies.map((en,idx)=>{
+                    const fc=FACTION_COLORS[en.faction]||"#8899cc";
+                    return React.createElement("div",{key:en.id,style:{display:"flex",gap:5,alignItems:"center",padding:"4px 6px",background:fc+"0a",border:"1px solid "+fc+"22",borderRadius:3}},
+                      React.createElement("span",{style:{fontFamily:MONO,fontSize:7,color:CC+"44",flexShrink:0,minWidth:14}},String(idx+1).padStart(2,"0")),
+                      React.createElement("span",{style:{width:5,height:5,borderRadius:"50%",background:fc,flexShrink:0}}),
+                      React.createElement("span",{style:{fontFamily:MONO,fontSize:8,color:"#ccc",flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},en.name),
+                      React.createElement("button",{onClick:(ev)=>{ev.stopPropagation();setEnemies(p=>p.filter(x=>x.id!==en.id));},style:{background:"transparent",border:"none",color:"#FF206066",cursor:"pointer",fontFamily:MONO,fontSize:10,padding:"0 2px",lineHeight:1,flexShrink:0}},"×")
+                    );
+                  })
+            )
           )
         ),
         enemies.length>0&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:5}},
