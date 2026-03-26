@@ -1129,8 +1129,6 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
                     <div style={{ fontFamily:MONO,fontSize:4,color:TEAL+'55',letterSpacing:1 }}>ONLINE</div>
                   </div>
                   <div style={{ fontFamily:ORB,fontSize:7,color:TEAL,letterSpacing:2 }}>MABEL</div>
-                  {commsLoading2 && <div style={{ fontFamily:MONO,fontSize:5,color:TEAL+'55',letterSpacing:1,animation:'roundPulse 1s ease-in-out infinite' }}>CONNECTING...</div>}
-                  {commsLine && !commsLoading2 && <div style={{ fontFamily:MONO,fontSize:6,color:TEAL+'cc',lineHeight:1.5,textAlign:'center',marginTop:2,padding:'0 2px' }}>{commsLine}</div>}
                 </div>
                 <div style={{ flex:1,border:'1px solid rgba(255,255,255,0.07)',borderRadius:3,padding:'8px',display:'flex',flexDirection:'column',alignItems:'center',gap:5,background:'rgba(255,255,255,0.01)' }}>
                   <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.17)',letterSpacing:2 }}>ENEMY SIGNAL</div>
@@ -1142,31 +1140,41 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
                   {selectedEnemy && <div style={{ fontFamily:MONO,fontSize:6,color:enemyDispositionColor(selectedEnemy),letterSpacing:2 }}>{enemyDisposition(selectedEnemy)}</div>}
                 </div>
               </div>
-              {/* MABEL advisory text — framed terminal block */}
-              <div style={{ margin:'8px 0 4px', padding:'8px 10px',
-                background:'rgba(0,255,208,0.03)',
-                border:'1px solid rgba(0,255,208,0.18)',
-                borderRadius:3, minHeight:38 }}>
-                <div style={{ fontFamily:MONO,fontSize:6,color:TEAL+'55',letterSpacing:2,marginBottom:5 }}>
-                  M.A.B.E.L // ADVISORY
-                </div>
-                {commsLoading2
-                  ? <div style={{ display:'flex',gap:4,alignItems:'center' }}>
-                      {[0,1,2].map(i=>(
-                        <div key={i} style={{ width:4,height:4,borderRadius:'50%',
-                          background:TEAL,
-                          animation:`hailPulse 1s ease-in-out ${i*0.18}s infinite` }}/>
-                      ))}
-                      <span style={{ fontFamily:MONO,fontSize:7,color:TEAL+'77',marginLeft:4,letterSpacing:1 }}>
-                        PROCESSING...
-                      </span>
+              {/* Faction intel dossier — database entry, not MABEL's voice */}
+              {(() => {
+                const FACTION_INTEL = {
+                  CORSAIR: 'Corsair Syndicate — opportunistic raiders operating outside ISF jurisdiction. Will negotiate if visibly outgunned. Expect deception regardless of outcome.',
+                  WARG:    'W.A.R.G. — revolutionary guerrillas. Hostile to authority and ISF-adjacent vessels. Respond to shows of force. Ideologically motivated, not mercenary.',
+                  MEDUSA:  'Medusa Sector — cyberterrorists and rogue hackers. Prefer psychological leverage over direct fire. Anticipate electronic countermeasures during comms.',
+                  ISF:     'Intersolar Federation — trade authority enforcement. Will accept negotiation if proper protocol is observed. Aggressive escalation may trigger backup call.',
+                  SYNTH:   'Synth Arch — android quasi-religious collective. Logical and emotionally cold. Respond to reason and data. Emotional appeals are ineffective.',
+                  ALIEN:   'Species unknown — IFF profile incomplete. Behavioral patterns unclassified. No established communication protocol on record. Extreme caution advised.',
+                  WANTED:  'Bounty contract vessel — active warrant confirmed. Subjects rarely negotiate. Priority: incapacitate or destroy. Reward applies on confirmation.',
+                };
+                const faction = selectedEnemy?.faction || 'NONE';
+                const intel = FACTION_INTEL[faction] || 'IFF signal unresponsive. Faction classification pending. No known affiliation in the database.';
+                const eColor = FACTION_COLOR[faction] || 'rgba(255,255,255,0.2)';
+                return (
+                  <div style={{ margin:'8px 0 4px', padding:'7px 10px',
+                    background:'rgba(255,255,255,0.02)',
+                    border:`1px solid ${eColor}22`,
+                    borderRadius:3,
+                    maxHeight:60, overflow:'hidden',
+                    boxSizing:'border-box' }}>
+                    <div style={{ fontFamily:MONO,fontSize:5,color:`${eColor}55`,letterSpacing:2,marginBottom:4 }}>
+                      ◈ TACTICAL DATABASE // {faction || 'UNKNOWN'}
                     </div>
-                  : <div style={{ fontFamily:MONO,fontSize:9,color:TEAL+'dd',
-                      lineHeight:1.7,letterSpacing:0.5,textAlign:'left',wordBreak:'break-word' }}>
-                      {commsLine || '// Establishing channel...'}
+                    <div style={{ fontFamily:MONO,fontSize:7,color:`${eColor}bb`,
+                      lineHeight:1.6,letterSpacing:0.3,
+                      overflow:'hidden',
+                      display:'-webkit-box',
+                      WebkitLineClamp:2,
+                      WebkitBoxOrient:'vertical' }}>
+                      {intel}
                     </div>
-                }
-              </div>
+                  </div>
+                );
+              })()}
 
               <div style={{ display:'flex',gap:6,marginTop:4,justifyContent:'center',flexWrap:'wrap' }}>
                 {['NEGOTIATE','DEMAND','BLUFF','REJECT'].map(opt=>(
