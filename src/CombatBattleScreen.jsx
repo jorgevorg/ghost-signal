@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import PortraitPanel from './PortraitPanel.jsx';
 
 const ACC   = '#FF6B35';
 const TEAL  = '#00FFD0';
@@ -1136,38 +1137,15 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
           )}
         </div>
 
-        {/* RIGHT PANEL: Target info */}
-        <div style={{ width:100,flexShrink:0,background:'#03060a',borderLeft:'1px solid rgba(255,255,255,0.03)',padding:'7px 6px',display:'flex',flexDirection:'column',gap:5,zIndex:45,overflow:'hidden' }}>
-          <div style={{ fontFamily:MONO,fontSize:6,color:'rgba(255,255,255,0.1)',letterSpacing:2 }}>TARGET</div>
-          {selectedEnemy ? (
-            <>
-              <div style={{ display:'flex',alignItems:'center',gap:3 }}>
-                <div style={{ width:4,height:4,borderRadius:'50%',background:selectedEnemy.hp>0?(FACTION_COLOR[selectedEnemy.faction]||RED):'rgba(255,255,255,0.1)',flexShrink:0 }}/>
-                <span style={{ fontFamily:ORB,fontSize:6,color:selectedEnemy.hp>0?(FACTION_COLOR[selectedEnemy.faction]||'rgba(255,255,255,0.47)'):'rgba(255,255,255,0.13)',letterSpacing:1,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{selectedEnemy.faction||'?'}</span>
-              </div>
-              <div style={{ padding:'4px',background:'rgba(255,255,255,0.01)',borderRadius:2,border:'1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.1)',letterSpacing:1,marginBottom:2 }}>HP</div>
-                <MiniBar val={selectedEnemy.hp} max={selectedEnemy.hpMax||selectedEnemy.hp} color={FACTION_COLOR[selectedEnemy.faction]||RED} h={4} />
-                <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.13)',marginTop:2 }}>{selectedEnemy.hp}/{selectedEnemy.hpMax||selectedEnemy.hp}</div>
-              </div>
-              {(selectedEnemy.shields||0) > 0 && (
-                <div style={{ padding:'4px',background:'rgba(0,191,255,0.02)',borderRadius:2,border:'1px solid rgba(0,191,255,0.08)' }}>
-                  <div style={{ fontFamily:MONO,fontSize:5,color:BLUE+'77',letterSpacing:1,marginBottom:2 }}>SHIELDS</div>
-                  <MiniBar val={selectedEnemy.shields} max={selectedEnemy.shieldsMax||selectedEnemy.shields} color={BLUE} h={3} />
-                </div>
-              )}
-              <div style={{ padding:'4px',background:'rgba(255,255,255,0.01)',borderRadius:2,border:'1px solid rgba(255,255,255,0.04)' }}>
-                <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.1)',letterSpacing:1,marginBottom:2 }}>STATUS</div>
-                <div style={{ fontFamily:MONO,fontSize:8,color:enemyDispositionColor(selectedEnemy),letterSpacing:1 }}>{enemyDisposition(selectedEnemy)}</div>
-              </div>
-              <div style={{ fontFamily:MONO,fontSize:5,color:'rgba(255,255,255,0.17)',letterSpacing:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',marginTop:1 }}>{selectedEnemy.name}</div>
-            </>
-          ) : (
-            <div style={{ flex:1,display:'flex',alignItems:'center',justifyContent:'center' }}>
-              <div style={{ fontFamily:MONO,fontSize:6,color:'rgba(255,255,255,0.06)',textAlign:'center',lineHeight:1.8,letterSpacing:1 }}>SELECT{'\n'}TARGET</div>
-            </div>
-          )}
-        </div>
+        {/* RIGHT PANEL: Portrait comms */}
+        <PortraitPanel
+          selectedEnemy={selectedEnemy}
+          mabelLine={mabelLine}
+          mabelLoading={false}
+          commsLine={commsLine}
+          commsLoading={commsLoading2}
+          active={active}
+        />
 
       </div>
 
