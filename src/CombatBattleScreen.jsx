@@ -965,7 +965,14 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
           <div style={{ position:'absolute',inset:0,pointerEvents:'none',zIndex:41,background:'radial-gradient(ellipse at 50% 50%,transparent 48%,rgba(0,0,0,0.82) 100%)' }}/>
 
           {combatResult && (
-            <div key={combatResult.key} style={{ position:'absolute',left:'50%',top:'35%', fontFamily:ORB,fontSize:12,fontWeight:900, color:combatResult.color, textShadow:'0 0 20px '+combatResult.color, letterSpacing:3,whiteSpace:'nowrap', animation:'resultFloat 1.8s ease-out forwards', pointerEvents:'none',zIndex:50, transform:'translateX(-50%)' }}>
+            <div key={combatResult.key} style={{ position:'absolute',left:'50%',top:'32%',
+              fontFamily:ORB, fontSize:20, fontWeight:900,
+              color:combatResult.color,
+              textShadow:`0 0 28px ${combatResult.color}, 0 0 8px ${combatResult.color}88`,
+              letterSpacing:5, whiteSpace:'nowrap',
+              animation:'resultFloat 1.8s ease-out forwards',
+              pointerEvents:'none', zIndex:50,
+              transform:'translateX(-50%)' }}>
               {combatResult.txt}
             </div>
           )}
@@ -1144,6 +1151,7 @@ export default function CombatBattleScreen({ ctBrief, gs, tab, onSelectEnemy }) 
           mabelLoading={false}
           commsLine={commsLine}
           commsLoading={commsLoading2}
+          commsOpen={commsOpen}
           active={active}
         />
 
